@@ -1,4 +1,3 @@
-
 // API service for handling all external data sources
 interface SurfCondition {
   location: string;
@@ -10,6 +9,20 @@ interface SurfCondition {
   setsPerHour: number;
   temperature: number;
   lastUpdated: string;
+}
+
+interface WeatherData {
+  temperature: number;
+  feelsLike: number;
+  humidity: number;
+  pressure: number;
+  visibility: number;
+  windSpeed: number;
+  windDirection: string;
+  windGust: number;
+  weatherCondition: string;
+  weatherIcon: string;
+  uvIndex: number;
 }
 
 interface TideData {
@@ -34,15 +47,18 @@ interface WavePoolSlot {
 class ApiService {
   private surflineApiKey: string = '';
   private tidesApiKey: string = '';
+  private weatherApiKey: string = '';
   private baseUrls = {
     surfline: 'https://services.surfline.com/kbyg',
     noaa: 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter',
-    stormglass: 'https://api.stormglass.io/v2'
+    stormglass: 'https://api.stormglass.io/v2',
+    openweather: 'https://api.openweathermap.org/data/2.5'
   };
 
-  setApiKeys(keys: { surfline?: string; tides?: string }) {
+  setApiKeys(keys: { surfline?: string; tides?: string; weather?: string }) {
     if (keys.surfline) this.surflineApiKey = keys.surfline;
     if (keys.tides) this.tidesApiKey = keys.tides;
+    if (keys.weather) this.weatherApiKey = keys.weather;
   }
 
   async getSurfConditions(spotId: string): Promise<SurfCondition> {
@@ -63,6 +79,34 @@ class ApiService {
       return mockData;
     } catch (error) {
       console.error('Error fetching surf conditions:', error);
+      throw error;
+    }
+  }
+
+  async getWeatherData(spotId: string): Promise<WeatherData> {
+    try {
+      // Mock data for now - replace with actual API calls once keys are provided
+      const windDirections = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+      const conditions = ['Sunny', 'Partly Cloudy', 'Cloudy', 'Rainy', 'Foggy'];
+      
+      const mockWeather: WeatherData = {
+        temperature: Math.floor(Math.random() * 20) + 65,
+        feelsLike: Math.floor(Math.random() * 20) + 65,
+        humidity: Math.floor(Math.random() * 40) + 40,
+        pressure: Math.floor(Math.random() * 50) + 1000,
+        visibility: Math.floor(Math.random() * 10) + 5,
+        windSpeed: Math.floor(Math.random() * 15) + 5,
+        windDirection: windDirections[Math.floor(Math.random() * windDirections.length)],
+        windGust: Math.floor(Math.random() * 20) + 10,
+        weatherCondition: conditions[Math.floor(Math.random() * conditions.length)],
+        weatherIcon: 'sunny',
+        uvIndex: Math.floor(Math.random() * 11)
+      };
+      
+      console.log('Generated mock weather data for spot:', spotId, mockWeather);
+      return mockWeather;
+    } catch (error) {
+      console.error('Error fetching weather data:', error);
       throw error;
     }
   }
@@ -126,4 +170,4 @@ class ApiService {
 }
 
 export const apiService = new ApiService();
-export type { SurfCondition, TideData, WavePoolSlot };
+export type { SurfCondition, WeatherData, TideData, WavePoolSlot };

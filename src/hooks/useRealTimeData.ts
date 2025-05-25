@@ -1,7 +1,6 @@
-
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { apiService, SurfCondition, TideData, WavePoolSlot } from '@/services/apiService';
+import { apiService, SurfCondition, WeatherData, TideData, WavePoolSlot } from '@/services/apiService';
 
 // Hook for real-time surf conditions
 export const useSurfConditions = (spotId: string, refetchInterval: number = 30000) => {
@@ -10,6 +9,16 @@ export const useSurfConditions = (spotId: string, refetchInterval: number = 3000
     queryFn: () => apiService.getSurfConditions(spotId),
     refetchInterval,
     staleTime: 30000, // Consider data stale after 30 seconds
+  });
+};
+
+// Hook for real-time weather data
+export const useWeatherData = (spotId: string, refetchInterval: number = 300000) => {
+  return useQuery({
+    queryKey: ['weather-data', spotId],
+    queryFn: () => apiService.getWeatherData(spotId),
+    refetchInterval,
+    staleTime: 300000, // Consider data stale after 5 minutes
   });
 };
 
@@ -38,15 +47,12 @@ export const useRealTimeUpdates = () => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    // Set up WebSocket connection for real-time updates
     const setupWebSocket = () => {
-      // This would connect to a WebSocket server for live updates
       console.log('Setting up real-time data connection...');
       
-      // Simulate periodic updates
       const interval = setInterval(() => {
-        // Invalidate queries to trigger refetch
         queryClient.invalidateQueries({ queryKey: ['surf-conditions'] });
+        queryClient.invalidateQueries({ queryKey: ['weather-data'] });
       }, 30000);
 
       return () => clearInterval(interval);
@@ -58,21 +64,23 @@ export const useRealTimeUpdates = () => {
 
 // Hook for API key management
 export const useApiKeys = () => {
-  const setApiKeys = (keys: { surfline?: string; tides?: string }) => {
+  const setApiKeys = (keys: { surfline?: string; tides?: string; weather?: string }) => {
     apiService.setApiKeys(keys);
-    // Store keys in localStorage for persistence
     if (keys.surfline) localStorage.setItem('surfline-api-key', keys.surfline);
     if (keys.tides) localStorage.setItem('tides-api-key', keys.tides);
+    if (keys.weather) localStorage.setItem('weather-api-key', keys.weather);
   };
 
   const loadStoredKeys = () => {
     const surflineKey = localStorage.getItem('surfline-api-key');
     const tidesKey = localStorage.getItem('tides-api-key');
+    const weatherKey = localStorage.getItem('weather-api-key');
     
-    if (surflineKey || tidesKey) {
+    if (surflineKey || tidesKey || weatherKey) {
       apiService.setApiKeys({
         surfline: surflineKey || undefined,
-        tides: tidesKey || undefined
+        tides: tidesKey || undefined,
+        weather: weatherKey || undefined
       });
     }
   };
