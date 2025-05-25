@@ -1,7 +1,9 @@
 
 import React, { useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import RealTimeSurfCam from './RealTimeSurfCam';
+import { Tabs } from "@/components/ui/tabs";
+import SurfCamHeader from './SurfCamHeader';
+import SurfCamTabs from './SurfCamTabs';
+import SurfCamContent from './SurfCamContent';
 import { useRealTimeUpdates } from '@/hooks/useRealTimeData';
 
 const SurfCamDisplay: React.FC = () => {
@@ -32,32 +34,15 @@ const SurfCamDisplay: React.FC = () => {
   return (
     <section id="surf-cams" className="py-16">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-ocean-dark mb-4">Live Surf Cams</h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Check real-time conditions at top surf spots around the world with live data feeds. 
-            Track wave consistency, crowd levels, and get instant updates on surf conditions.
-          </p>
-        </div>
+        <SurfCamHeader />
 
         <div className="max-w-6xl mx-auto">
           <Tabs defaultValue="pipeline" onValueChange={setSelectedLocation}>
-            <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-8">
-              <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
-              <TabsTrigger value="mavericks">Mavericks</TabsTrigger>
-              <TabsTrigger value="snapper">Snapper Rocks</TabsTrigger>
-              <TabsTrigger value="jeffreys">Jeffreys Bay</TabsTrigger>
-            </TabsList>
-
-            {Object.entries(surfLocations).map(([key, location]) => (
-              <TabsContent key={key} value={key} className="mt-0">
-                <RealTimeSurfCam
-                  spotId={key}
-                  spotName={location.name}
-                  imageSrc={location.imageSrc}
-                />
-              </TabsContent>
-            ))}
+            <SurfCamTabs 
+              surfLocations={surfLocations}
+              onLocationChange={setSelectedLocation}
+            />
+            <SurfCamContent surfLocations={surfLocations} />
           </Tabs>
         </div>
       </div>
