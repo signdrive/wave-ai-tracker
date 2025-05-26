@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -5,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useSurfConditions, useWeatherData } from '@/hooks/useRealTimeData';
 import { RefreshCw, Thermometer, Wind, Users, Waves } from 'lucide-react';
 import WeatherWidget from './WeatherWidget';
+import SurfForecast from './SurfForecast';
 
 interface RealTimeSurfCamProps {
   spotId: string;
@@ -35,7 +37,7 @@ const RealTimeSurfCam: React.FC<RealTimeSurfCamProps> = ({ spotId, spotName, ima
         spotName={spotName}
       />
 
-      {/* Existing surf cam and conditions */}
+      {/* Current Surf Conditions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Surf Cam Video */}
         <div className="md:col-span-2">
@@ -163,6 +165,9 @@ const RealTimeSurfCam: React.FC<RealTimeSurfCamProps> = ({ spotId, spotName, ima
           </Card>
         </div>
       </div>
+
+      {/* 7-Day Surf Forecast */}
+      <SurfForecast spotId={spotId} spotName={spotName} />
     </div>
   );
 };

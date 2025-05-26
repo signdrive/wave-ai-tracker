@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { apiService, SurfCondition, WeatherData, TideData, WavePoolSlot } from '@/services/apiService';
+import { apiService, SurfCondition, WeatherData, TideData, WavePoolSlot, SurfForecast } from '@/services/apiService';
 
 // Hook for real-time surf conditions
 export const useSurfConditions = (spotId: string, refetchInterval: number = 30000) => {
@@ -19,6 +19,16 @@ export const useWeatherData = (spotId: string, refetchInterval: number = 300000)
     queryFn: () => apiService.getWeatherData(spotId),
     refetchInterval,
     staleTime: 300000, // Consider data stale after 5 minutes
+  });
+};
+
+// Hook for surf forecast data
+export const useSurfForecast = (spotId: string, refetchInterval: number = 600000) => {
+  return useQuery({
+    queryKey: ['surf-forecast', spotId],
+    queryFn: () => apiService.getSurfForecast(spotId),
+    refetchInterval,
+    staleTime: 600000, // Consider data stale after 10 minutes
   });
 };
 
@@ -53,6 +63,7 @@ export const useRealTimeUpdates = () => {
       const interval = setInterval(() => {
         queryClient.invalidateQueries({ queryKey: ['surf-conditions'] });
         queryClient.invalidateQueries({ queryKey: ['weather-data'] });
+        queryClient.invalidateQueries({ queryKey: ['surf-forecast'] });
       }, 30000);
 
       return () => clearInterval(interval);

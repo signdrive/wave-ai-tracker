@@ -44,6 +44,31 @@ interface WavePoolSlot {
   };
 }
 
+interface ForecastDay {
+  date: string;
+  timestamp: number;
+  waveHeight: {
+    min: number;
+    max: number;
+    avg: number;
+  };
+  period: number;
+  swellDirection: number; // degrees (0-360)
+  swellDirectionText: string;
+  windSpeed: number;
+  windDirection: string;
+  rating: number; // 1-5 stars
+  conditions: string;
+  bestTimes: string[];
+}
+
+interface SurfForecast {
+  spotId: string;
+  spotName: string;
+  generated: string;
+  days: ForecastDay[];
+}
+
 class ApiService {
   private surflineApiKey: string = '';
   private tidesApiKey: string = '';
@@ -167,7 +192,79 @@ class ApiService {
       throw error;
     }
   }
+
+  async getSurfForecast(spotId: string): Promise<SurfForecast> {
+    try {
+      const spotNames: Record<string, string> = {
+        pipeline: 'Pipeline, Oahu',
+        mavericks: 'Mavericks, California',
+        snapper: 'Snapper Rocks, Australia',
+        jeffreys: 'Jeffreys Bay, South Africa'
+      };
+
+      const swellDirections = [
+        { degrees: 0, text: 'N' },
+        { degrees: 45, text: 'NE' },
+        { degrees: 90, text: 'E' },
+        { degrees: 135, text: 'SE' },
+        { degrees: 180, text: 'S' },
+        { degrees: 225, text: 'SW' },
+        { degrees: 270, text: 'W' },
+        { degrees: 315, text: 'NW' }
+      ];
+
+      const conditions = ['Poor', 'Fair', 'Good', 'Very Good', 'Epic'];
+      const windDirections = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+
+      const mockForecast: SurfForecast = {
+        spotId,
+        spotName: spotNames[spotId] || `Spot ${spotId}`,
+        generated: new Date().toISOString(),
+        days: []
+      };
+
+      for (let i = 0; i < 7; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() + i);
+        
+        const swellDir = swellDirections[Math.floor(Math.random() * swellDirections.length)];
+        const minWave = Math.random() * 3 + 1;
+        const maxWave = minWave + Math.random() * 4 + 1;
+        const rating = Math.floor(Math.random() * 5) + 1;
+        
+        const bestTimes = [];
+        if (rating >= 3) {
+          bestTimes.push('6-9 AM');
+          if (rating >= 4) bestTimes.push('4-6 PM');
+        }
+
+        mockForecast.days.push({
+          date: date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+          timestamp: date.getTime(),
+          waveHeight: {
+            min: Number(minWave.toFixed(1)),
+            max: Number(maxWave.toFixed(1)),
+            avg: Number(((minWave + maxWave) / 2).toFixed(1))
+          },
+          period: Math.floor(Math.random() * 8) + 8,
+          swellDirection: swellDir.degrees,
+          swellDirectionText: swellDir.text,
+          windSpeed: Math.floor(Math.random() * 15) + 5,
+          windDirection: windDirections[Math.floor(Math.random() * windDirections.length)],
+          rating,
+          conditions: conditions[rating - 1],
+          bestTimes
+        });
+      }
+
+      console.log('Generated surf forecast for:', spotId, mockForecast);
+      return mockForecast;
+    } catch (error) {
+      console.error('Error fetching surf forecast:', error);
+      throw error;
+    }
+  }
 }
 
 export const apiService = new ApiService();
-export type { SurfCondition, WeatherData, TideData, WavePoolSlot };
+export type { SurfCondition, WeatherData, TideData, WavePoolSlot, SurfForecast, ForecastDay };
