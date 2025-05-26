@@ -264,6 +264,182 @@ class ApiService {
       throw error;
     }
   }
+
+  async getHistoricalWaveData(spotId: string, days: number) {
+    try {
+      const mockData = {
+        avgWaveHeight: 0,
+        maxWaveHeight: 0,
+        minWaveHeight: 0,
+        dailyData: [] as Array<{ date: string; waveHeight: number }>
+      };
+
+      let totalWaveHeight = 0;
+      let maxHeight = 0;
+      let minHeight = Infinity;
+
+      for (let i = days - 1; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        
+        const waveHeight = Math.random() * 8 + 1;
+        totalWaveHeight += waveHeight;
+        maxHeight = Math.max(maxHeight, waveHeight);
+        minHeight = Math.min(minHeight, waveHeight);
+
+        mockData.dailyData.push({
+          date: date.toISOString(),
+          waveHeight: Number(waveHeight.toFixed(1))
+        });
+      }
+
+      mockData.avgWaveHeight = totalWaveHeight / days;
+      mockData.maxWaveHeight = maxHeight;
+      mockData.minWaveHeight = minHeight;
+
+      console.log('Generated historical wave data for:', spotId, mockData);
+      return mockData;
+    } catch (error) {
+      console.error('Error fetching historical wave data:', error);
+      throw error;
+    }
+  }
+
+  async getHistoricalWindData(spotId: string, days: number) {
+    try {
+      const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+      const directionCounts: Record<string, number> = {};
+      
+      const mockData = {
+        avgWindSpeed: 0,
+        maxWindSpeed: 0,
+        dominantDirection: '',
+        dailyData: [] as Array<{ date: string; windSpeed: number; direction: string }>
+      };
+
+      let totalWindSpeed = 0;
+      let maxSpeed = 0;
+
+      for (let i = days - 1; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        
+        const windSpeed = Math.random() * 20 + 5;
+        const direction = directions[Math.floor(Math.random() * directions.length)];
+        
+        totalWindSpeed += windSpeed;
+        maxSpeed = Math.max(maxSpeed, windSpeed);
+        directionCounts[direction] = (directionCounts[direction] || 0) + 1;
+
+        mockData.dailyData.push({
+          date: date.toISOString(),
+          windSpeed: Number(windSpeed.toFixed(1)),
+          direction
+        });
+      }
+
+      mockData.avgWindSpeed = totalWindSpeed / days;
+      mockData.maxWindSpeed = maxSpeed;
+      mockData.dominantDirection = Object.keys(directionCounts).reduce((a, b) => 
+        directionCounts[a] > directionCounts[b] ? a : b
+      );
+
+      console.log('Generated historical wind data for:', spotId, mockData);
+      return mockData;
+    } catch (error) {
+      console.error('Error fetching historical wind data:', error);
+      throw error;
+    }
+  }
+
+  async getHistoricalCrowdData(spotId: string, days: number) {
+    try {
+      const timeSlots = ['6-9 AM', '9-12 PM', '12-3 PM', '3-6 PM', '6-9 PM'];
+      const slotCounts: Record<string, number> = {};
+      
+      const mockData = {
+        lowCrowdDays: 0,
+        moderateCrowdDays: 0,
+        highCrowdDays: 0,
+        bestTimeSlot: '',
+        dailyData: [] as Array<{ date: string; crowdLevel: number }>
+      };
+
+      for (let i = days - 1; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        
+        const crowdLevel = Math.random() * 100;
+        const timeSlot = timeSlots[Math.floor(Math.random() * timeSlots.length)];
+        
+        if (crowdLevel < 30) mockData.lowCrowdDays++;
+        else if (crowdLevel < 70) mockData.moderateCrowdDays++;
+        else mockData.highCrowdDays++;
+        
+        slotCounts[timeSlot] = (slotCounts[timeSlot] || 0) + (100 - crowdLevel);
+
+        mockData.dailyData.push({
+          date: date.toISOString(),
+          crowdLevel: Number(crowdLevel.toFixed(0))
+        });
+      }
+
+      mockData.bestTimeSlot = Object.keys(slotCounts).reduce((a, b) => 
+        slotCounts[a] > slotCounts[b] ? a : b
+      );
+
+      console.log('Generated historical crowd data for:', spotId, mockData);
+      return mockData;
+    } catch (error) {
+      console.error('Error fetching historical crowd data:', error);
+      throw error;
+    }
+  }
+
+  async getHistoricalTemperatureData(spotId: string, days: number) {
+    try {
+      const mockData = {
+        avgAirTemp: 0,
+        avgWaterTemp: 0,
+        tempRange: 0,
+        dailyData: [] as Array<{ date: string; airTemp: number; waterTemp: number }>
+      };
+
+      let totalAirTemp = 0;
+      let totalWaterTemp = 0;
+      let minTemp = Infinity;
+      let maxTemp = -Infinity;
+
+      for (let i = days - 1; i >= 0; i--) {
+        const date = new Date();
+        date.setDate(date.getDate() - i);
+        
+        const airTemp = Math.random() * 20 + 65;
+        const waterTemp = airTemp - Math.random() * 10 - 5;
+        
+        totalAirTemp += airTemp;
+        totalWaterTemp += waterTemp;
+        minTemp = Math.min(minTemp, Math.min(airTemp, waterTemp));
+        maxTemp = Math.max(maxTemp, Math.max(airTemp, waterTemp));
+
+        mockData.dailyData.push({
+          date: date.toISOString(),
+          airTemp: Number(airTemp.toFixed(1)),
+          waterTemp: Number(waterTemp.toFixed(1))
+        });
+      }
+
+      mockData.avgAirTemp = totalAirTemp / days;
+      mockData.avgWaterTemp = totalWaterTemp / days;
+      mockData.tempRange = maxTemp - minTemp;
+
+      console.log('Generated historical temperature data for:', spotId, mockData);
+      return mockData;
+    } catch (error) {
+      console.error('Error fetching historical temperature data:', error);
+      throw error;
+    }
+  }
 }
 
 export const apiService = new ApiService();

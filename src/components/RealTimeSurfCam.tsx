@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
@@ -7,6 +6,7 @@ import { useSurfConditions, useWeatherData } from '@/hooks/useRealTimeData';
 import { RefreshCw, Thermometer, Wind, Users, Waves } from 'lucide-react';
 import WeatherWidget from './WeatherWidget';
 import SurfForecast from './SurfForecast';
+import HistoricalCharts from './HistoricalCharts';
 
 interface RealTimeSurfCamProps {
   spotId: string;
@@ -168,6 +168,9 @@ const RealTimeSurfCam: React.FC<RealTimeSurfCamProps> = ({ spotId, spotName, ima
 
       {/* 7-Day Surf Forecast */}
       <SurfForecast spotId={spotId} spotName={spotName} />
+
+      {/* Historical Analytics Charts */}
+      <HistoricalCharts spotId={spotId} spotName={spotName} />
     </div>
   );
 };
