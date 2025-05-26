@@ -1,12 +1,17 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useSurfConditions, useWeatherData } from '@/hooks/useRealTimeData';
-import { RefreshCw, Thermometer, Wind, Users, Waves } from 'lucide-react';
+import { RefreshCw, Thermometer, Wind, Users, Waves, Bell } from 'lucide-react';
 import WeatherWidget from './WeatherWidget';
 import SurfForecast from './SurfForecast';
 import HistoricalCharts from './HistoricalCharts';
+import FavoriteButton from './FavoriteButton';
+import AlertPreferencesDialog from './AlertPreferencesDialog';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
 
 interface RealTimeSurfCamProps {
   spotId: string;
@@ -17,6 +22,13 @@ interface RealTimeSurfCamProps {
 const RealTimeSurfCam: React.FC<RealTimeSurfCamProps> = ({ spotId, spotName, imageSrc }) => {
   const { data: conditions, isLoading, error, isRefetching } = useSurfConditions(spotId);
   const { data: weatherData, isLoading: isWeatherLoading } = useWeatherData(spotId);
+  const { user } = useAuth();
+  const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
+  const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+
+  const handleAuthRequired = () => {
+    setIsAuthDialogOpen(true);
+  };
 
   if (error) {
     return (
@@ -63,6 +75,29 @@ const RealTimeSurfCam: React.FC<RealTimeSurfCamProps> = ({ spotId, spotName, ima
             </div>
 
             <CardContent className="p-4">
+              {/* Action Buttons */}
+              <div className="flex gap-2 mb-4">
+                <FavoriteButton 
+                  spotId={spotId} 
+                  spotName={spotName} 
+                  onAuthRequired={handleAuthRequired}
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (!user) {
+                      handleAuthRequired();
+                      return;
+                    }
+                    setIsAlertDialogOpen(true);
+                  }}
+                >
+                  <Bell className="w-4 h-4 mr-1" />
+                  Set Alerts
+                </Button>
+              </div>
+
               {isLoading ? (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {[...Array(4)].map((_, i) => (
@@ -171,6 +206,14 @@ const RealTimeSurfCam: React.FC<RealTimeSurfCamProps> = ({ spotId, spotName, ima
 
       {/* Historical Analytics Charts */}
       <HistoricalCharts spotId={spotId} spotName={spotName} />
+
+      {/* Alert Preferences Dialog */}
+      <AlertPreferencesDialog
+        open={isAlertDialogOpen}
+        onOpenChange={setIsAlertDialogOpen}
+        spotId={spotId}
+        spotName={spotName}
+      />
     </div>
   );
 };

@@ -9,7 +9,96 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      alert_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          max_crowd_level: number | null
+          max_wave_height: number | null
+          max_wind_speed: number | null
+          min_wave_height: number | null
+          notifications_enabled: boolean | null
+          preferred_wind_direction: string | null
+          spot_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          max_crowd_level?: number | null
+          max_wave_height?: number | null
+          max_wind_speed?: number | null
+          min_wave_height?: number | null
+          notifications_enabled?: boolean | null
+          preferred_wind_direction?: string | null
+          spot_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          max_crowd_level?: number | null
+          max_wave_height?: number | null
+          max_wind_speed?: number | null
+          min_wave_height?: number | null
+          notifications_enabled?: boolean | null
+          preferred_wind_direction?: string | null
+          spot_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_favorites: {
+        Row: {
+          created_at: string
+          id: string
+          spot_id: string
+          spot_name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          spot_id: string
+          spot_name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          spot_id?: string
+          spot_name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
