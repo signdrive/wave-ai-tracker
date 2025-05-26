@@ -156,8 +156,9 @@ const RealTimeSurfCam: React.FC<RealTimeSurfCamProps> = ({ spotId, spotName, ima
                         {conditions.waveHeight > 6 ? 'Epic' : conditions.waveHeight > 4 ? 'Good' : conditions.waveHeight > 2 ? 'Fair' : 'Small'} waves today
                       </p>
                     </div>
-                  </>
-                ) : null}
+                  </div>
+                </>
+              ) : null}
             </CardContent>
           </Card>
         </div>
