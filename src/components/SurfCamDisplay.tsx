@@ -4,10 +4,9 @@ import { Tabs } from "@/components/ui/tabs";
 import SurfCamHeader from './SurfCamHeader';
 import SurfCamTabs from './SurfCamTabs';
 import SurfCamContent from './SurfCamContent';
+import CameraValidationDashboard from './CameraValidationDashboard';
 import { useSurfSpots } from '@/hooks/useSurfSpots';
 import { useRealTimeUpdates } from '@/hooks/useRealTimeData';
-import { Button } from '@/components/ui/button';
-import { RefreshCw, CheckCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const SurfCamDisplay: React.FC = () => {
@@ -42,8 +41,6 @@ const SurfCamDisplay: React.FC = () => {
   }
 
   const totalCameras = Object.keys(surfLocations).length;
-  const validatedCameras = Object.keys(cameraStatuses).length;
-  const liveCameras = Object.values(cameraStatuses).filter(status => status.status === 'LIVE').length;
 
   return (
     <section id="surf-cams" className="py-16">
@@ -52,48 +49,12 @@ const SurfCamDisplay: React.FC = () => {
 
         <div className="max-w-6xl mx-auto">
           {/* Camera Status Dashboard */}
-          <div className="mb-6 p-4 bg-sand/30 rounded-lg">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <div className="flex flex-wrap gap-4 text-sm">
-                <span className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  Live: {liveCameras}
-                </span>
-                <span className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                  Placeholder: {Object.values(cameraStatuses).filter(s => s.status === 'PLACEHOLDER').length}
-                </span>
-                <span className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  Offline: {Object.values(cameraStatuses).filter(s => s.status === 'OFFLINE').length}
-                </span>
-                <span className="text-gray-600">
-                  Total: {totalCameras} spots
-                </span>
-              </div>
-              
-              <Button
-                onClick={validateAllCameras}
-                disabled={isValidating}
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                {isValidating ? (
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                ) : (
-                  <CheckCircle className="w-4 h-4" />
-                )}
-                {isValidating ? 'Validating...' : 'Validate All Cameras'}
-              </Button>
-            </div>
-            
-            {validatedCameras > 0 && (
-              <div className="mt-2 text-xs text-gray-600">
-                Last validation: {validatedCameras}/{totalCameras} cameras checked
-              </div>
-            )}
-          </div>
+          <CameraValidationDashboard
+            cameraStatuses={cameraStatuses}
+            totalCameras={totalCameras}
+            isValidating={isValidating}
+            onValidateAll={validateAllCameras}
+          />
 
           <Tabs defaultValue="pipeline" onValueChange={setSelectedLocation}>
             <SurfCamTabs 
