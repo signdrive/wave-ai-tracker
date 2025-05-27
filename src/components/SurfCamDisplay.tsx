@@ -4,64 +4,46 @@ import { Tabs } from "@/components/ui/tabs";
 import SurfCamHeader from './SurfCamHeader';
 import SurfCamTabs from './SurfCamTabs';
 import SurfCamContent from './SurfCamContent';
+import { useSurfSpots } from '@/hooks/useSurfSpots';
 import { useRealTimeUpdates } from '@/hooks/useRealTimeData';
+import { Button } from '@/components/ui/button';
+import { RefreshCw, CheckCircle } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const SurfCamDisplay: React.FC = () => {
   const [selectedLocation, setSelectedLocation] = useState<string>("pipeline");
+  const { 
+    surfLocations, 
+    isLoading, 
+    isValidating, 
+    validateAllCameras,
+    cameraStatuses 
+  } = useSurfSpots();
   
   // Set up real-time updates
   useRealTimeUpdates();
 
-  const surfLocations = {
-    "pipeline": {
-      name: "Pipeline, Oahu",
-      imageSrc: "https://images.unsplash.com/photo-1535682215715-c31b9db51592?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80"
-    },
-    "mavericks": {
-      name: "Mavericks, California",
-      imageSrc: "https://images.unsplash.com/photo-1565142453412-4e95c3ff81b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80"
-    },
-    "nazare": {
-      name: "Nazaré, Portugal",
-      imageSrc: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80"
-    },
-    "snapper": {
-      name: "Snapper Rocks, Australia",
-      imageSrc: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1173&q=80"
-    },
-    "jeffreys": {
-      name: "Jeffreys Bay, South Africa",
-      imageSrc: "https://images.unsplash.com/photo-1626450787667-830beef2d6bd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80"
-    },
-    "teahupoo": {
-      name: "Teahupo'o, Tahiti",
-      imageSrc: "https://images.unsplash.com/photo-1544551763-77ef2d0cfc6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80"
-    },
-    "uluwatu": {
-      name: "Uluwatu, Bali",
-      imageSrc: "https://images.unsplash.com/photo-1573160103600-f42db24835d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80"
-    },
-    "hossegor": {
-      name: "Hossegor, France",
-      imageSrc: "https://images.unsplash.com/photo-1505142468610-359e7d316be0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80"
-    },
-    "mundaka": {
-      name: "Mundaka, Spain",
-      imageSrc: "https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80"
-    },
-    "trestles": {
-      name: "Trestles, California",
-      imageSrc: "https://images.unsplash.com/photo-1505142468610-359e7d316be0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80"
-    },
-    "bells": {
-      name: "Bells Beach, Australia",
-      imageSrc: "https://images.unsplash.com/photo-1530549387789-4c1017266635?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80"
-    },
-    "ericeira": {
-      name: "Ericeira, Portugal",
-      imageSrc: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80"
-    }
-  };
+  if (isLoading) {
+    return (
+      <section id="surf-cams" className="py-16">
+        <div className="container mx-auto px-4">
+          <SurfCamHeader />
+          <div className="max-w-6xl mx-auto">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
+              {[...Array(12)].map((_, i) => (
+                <Skeleton key={i} className="h-10 w-full" />
+              ))}
+            </div>
+            <Skeleton className="h-96 w-full" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  const totalCameras = Object.keys(surfLocations).length;
+  const validatedCameras = Object.keys(cameraStatuses).length;
+  const liveCameras = Object.values(cameraStatuses).filter(status => status.status === 'LIVE').length;
 
   return (
     <section id="surf-cams" className="py-16">
@@ -69,12 +51,60 @@ const SurfCamDisplay: React.FC = () => {
         <SurfCamHeader />
 
         <div className="max-w-6xl mx-auto">
+          {/* Camera Status Dashboard */}
+          <div className="mb-6 p-4 bg-sand/30 rounded-lg">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div className="flex flex-wrap gap-4 text-sm">
+                <span className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  Live: {liveCameras}
+                </span>
+                <span className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                  Placeholder: {Object.values(cameraStatuses).filter(s => s.status === 'PLACEHOLDER').length}
+                </span>
+                <span className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                  Offline: {Object.values(cameraStatuses).filter(s => s.status === 'OFFLINE').length}
+                </span>
+                <span className="text-gray-600">
+                  Total: {totalCameras} spots
+                </span>
+              </div>
+              
+              <Button
+                onClick={validateAllCameras}
+                disabled={isValidating}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                {isValidating ? (
+                  <RefreshCw className="w-4 h-4 animate-spin" />
+                ) : (
+                  <CheckCircle className="w-4 h-4" />
+                )}
+                {isValidating ? 'Validating...' : 'Validate All Cameras'}
+              </Button>
+            </div>
+            
+            {validatedCameras > 0 && (
+              <div className="mt-2 text-xs text-gray-600">
+                Last validation: {validatedCameras}/{totalCameras} cameras checked
+              </div>
+            )}
+          </div>
+
           <Tabs defaultValue="pipeline" onValueChange={setSelectedLocation}>
             <SurfCamTabs 
               surfLocations={surfLocations}
               onLocationChange={setSelectedLocation}
+              cameraStatuses={cameraStatuses}
             />
-            <SurfCamContent surfLocations={surfLocations} />
+            <SurfCamContent 
+              surfLocations={surfLocations}
+              cameraStatuses={cameraStatuses}
+            />
           </Tabs>
         </div>
       </div>
