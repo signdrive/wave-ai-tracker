@@ -17,20 +17,38 @@ const SurfCamTabs: React.FC<SurfCamTabsProps> = ({ surfLocations, onLocationChan
     switch (key) {
       case 'pipeline': return 'Pipeline';
       case 'mavericks': return 'Mavericks';
+      case 'nazare': return 'Nazaré';
       case 'snapper': return 'Snapper Rocks';
       case 'jeffreys': return 'Jeffreys Bay';
+      case 'teahupoo': return "Teahupo'o";
+      case 'uluwatu': return 'Uluwatu';
+      case 'hossegor': return 'Hossegor';
+      case 'mundaka': return 'Mundaka';
+      case 'trestles': return 'Trestles';
+      case 'bells': return 'Bells Beach';
+      case 'ericeira': return 'Ericeira';
       default: return key;
     }
   };
 
   return (
-    <TabsList className="grid grid-cols-2 md:grid-cols-4 mb-8">
-      {Object.keys(surfLocations).map((key) => (
-        <TabsTrigger key={key} value={key}>
-          {getTabLabel(key)}
-        </TabsTrigger>
-      ))}
-    </TabsList>
+    <div className="mb-8">
+      <TabsList className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 mb-4">
+        {Object.keys(surfLocations).slice(0, 6).map((key) => (
+          <TabsTrigger key={key} value={key} className="text-xs md:text-sm">
+            {getTabLabel(key)}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+      
+      <TabsList className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+        {Object.keys(surfLocations).slice(6).map((key) => (
+          <TabsTrigger key={key} value={key} className="text-xs md:text-sm">
+            {getTabLabel(key)}
+          </TabsTrigger>
+        ))}
+      </TabsList>
+    </div>
   );
 };
 
