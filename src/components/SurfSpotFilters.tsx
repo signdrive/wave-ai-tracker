@@ -13,6 +13,7 @@ interface FilterOptions {
   difficulty: string;
   waveType: string;
   breakType: string;
+  surfNow: boolean;
 }
 
 interface SurfSpotFiltersProps {
@@ -28,14 +29,18 @@ const SurfSpotFilters: React.FC<SurfSpotFiltersProps> = ({
   countries,
   onClearFilters
 }) => {
-  const handleFilterChange = (key: keyof FilterOptions, value: string) => {
+  const handleFilterChange = (key: keyof FilterOptions, value: string | boolean) => {
     onFiltersChange({
       ...filters,
       [key]: value
     });
   };
 
-  const activeFilterCount = Object.values(filters).filter(value => value && value !== 'all').length;
+  const activeFilterCount = Object.entries(filters).filter(([key, value]) => {
+    if (key === 'search') return value !== '';
+    if (key === 'surfNow') return value === true;
+    return value !== 'all';
+  }).length;
 
   return (
     <Card className="mb-6">

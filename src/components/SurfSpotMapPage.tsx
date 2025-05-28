@@ -2,12 +2,13 @@
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import SurfSpotMap from './SurfSpotMap';
 import SurfSpotFilters from './SurfSpotFilters';
 import SurfSpotList from './SurfSpotList';
+import MapPageHeader from './MapPageHeader';
+import ActiveFiltersDisplay from './ActiveFiltersDisplay';
+import SurfSpotStats from './SurfSpotStats';
 import { useSurfSpots } from '@/hooks/useSurfSpots';
-import { Map, List, LayoutGrid, Waves } from 'lucide-react';
 
 interface FilterOptions {
   search: string;
@@ -97,55 +98,14 @@ const SurfSpotMapPage: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-3xl font-bold text-ocean-dark">Global Surf Spots</h1>
-            <p className="text-gray-600 mt-1">
-              Discover {surfSpots.length} surf spots worldwide with live conditions
-              {filteredSpots.length !== surfSpots.length && (
-                <span> • {filteredSpots.length} matching filters</span>
-              )}
-            </p>
-          </div>
-          
-          {/* Action Buttons */}
-          <div className="flex items-center space-x-2">
-            <Button
-              variant={filters.surfNow ? 'default' : 'outline'}
-              size="sm"
-              onClick={handleSurfNowToggle}
-              className="mr-4"
-            >
-              <Waves className="w-4 h-4 mr-1" />
-              Surf Now
-            </Button>
-            
-            <Button
-              variant={viewMode === 'map' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewMode('map')}
-            >
-              <Map className="w-4 h-4 mr-1" />
-              Map
-            </Button>
-            <Button
-              variant={viewMode === 'split' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewMode('split')}
-            >
-              <LayoutGrid className="w-4 h-4 mr-1" />
-              Split
-            </Button>
-            <Button
-              variant={viewMode === 'list' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setViewMode('list')}
-            >
-              <List className="w-4 h-4 mr-1" />
-              List
-            </Button>
-          </div>
-        </div>
+        <MapPageHeader
+          totalSpots={surfSpots.length}
+          filteredSpots={filteredSpots.length}
+          viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          surfNowActive={filters.surfNow}
+          onSurfNowToggle={handleSurfNowToggle}
+        />
 
         {/* Enhanced Filters */}
         <SurfSpotFilters
@@ -156,21 +116,7 @@ const SurfSpotMapPage: React.FC = () => {
         />
         
         {/* Active Filters Display */}
-        {(filters.surfNow || filters.country !== 'all' || filters.difficulty !== 'all') && (
-          <div className="flex flex-wrap gap-2 mt-4">
-            {filters.surfNow && (
-              <Badge variant="secondary" className="bg-ocean/10 text-ocean-dark">
-                Surf Now Active
-              </Badge>
-            )}
-            {filters.country !== 'all' && (
-              <Badge variant="outline">{filters.country}</Badge>
-            )}
-            {filters.difficulty !== 'all' && (
-              <Badge variant="outline">{filters.difficulty}</Badge>
-            )}
-          </div>
-        )}
+        <ActiveFiltersDisplay filters={filters} />
       </div>
 
       {/* Content Layout */}
@@ -237,28 +183,11 @@ const SurfSpotMapPage: React.FC = () => {
       </div>
 
       {/* Quick Stats */}
-      <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="p-4">
-          <div className="text-2xl font-bold text-ocean">{surfSpots.length}</div>
-          <div className="text-sm text-gray-600">Total Spots</div>
-        </Card>
-        <Card className="p-4">
-          <div className="text-2xl font-bold text-green-600">
-            {surfSpots.filter(s => s.live_cam).length}
-          </div>
-          <div className="text-sm text-gray-600">Live Cams</div>
-        </Card>
-        <Card className="p-4">
-          <div className="text-2xl font-bold text-blue-600">{countries.length}</div>
-          <div className="text-sm text-gray-600">Countries</div>
-        </Card>
-        <Card className="p-4">
-          <div className="text-2xl font-bold text-orange-600">
-            {filteredSpots.filter(s => s.difficulty.toLowerCase().includes('beginner')).length}
-          </div>
-          <div className="text-sm text-gray-600">Beginner Spots</div>
-        </Card>
-      </div>
+      <SurfSpotStats 
+        surfSpots={surfSpots}
+        countries={countries}
+        filteredSpots={filteredSpots}
+      />
     </div>
   );
 };
