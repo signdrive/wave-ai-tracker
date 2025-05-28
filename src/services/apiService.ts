@@ -72,12 +72,13 @@ interface SurfForecast {
 class ApiService {
   private surflineApiKey: string = '';
   private tidesApiKey: string = '';
-  private weatherApiKey: string = '';
+  private weatherApiKey: string = '1ccbc1f726134bf499f222242252805';
   private baseUrls = {
     surfline: 'https://services.surfline.com/kbyg',
     noaa: 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter',
     stormglass: 'https://api.stormglass.io/v2',
-    openweather: 'https://api.openweathermap.org/data/2.5'
+    openweather: 'https://api.openweathermap.org/data/2.5',
+    weatherapi: 'https://api.weatherapi.com/v1'
   };
 
   setApiKeys(keys: { surfline?: string; tides?: string; weather?: string }) {
@@ -110,7 +111,36 @@ class ApiService {
 
   async getWeatherData(spotId: string): Promise<WeatherData> {
     try {
-      // Mock data for now - replace with actual API calls once keys are provided
+      // First try to get real weather data if we have coordinates
+      const spotCoordinates = this.getSpotCoordinates(spotId);
+      
+      if (spotCoordinates && this.weatherApiKey) {
+        const response = await fetch(
+          `${this.baseUrls.weatherapi}/current.json?key=${this.weatherApiKey}&q=${spotCoordinates.lat},${spotCoordinates.lon}&aqi=no`
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          const weatherData: WeatherData = {
+            temperature: Math.round(data.current.temp_f),
+            feelsLike: Math.round(data.current.feelslike_f),
+            humidity: data.current.humidity,
+            pressure: Math.round(data.current.pressure_mb),
+            visibility: Math.round(data.current.vis_miles),
+            windSpeed: Math.round(data.current.wind_mph),
+            windDirection: data.current.wind_dir,
+            windGust: Math.round(data.current.gust_mph || data.current.wind_mph * 1.2),
+            weatherCondition: data.current.condition.text,
+            weatherIcon: data.current.condition.icon,
+            uvIndex: data.current.uv
+          };
+          
+          console.log('Fetched real weather data for spot:', spotId, weatherData);
+          return weatherData;
+        }
+      }
+      
+      // Fallback to mock data
       const windDirections = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
       const conditions = ['Sunny', 'Partly Cloudy', 'Cloudy', 'Rainy', 'Foggy'];
       
@@ -134,6 +164,24 @@ class ApiService {
       console.error('Error fetching weather data:', error);
       throw error;
     }
+  }
+
+  private getSpotCoordinates(spotId: string): { lat: number; lon: number } | null {
+    // Basic coordinate mapping for popular surf spots
+    const spotCoordinates: Record<string, { lat: number; lon: number }> = {
+      'pipeline': { lat: 21.6597, lon: -158.0575 },
+      'mavericks': { lat: 37.4912, lon: -122.5008 },
+      'snapper': { lat: -28.1667, lon: 153.5500 },
+      'jeffreys': { lat: -34.0508, lon: 24.9094 },
+      'bells': { lat: -38.3667, lon: 144.2833 },
+      'cloudbreak': { lat: -17.8500, lon: 177.2000 },
+      'teahupoo': { lat: -17.8333, lon: -149.2667 },
+      'mundaka': { lat: 43.4167, lon: -2.7000 },
+      'uluwatu': { lat: -8.8292, lon: 115.0850 },
+      'trestles': { lat: 33.3900, lon: -117.5850 }
+    };
+    
+    return spotCoordinates[spotId.toLowerCase()] || null;
   }
 
   async getTideData(stationId: string, days: number = 3): Promise<TideData[]> {
