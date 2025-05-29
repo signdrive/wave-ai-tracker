@@ -28,7 +28,10 @@ const SurfCamTabs: React.FC<SurfCamTabsProps> = ({
           onClick={() => onLocationChange(id)}
         >
           <div className="absolute top-1 right-1">
-            <CameraStatusIndicator status={cameraStatuses[id]} size="sm" />
+            <CameraStatusIndicator 
+              status={cameraStatuses[id]} 
+              className="text-xs px-2 py-0.5"
+            />
           </div>
           
           <div className="text-center">
