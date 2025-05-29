@@ -44,7 +44,7 @@ const SurfSpotMapPage: React.FC = () => {
     return uniqueCountries.sort();
   }, [surfSpots]);
 
-  // Enhanced filtering logic with performance optimization
+  // Simplified filtering logic
   const filteredSpots = useMemo(() => {
     return surfSpots.filter(spot => {
       // Text search
@@ -70,20 +70,19 @@ const SurfSpotMapPage: React.FC = () => {
         if (!spot.wave_type.toLowerCase().includes(filters.waveType.toLowerCase())) return false;
       }
 
-      // "Surf Now" filter - enhanced logic
+      // "Surf Now" filter - simplified logic
       if (filters.surfNow) {
         const hasLiveCam = !!spot.live_cam;
         const isNotExpert = !spot.difficulty.toLowerCase().includes('expert');
-        const isAccessible = !spot.crowd_factor.toLowerCase().includes('locals only');
         
-        if (!hasLiveCam || !isNotExpert || !isAccessible) return false;
+        if (!hasLiveCam || !isNotExpert) return false;
       }
 
       return true;
     });
   }, [surfSpots, filters]);
 
-  // Optimized filter change handler
+  // Filter change handlers
   const handleFiltersChange = useCallback((newFilters: FilterOptions) => {
     setFilters(newFilters);
   }, []);
@@ -131,7 +130,7 @@ const SurfSpotMapPage: React.FC = () => {
           onSurfNowToggle={handleSurfNowToggle}
         />
 
-        {/* Enhanced Filters */}
+        {/* Filters */}
         <SurfSpotFilters
           filters={filters}
           onFiltersChange={handleFiltersChange}
@@ -206,7 +205,7 @@ const SurfSpotMapPage: React.FC = () => {
         )}
       </div>
 
-      {/* Enhanced Quick Stats */}
+      {/* Stats */}
       <SurfSpotStats 
         surfSpots={surfSpots}
         countries={countries}
