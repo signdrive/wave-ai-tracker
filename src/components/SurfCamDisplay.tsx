@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Tabs } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs";
 import SurfCamHeader from './SurfCamHeader';
 import SurfCamTabs from './SurfCamTabs';
 import SurfCamContent from './SurfCamContent';
@@ -57,15 +57,19 @@ const SurfCamDisplay: React.FC = () => {
           />
 
           <Tabs defaultValue="pipeline" onValueChange={setSelectedLocation}>
-            <SurfCamTabs 
-              surfLocations={surfLocations}
-              onLocationChange={setSelectedLocation}
-              cameraStatuses={cameraStatuses}
-            />
-            <SurfCamContent 
-              surfLocations={surfLocations}
-              cameraStatuses={cameraStatuses}
-            />
+            <TabsList className="grid w-full grid-cols-6 mb-8">
+              <SurfCamTabs 
+                surfLocations={surfLocations}
+                onLocationChange={setSelectedLocation}
+                cameraStatuses={cameraStatuses}
+              />
+            </TabsList>
+            <TabsContent value={selectedLocation} className="space-y-4">
+              <SurfCamContent 
+                surfLocations={surfLocations}
+                cameraStatuses={cameraStatuses}
+              />
+            </TabsContent>
           </Tabs>
         </div>
       </div>

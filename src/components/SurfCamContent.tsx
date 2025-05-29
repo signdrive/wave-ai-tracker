@@ -2,34 +2,25 @@
 import React from 'react';
 import { TabsContent } from "@/components/ui/tabs";
 import RealTimeSurfCam from './RealTimeSurfCam';
-import { CameraValidationResult } from '@/utils/cameraValidation';
-
-interface SurfLocation {
-  name: string;
-  imageSrc: string;
-  metadata?: {
-    [key: string]: any;
-  };
-}
 
 interface SurfCamContentProps {
-  surfLocations: Record<string, SurfLocation>;
-  cameraStatuses?: Record<string, CameraValidationResult>;
+  surfLocations: Record<string, any>;
+  cameraStatuses: Record<string, any>;
 }
 
-const SurfCamContent: React.FC<SurfCamContentProps> = ({ 
-  surfLocations, 
-  cameraStatuses = {} 
+const SurfCamContent: React.FC<SurfCamContentProps> = ({
+  surfLocations,
+  cameraStatuses
 }) => {
   return (
     <>
-      {Object.entries(surfLocations).map(([key, location]) => (
-        <TabsContent key={key} value={key} className="mt-0">
+      {Object.entries(surfLocations).map(([spotId, location]) => (
+        <TabsContent key={spotId} value={spotId} className="mt-4">
           <RealTimeSurfCam
-            spotId={key}
+            spotId={spotId}
             spotName={location.name}
             imageSrc={location.imageSrc}
-            cameraStatus={cameraStatuses[key]}
+            cameraStatus={cameraStatuses[spotId]}
             metadata={location.metadata}
           />
         </TabsContent>
