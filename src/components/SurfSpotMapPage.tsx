@@ -9,7 +9,6 @@ import MapPageHeader from './MapPageHeader';
 import ActiveFiltersDisplay from './ActiveFiltersDisplay';
 import SurfSpotStats from './SurfSpotStats';
 import { useSurfSpots } from '@/hooks/useSurfSpots';
-import { useSurfConditions } from '@/hooks/useRealTimeData';
 
 interface FilterOptions {
   search: string;
@@ -69,70 +68,6 @@ const SurfSpotMapPage: React.FC = () => {
       // Wave type filter
       if (filters.waveType !== 'all') {
         if (!spot.wave_type.toLowerCase().includes(filters.waveType.toLowerCase())) return false;
-      }
-
-      // Break type filter
-      if (filters.breakType !== 'all') {
-        if (!spot.wave_type.toLowerCase().includes(filters.breakType.toLowerCase())) return false;
-      }
-
-      // Wave height filter (simulated based on spot characteristics)
-      if (filters.waveHeight !== 'all') {
-        const isExpertSpot = spot.difficulty.toLowerCase().includes('expert');
-        const isAdvancedSpot = spot.difficulty.toLowerCase().includes('advanced');
-        
-        switch (filters.waveHeight) {
-          case 'small':
-            if (isExpertSpot || isAdvancedSpot) return false;
-            break;
-          case 'medium':
-            if (isExpertSpot) return false;
-            break;
-          case 'large':
-            if (!isAdvancedSpot && !isExpertSpot) return false;
-            break;
-          case 'huge':
-            if (!isExpertSpot) return false;
-            break;
-        }
-      }
-
-      // Wind direction filter (simplified logic)
-      if (filters.windDirection !== 'all') {
-        const bestWind = spot.best_wind.toLowerCase();
-        switch (filters.windDirection) {
-          case 'offshore':
-            if (!bestWind.includes('offshore') && !bestWind.includes('land')) return false;
-            break;
-          case 'onshore':
-            if (!bestWind.includes('onshore') && !bestWind.includes('sea')) return false;
-            break;
-          case 'cross':
-            if (!bestWind.includes('cross') && !bestWind.includes('side')) return false;
-            break;
-          case 'calm':
-            if (!bestWind.includes('light') && !bestWind.includes('calm')) return false;
-            break;
-        }
-      }
-
-      // Crowd level filter
-      if (filters.crowdLevel !== 'all') {
-        const crowdFactor = spot.crowd_factor.toLowerCase();
-        switch (filters.crowdLevel) {
-          case 'empty':
-            if (!crowdFactor.includes('low') && !crowdFactor.includes('empty')) return false;
-            break;
-          case 'light':
-            if (!crowdFactor.includes('light') && !crowdFactor.includes('medium-low')) return false;
-            break;
-          case 'moderate':
-            if (!crowdFactor.includes('medium') && !crowdFactor.includes('moderate')) return false;
-            break;
-          case 'crowded':
-            if (!crowdFactor.includes('high') && !crowdFactor.includes('busy')) return false;
-            break;
-        }
       }
 
       // "Surf Now" filter - enhanced logic
