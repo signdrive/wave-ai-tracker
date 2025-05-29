@@ -7,6 +7,8 @@ import { useRealTimeUpdates } from '@/hooks/useRealTimeData';
 const TideChart: React.FC = () => {
   const [selectedDay, setSelectedDay] = useState<string>('today');
   
+  console.log('TideChart rendering with selectedDay:', selectedDay);
+  
   // Set up real-time updates
   useRealTimeUpdates();
 
@@ -34,7 +36,7 @@ const TideChart: React.FC = () => {
         </div>
 
         <div className="max-w-5xl mx-auto">
-          <Tabs defaultValue="today" onValueChange={setSelectedDay}>
+          <Tabs value={selectedDay} onValueChange={setSelectedDay}>
             <TabsList className="grid grid-cols-3 mb-8">
               <TabsTrigger value="today">{dateLabels.today}</TabsTrigger>
               <TabsTrigger value="tomorrow">{dateLabels.tomorrow}</TabsTrigger>
