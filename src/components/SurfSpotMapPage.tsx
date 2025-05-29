@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import SurfSpotMap from './SurfSpotMap';
@@ -9,6 +9,7 @@ import MapPageHeader from './MapPageHeader';
 import ActiveFiltersDisplay from './ActiveFiltersDisplay';
 import SurfSpotStats from './SurfSpotStats';
 import { useSurfSpots } from '@/hooks/useSurfSpots';
+import { useSurfConditions } from '@/hooks/useRealTimeData';
 
 interface FilterOptions {
   search: string;
@@ -17,6 +18,9 @@ interface FilterOptions {
   waveType: string;
   breakType: string;
   surfNow: boolean;
+  waveHeight: string;
+  windDirection: string;
+  crowdLevel: string;
 }
 
 const SurfSpotMapPage: React.FC = () => {
@@ -29,58 +33,143 @@ const SurfSpotMapPage: React.FC = () => {
     difficulty: 'all',
     waveType: 'all',
     breakType: 'all',
-    surfNow: false
+    surfNow: false,
+    waveHeight: 'all',
+    windDirection: 'all',
+    crowdLevel: 'all'
   });
 
-  // Get unique countries for filter dropdown
+  // Memoized countries list
   const countries = useMemo(() => {
     const uniqueCountries = [...new Set(surfSpots.map(spot => spot.country))];
     return uniqueCountries.sort();
   }, [surfSpots]);
 
-  // Filter spots based on current filters
+  // Enhanced filtering logic with performance optimization
   const filteredSpots = useMemo(() => {
     return surfSpots.filter(spot => {
-      const matchesSearch = filters.search === '' || 
-        spot.full_name.toLowerCase().includes(filters.search.toLowerCase()) ||
-        spot.country.toLowerCase().includes(filters.search.toLowerCase());
-      
-      const matchesCountry = filters.country === 'all' || spot.country === filters.country;
-      
-      const matchesDifficulty = filters.difficulty === 'all' || 
-        spot.difficulty.toLowerCase().includes(filters.difficulty);
-      
-      const matchesBreakType = filters.breakType === 'all' || 
-        spot.wave_type.toLowerCase().includes(filters.breakType);
-      
-      const matchesWaveType = filters.waveType === 'all' || 
-        spot.wave_type.toLowerCase().includes(filters.waveType);
+      // Text search
+      if (filters.search !== '') {
+        const searchTerm = filters.search.toLowerCase();
+        const matchesSearch = spot.full_name.toLowerCase().includes(searchTerm) ||
+          spot.country.toLowerCase().includes(searchTerm) ||
+          spot.state?.toLowerCase().includes(searchTerm) ||
+          spot.wave_type.toLowerCase().includes(searchTerm);
+        if (!matchesSearch) return false;
+      }
 
-      // "Surf Now" filter - spots with good conditions (simplified logic)
-      const matchesSurfNow = !filters.surfNow || (
-        spot.live_cam && // Has live cam for verification
-        !spot.difficulty.toLowerCase().includes('expert') // Not expert-only
-      );
+      // Country filter
+      if (filters.country !== 'all' && spot.country !== filters.country) return false;
 
-      return matchesSearch && matchesCountry && matchesDifficulty && 
-             matchesBreakType && matchesWaveType && matchesSurfNow;
+      // Difficulty filter
+      if (filters.difficulty !== 'all') {
+        if (!spot.difficulty.toLowerCase().includes(filters.difficulty.toLowerCase())) return false;
+      }
+
+      // Wave type filter
+      if (filters.waveType !== 'all') {
+        if (!spot.wave_type.toLowerCase().includes(filters.waveType.toLowerCase())) return false;
+      }
+
+      // Break type filter
+      if (filters.breakType !== 'all') {
+        if (!spot.wave_type.toLowerCase().includes(filters.breakType.toLowerCase())) return false;
+      }
+
+      // Wave height filter (simulated based on spot characteristics)
+      if (filters.waveHeight !== 'all') {
+        const isExpertSpot = spot.difficulty.toLowerCase().includes('expert');
+        const isAdvancedSpot = spot.difficulty.toLowerCase().includes('advanced');
+        
+        switch (filters.waveHeight) {
+          case 'small':
+            if (isExpertSpot || isAdvancedSpot) return false;
+            break;
+          case 'medium':
+            if (isExpertSpot) return false;
+            break;
+          case 'large':
+            if (!isAdvancedSpot && !isExpertSpot) return false;
+            break;
+          case 'huge':
+            if (!isExpertSpot) return false;
+            break;
+        }
+      }
+
+      // Wind direction filter (simplified logic)
+      if (filters.windDirection !== 'all') {
+        const bestWind = spot.best_wind.toLowerCase();
+        switch (filters.windDirection) {
+          case 'offshore':
+            if (!bestWind.includes('offshore') && !bestWind.includes('land')) return false;
+            break;
+          case 'onshore':
+            if (!bestWind.includes('onshore') && !bestWind.includes('sea')) return false;
+            break;
+          case 'cross':
+            if (!bestWind.includes('cross') && !bestWind.includes('side')) return false;
+            break;
+          case 'calm':
+            if (!bestWind.includes('light') && !bestWind.includes('calm')) return false;
+            break;
+        }
+      }
+
+      // Crowd level filter
+      if (filters.crowdLevel !== 'all') {
+        const crowdFactor = spot.crowd_factor.toLowerCase();
+        switch (filters.crowdLevel) {
+          case 'empty':
+            if (!crowdFactor.includes('low') && !crowdFactor.includes('empty')) return false;
+            break;
+          case 'light':
+            if (!crowdFactor.includes('light') && !crowdFactor.includes('medium-low')) return false;
+            break;
+          case 'moderate':
+            if (!crowdFactor.includes('medium') && !crowdFactor.includes('moderate')) return false;
+            break;
+          case 'crowded':
+            if (!crowdFactor.includes('high') && !crowdFactor.includes('busy')) return false;
+            break;
+        }
+      }
+
+      // "Surf Now" filter - enhanced logic
+      if (filters.surfNow) {
+        const hasLiveCam = !!spot.live_cam;
+        const isNotExpert = !spot.difficulty.toLowerCase().includes('expert');
+        const isAccessible = !spot.crowd_factor.toLowerCase().includes('locals only');
+        
+        if (!hasLiveCam || !isNotExpert || !isAccessible) return false;
+      }
+
+      return true;
     });
   }, [surfSpots, filters]);
 
-  const handleClearFilters = () => {
+  // Optimized filter change handler
+  const handleFiltersChange = useCallback((newFilters: FilterOptions) => {
+    setFilters(newFilters);
+  }, []);
+
+  const handleClearFilters = useCallback(() => {
     setFilters({
       search: '',
       country: 'all',
       difficulty: 'all',
       waveType: 'all',
       breakType: 'all',
-      surfNow: false
+      surfNow: false,
+      waveHeight: 'all',
+      windDirection: 'all',
+      crowdLevel: 'all'
     });
-  };
+  }, []);
 
-  const handleSurfNowToggle = () => {
+  const handleSurfNowToggle = useCallback(() => {
     setFilters(prev => ({ ...prev, surfNow: !prev.surfNow }));
-  };
+  }, []);
 
   if (isLoading) {
     return (
@@ -110,7 +199,7 @@ const SurfSpotMapPage: React.FC = () => {
         {/* Enhanced Filters */}
         <SurfSpotFilters
           filters={filters}
-          onFiltersChange={setFilters}
+          onFiltersChange={handleFiltersChange}
           countries={countries}
           onClearFilters={handleClearFilters}
         />
@@ -133,7 +222,7 @@ const SurfSpotMapPage: React.FC = () => {
                   <div className="flex items-center space-x-2">
                     {filters.surfNow && (
                       <Badge className="bg-green-500">
-                        Live Conditions
+                        🏄‍♂️ Live Conditions
                       </Badge>
                     )}
                     <Badge variant="outline">
@@ -182,7 +271,7 @@ const SurfSpotMapPage: React.FC = () => {
         )}
       </div>
 
-      {/* Quick Stats */}
+      {/* Enhanced Quick Stats */}
       <SurfSpotStats 
         surfSpots={surfSpots}
         countries={countries}
