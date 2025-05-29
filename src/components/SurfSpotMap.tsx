@@ -6,7 +6,6 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { SurfSpot } from '@/types/surfSpots';
 import SurfSpotPopup from './SurfSpotPopup';
-import MapControls from './MapControls';
 import { useSurfSpots } from '@/hooks/useSurfSpots';
 
 // Custom surf spot marker icons with dynamic colors based on conditions
@@ -107,7 +106,7 @@ const SurfSpotMap: React.FC<SurfSpotMapProps> = ({
         center={mapCenter}
         zoom={mapZoom}
         className="w-full h-full"
-        zoomControl={false}
+        zoomControl={true}
         maxZoom={18}
         minZoom={2}
         worldCopyJump={true}
@@ -117,8 +116,6 @@ const SurfSpotMap: React.FC<SurfSpotMapProps> = ({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           maxZoom={18}
         />
-        
-        <MapControls />
         
         <MarkerClusterGroup
           chunkedLoading
