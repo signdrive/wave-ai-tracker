@@ -65,6 +65,17 @@ export const useMapMarkers = ({
       return;
     }
 
+    // Validate map instance before proceeding
+    try {
+      if (!mapInstance.getContainer() || !mapInstance._loaded) {
+        console.warn('⚠️ Map instance is not ready for marker creation');
+        return;
+      }
+    } catch (error) {
+      console.warn('⚠️ Map validation failed:', error);
+      return;
+    }
+
     console.log('✅ All prerequisites met, starting marker creation...');
     isCreatingMarkersRef.current = true;
 
@@ -99,31 +110,33 @@ export const useMapMarkers = ({
 
         console.log(`🎉 Marker creation complete: ${successCount}/${spots.length} markers created`);
 
-        // Fit bounds if we have markers
+        // Fit bounds if we have markers - with better validation
         if (successCount > 0 && bounds.isValid()) {
           setTimeout(() => {
             try {
-              if (mapInstance && mapInstance.getContainer()) {
+              if (mapInstance && mapInstance.getContainer() && mapInstance._loaded) {
                 mapInstance.fitBounds(bounds, FIT_BOUNDS_CONFIG);
                 console.log('🔍 Map bounds fitted');
+              } else {
+                console.warn('⚠️ Map not ready for fitBounds');
               }
             } catch (error) {
               console.error('❌ Error fitting bounds:', error);
             }
-          }, 100);
+          }, 200);
         }
 
-        // Force map refresh
+        // Force map refresh - with validation
         setTimeout(() => {
           try {
-            if (mapInstance && mapInstance.getContainer()) {
+            if (mapInstance && mapInstance.getContainer() && mapInstance._loaded) {
               mapInstance.invalidateSize();
               console.log('🔄 Map size invalidated');
             }
           } catch (error) {
             console.warn('⚠️ Error invalidating map size:', error);
           }
-        }, 200);
+        }, 300);
 
       } catch (error) {
         console.error('❌ Critical error in marker creation:', error);

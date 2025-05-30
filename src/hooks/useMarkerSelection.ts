@@ -38,6 +38,17 @@ export const useMarkerSelection = ({
 
     console.log(`🎯 Updating selection for spot: ${selectedSpotId}`);
 
+    // Validate map instance before proceeding
+    try {
+      if (!mapInstance.getContainer() || !mapInstance._loaded) {
+        console.warn('⚠️ Map instance is not ready or has been destroyed');
+        return;
+      }
+    } catch (error) {
+      console.warn('⚠️ Map instance validation failed:', error);
+      return;
+    }
+
     const createDefaultIcon = () => {
       return L.icon({
         iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
@@ -65,13 +76,29 @@ export const useMarkerSelection = ({
       }
     });
 
-    // Center on selected spot
+    // Center on selected spot with additional validation
     const selectedSpot = spots.find(s => s.id === selectedSpotId);
     if (selectedSpot) {
       const lat = Number(selectedSpot.lat);
       const lon = Number(selectedSpot.lon);
       if (isValidCoordinate(lat, lon)) {
-        mapInstance.setView([lat, lon], 12, { animate: true });
+        try {
+          // Double-check map is still valid before setView
+          if (mapInstance.getContainer() && mapInstance._loaded) {
+            setTimeout(() => {
+              try {
+                if (mapInstance.getContainer() && mapInstance._loaded) {
+                  mapInstance.setView([lat, lon], 12, { animate: true });
+                  console.log(`✅ Map centered on ${selectedSpot.full_name}`);
+                }
+              } catch (setViewError) {
+                console.warn('⚠️ Error in delayed setView:', setViewError);
+              }
+            }, 100);
+          }
+        } catch (error) {
+          console.warn('⚠️ Error setting map view:', error);
+        }
       }
     }
   }, [selectedSpotId, spots, mapInstance, markersMap]);
