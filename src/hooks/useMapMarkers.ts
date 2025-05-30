@@ -134,14 +134,12 @@ export const useMapMarkers = ({
       }
     }
 
-    // Final verification with detailed check
+    // Final verification without accessing private properties
     setTimeout(() => {
       const layerCount = layerGroup.getLayers().length;
-      const mapLayerCount = mapInstance.eachLayer ? Object.keys(mapInstance._layers || {}).length : 'unknown';
       
       console.log(`🔍 FINAL VERIFICATION:`, {
         layersInLayerGroup: layerCount,
-        totalMapLayers: mapLayerCount,
         markersInRef: markersRef.current.size,
         success: layerCount > 0
       });
