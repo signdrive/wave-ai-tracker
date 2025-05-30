@@ -43,16 +43,10 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
     }))
   });
 
+  // Always call hooks in the same order - no conditional calls
   const { mapRef, mapInstanceRef, layerGroupRef, isMapReady } = useMapInitialization();
   
-  console.log('🗺️ Map initialization state:', {
-    hasMapRef: !!mapRef.current,
-    hasMapInstance: !!mapInstanceRef.current,
-    hasLayerGroup: !!layerGroupRef.current,
-    isMapReady
-  });
-
-  // Use the simplified markers hook
+  // Always call useMapMarkers - let it handle the conditional logic internally
   useMapMarkers({
     mapInstance: mapInstanceRef.current,
     layerGroup: layerGroupRef.current,
@@ -60,6 +54,13 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
     isLoading,
     onSpotClick,
     selectedSpotId,
+    isMapReady
+  });
+
+  console.log('🗺️ Map initialization state:', {
+    hasMapRef: !!mapRef.current,
+    hasMapInstance: !!mapInstanceRef.current,
+    hasLayerGroup: !!layerGroupRef.current,
     isMapReady
   });
 
