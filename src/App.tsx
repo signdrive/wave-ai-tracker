@@ -9,6 +9,8 @@ import Index from "./pages/Index";
 import MapPage from "./pages/MapPage";
 import PremiumPage from "./pages/PremiumPage";
 import NotFound from "./pages/NotFound";
+import OfflineIndicator from "./components/OfflineIndicator";
+import PWAInstallPrompt from "./components/PWAInstallPrompt";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +23,8 @@ const App = () => {
         <TooltipProvider>
           <Toaster />
           <Sonner />
+          <OfflineIndicator />
+          <PWAInstallPrompt />
           <BrowserRouter>
             <div className="min-h-screen w-full transition-colors duration-300">
               <Routes>
