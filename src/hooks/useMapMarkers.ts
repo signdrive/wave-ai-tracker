@@ -20,6 +20,7 @@ interface DatabaseSurfSpot {
 
 interface UseMapMarkersProps {
   mapInstance: L.Map | null;
+  layerGroup: L.LayerGroup | null;
   spots: DatabaseSurfSpot[];
   isLoading: boolean;
   onSpotClick?: (spotId: string) => void;
@@ -28,26 +29,18 @@ interface UseMapMarkersProps {
 
 export const useMapMarkers = ({ 
   mapInstance, 
+  layerGroup,
   spots, 
   isLoading, 
   onSpotClick, 
   selectedSpotId 
 }: UseMapMarkersProps) => {
   const markersRef = useRef<Map<string, L.Marker>>(new Map());
-  const layerGroupRef = useRef<L.LayerGroup | null>(null);
   const highlightedIcon = createHighlightedIcon();
 
-  // Initialize layer group
   useEffect(() => {
-    if (mapInstance && !layerGroupRef.current) {
-      layerGroupRef.current = L.layerGroup().addTo(mapInstance);
-      console.log('✅ Layer group created');
-    }
-  }, [mapInstance]);
-
-  useEffect(() => {
-    if (!mapInstance || !layerGroupRef.current) {
-      console.log('🚫 Map or layer group not ready for adding markers');
+    if (!mapInstance || !layerGroup) {
+      console.log('🚫 Map instance or layer group not ready for adding markers');
       return;
     }
 
@@ -60,7 +53,7 @@ export const useMapMarkers = ({
 
     // Clear existing markers safely
     try {
-      layerGroupRef.current.clearLayers();
+      layerGroup.clearLayers();
       markersRef.current.clear();
       console.log('🧹 Cleared existing markers');
     } catch (error) {
@@ -102,13 +95,8 @@ export const useMapMarkers = ({
           icon: isSelected ? highlightedIcon : undefined
         });
 
-        if (!layerGroupRef.current) {
-          console.error('❌ Layer group lost while adding markers');
-          return;
-        }
-
-        // Add to layer group instead of directly to map
-        layerGroupRef.current.addLayer(marker);
+        // Add to layer group
+        layerGroup.addLayer(marker);
         
         // Store marker reference
         markersRef.current.set(spot.id, marker);
@@ -150,7 +138,7 @@ export const useMapMarkers = ({
       console.log('❗ No valid spots to fit bounds, keeping default view');
     }
 
-  }, [mapInstance, spots, isLoading, selectedSpotId, onSpotClick, highlightedIcon]);
+  }, [mapInstance, layerGroup, spots, isLoading, selectedSpotId, onSpotClick, highlightedIcon]);
 
   // Center map on selected spot
   useEffect(() => {

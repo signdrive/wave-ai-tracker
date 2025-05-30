@@ -31,10 +31,11 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
   onSpotClick,
   selectedSpotId
 }) => {
-  const { mapRef, mapInstanceRef } = useMapInitialization();
+  const { mapRef, mapInstanceRef, layerGroupRef } = useMapInitialization();
   
   useMapMarkers({
     mapInstance: mapInstanceRef.current,
+    layerGroup: layerGroupRef.current,
     spots,
     isLoading,
     onSpotClick,

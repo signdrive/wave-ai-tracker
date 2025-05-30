@@ -7,6 +7,7 @@ import { initializeLeafletIcons } from '@/utils/mapUtils';
 export const useMapInitialization = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
+  const layerGroupRef = useRef<L.LayerGroup | null>(null);
   const isInitializedRef = useRef(false);
 
   useEffect(() => {
@@ -28,6 +29,11 @@ export const useMapInitialization = () => {
       });
       
       mapInstanceRef.current = map;
+      
+      // Create layer group immediately after map creation
+      layerGroupRef.current = L.layerGroup().addTo(map);
+      console.log('✅ Layer group created and added to map');
+      
       isInitializedRef.current = true;
       console.log('✅ Map instance created');
 
@@ -62,7 +68,7 @@ export const useMapInitialization = () => {
         }
       }, 100);
 
-      console.log('✅ Map initialized successfully');
+      console.log('✅ Map initialized successfully with layer group');
 
     } catch (error) {
       console.error('❌ Error initializing map:', error);
@@ -71,19 +77,18 @@ export const useMapInitialization = () => {
 
     return () => {
       console.log('🧹 Cleaning up map...');
+      if (layerGroupRef.current) {
+        try {
+          layerGroupRef.current.clearLayers();
+          layerGroupRef.current = null;
+          console.log('✅ Layer group cleaned up');
+        } catch (error) {
+          console.warn('⚠️ Error cleaning up layer group:', error);
+        }
+      }
+      
       if (mapInstanceRef.current) {
         try {
-          // Clear all layers safely before removing map
-          mapInstanceRef.current.eachLayer((layer) => {
-            if (mapInstanceRef.current && layer) {
-              try {
-                mapInstanceRef.current.removeLayer(layer);
-              } catch (e) {
-                console.warn('⚠️ Error removing layer during cleanup:', e);
-              }
-            }
-          });
-          
           mapInstanceRef.current.remove();
           mapInstanceRef.current = null;
           isInitializedRef.current = false;
@@ -97,5 +102,5 @@ export const useMapInitialization = () => {
     };
   }, []);
 
-  return { mapRef, mapInstanceRef };
+  return { mapRef, mapInstanceRef, layerGroupRef };
 };
