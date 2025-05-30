@@ -67,7 +67,7 @@ export const useMapMarkers = ({
 
     // Validate map instance before proceeding
     try {
-      if (!mapInstance.getContainer() || !mapInstance._loaded) {
+      if (!mapInstance.getContainer()) {
         console.warn('⚠️ Map instance is not ready for marker creation');
         return;
       }
@@ -114,7 +114,7 @@ export const useMapMarkers = ({
         if (successCount > 0 && bounds.isValid()) {
           setTimeout(() => {
             try {
-              if (mapInstance && mapInstance.getContainer() && mapInstance._loaded) {
+              if (mapInstance && mapInstance.getContainer()) {
                 mapInstance.fitBounds(bounds, FIT_BOUNDS_CONFIG);
                 console.log('🔍 Map bounds fitted');
               } else {
@@ -129,7 +129,7 @@ export const useMapMarkers = ({
         // Force map refresh - with validation
         setTimeout(() => {
           try {
-            if (mapInstance && mapInstance.getContainer() && mapInstance._loaded) {
+            if (mapInstance && mapInstance.getContainer()) {
               mapInstance.invalidateSize();
               console.log('🔄 Map size invalidated');
             }

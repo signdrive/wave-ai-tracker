@@ -40,7 +40,7 @@ export const useMarkerSelection = ({
 
     // Validate map instance before proceeding
     try {
-      if (!mapInstance.getContainer() || !mapInstance._loaded) {
+      if (!mapInstance.getContainer()) {
         console.warn('⚠️ Map instance is not ready or has been destroyed');
         return;
       }
@@ -84,10 +84,10 @@ export const useMarkerSelection = ({
       if (isValidCoordinate(lat, lon)) {
         try {
           // Double-check map is still valid before setView
-          if (mapInstance.getContainer() && mapInstance._loaded) {
+          if (mapInstance.getContainer()) {
             setTimeout(() => {
               try {
-                if (mapInstance.getContainer() && mapInstance._loaded) {
+                if (mapInstance.getContainer()) {
                   mapInstance.setView([lat, lon], 12, { animate: true });
                   console.log(`✅ Map centered on ${selectedSpot.full_name}`);
                 }
