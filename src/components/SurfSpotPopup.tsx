@@ -4,16 +4,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { SurfSpot } from '@/types/surfSpots';
 import { MapPin, Waves, Wind, Thermometer, Clock, Camera, Star } from 'lucide-react';
-import { useSurfConditions, useWeatherData } from '@/hooks/useRealTimeData';
 
 interface SurfSpotPopupProps {
   spot: SurfSpot;
 }
 
 const SurfSpotPopup: React.FC<SurfSpotPopupProps> = ({ spot }) => {
-  const { data: conditions, isLoading: conditionsLoading } = useSurfConditions(spot.id);
-  const { data: weather, isLoading: weatherLoading } = useWeatherData(spot.id);
-
   const getDifficultyColor = (difficulty: string) => {
     if (difficulty.toLowerCase().includes('beginner')) return 'bg-green-500';
     if (difficulty.toLowerCase().includes('intermediate')) return 'bg-yellow-500';
@@ -27,22 +23,6 @@ const SurfSpotPopup: React.FC<SurfSpotPopupProps> = ({ spot }) => {
     if (waveType.toLowerCase().includes('beach')) return '🏖️';
     return '🌊';
   };
-
-  const getConditionRating = () => {
-    if (!conditions || !weather) return null;
-    
-    // Simple rating algorithm based on wave height and wind
-    let rating = 3; // Start with average
-    
-    if (conditions.waveHeight >= 3 && conditions.waveHeight <= 8) rating += 1;
-    if (conditions.windSpeed < 10) rating += 1;
-    if (conditions.windSpeed > 20) rating -= 1;
-    if (conditions.crowdLevel < 30) rating += 1;
-    
-    return Math.max(1, Math.min(5, rating));
-  };
-
-  const rating = getConditionRating();
 
   return (
     <div className="w-full max-w-sm space-y-3">
@@ -68,18 +48,6 @@ const SurfSpotPopup: React.FC<SurfSpotPopupProps> = ({ spot }) => {
             <MapPin className="w-4 h-4 mr-1" />
             {spot.lat.toFixed(4)}, {spot.lon.toFixed(4)}
           </div>
-          {rating && (
-            <div className="flex items-center">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`w-3 h-3 ${
-                    i < rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
-                  }`}
-                />
-              ))}
-            </div>
-          )}
         </div>
       </div>
 
@@ -101,61 +69,6 @@ const SurfSpotPopup: React.FC<SurfSpotPopupProps> = ({ spot }) => {
           <p className="text-sm font-medium">{spot.difficulty}</p>
         </div>
       </div>
-
-      {/* Live Conditions */}
-      {conditions && weather && !conditionsLoading && !weatherLoading && (
-        <div className="bg-gradient-to-r from-ocean/10 to-sand/20 p-3 rounded-md">
-          <h4 className="font-medium text-sm mb-2 flex items-center">
-            <Waves className="w-4 h-4 mr-1" />
-            Live Conditions
-            <span className="ml-2 text-xs text-gray-500">
-              Updated {new Date(conditions.lastUpdated).toLocaleTimeString()}
-            </span>
-          </h4>
-          
-          <div className="grid grid-cols-2 gap-3 text-sm">
-            <div className="flex items-center space-x-2">
-              <Waves className="w-4 h-4 text-blue-500" />
-              <div>
-                <span className="text-gray-600">Waves:</span>
-                <p className="font-medium">{conditions.waveHeight.toFixed(1)}ft</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Wind className="w-4 h-4 text-gray-500" />
-              <div>
-                <span className="text-gray-600">Wind:</span>
-                <p className="font-medium">{conditions.windSpeed}mph {conditions.windDirection}</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Thermometer className="w-4 h-4 text-red-500" />
-              <div>
-                <span className="text-gray-600">Water:</span>
-                <p className="font-medium">{conditions.temperature}°F</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Clock className="w-4 h-4 text-purple-500" />
-              <div>
-                <span className="text-gray-600">Crowd:</span>
-                <p className="font-medium">{Math.round(conditions.crowdLevel)}/10</p>
-              </div>
-            </div>
-          </div>
-          
-          {/* Period and sets */}
-          <div className="mt-2 pt-2 border-t border-white/30">
-            <div className="flex justify-between text-xs">
-              <span>Period: {conditions.period}s</span>
-              <span>Sets/hr: {conditions.setsPerHour}</span>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Best Conditions */}
       <div className="space-y-2">
