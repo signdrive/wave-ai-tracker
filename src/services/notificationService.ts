@@ -1,5 +1,9 @@
-
 // Push notification service for surf alerts
+interface NotificationAction {
+  action: string;
+  title: string;
+}
+
 interface NotificationOptions {
   title: string;
   body: string;
@@ -7,6 +11,8 @@ interface NotificationOptions {
   badge?: string;
   tag?: string;
   data?: any;
+  actions?: NotificationAction[];
+  requireInteraction?: boolean;
 }
 
 interface AlertPreferences {
@@ -101,7 +107,18 @@ class NotificationService {
         title: `🏄‍♂️ Great surf at ${spot}!`,
         body: `${conditions.waveHeight}ft waves, ${conditions.windSpeed}mph wind, ${conditions.rating}/5 rating`,
         tag: `surf-alert-${spot}`,
-        data: { spot, conditions }
+        data: { spot, conditions },
+        actions: [
+          {
+            action: 'view',
+            title: 'View Details'
+          },
+          {
+            action: 'dismiss',
+            title: 'Dismiss'
+          }
+        ],
+        requireInteraction: true
       });
     }
   }
