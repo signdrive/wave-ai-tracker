@@ -41,23 +41,20 @@ export const useMapMarkers = ({
   const highlightedIcon = createHighlightedIcon();
 
   useEffect(() => {
-    if (!mapInstance || !layerGroup || !isMapReady) {
-      console.log('🚫 Map instance, layer group not ready or map not ready for adding markers', {
+    if (!mapInstance || !layerGroup || !isMapReady || isLoading) {
+      console.log('🚫 Waiting for map requirements:', {
         mapInstance: !!mapInstance,
         layerGroup: !!layerGroup,
-        isMapReady
+        isMapReady,
+        isLoading,
+        spotsCount: spots.length
       });
       return;
     }
 
-    if (isLoading) {
-      console.log('⏳ Still loading data, skipping marker update');
-      return;
-    }
+    console.log(`🎯 Starting to add ${spots.length} markers to map`);
 
-    console.log(`🎯 Processing ${spots.length} spots for map display`);
-
-    // Clear existing markers safely
+    // Clear existing markers
     try {
       layerGroup.clearLayers();
       markersRef.current.clear();
@@ -67,45 +64,36 @@ export const useMapMarkers = ({
     }
 
     if (spots.length === 0) {
-      console.log('❗ No spots to display on map');
+      console.log('❗ No spots to display');
       return;
     }
 
-    console.log(`📍 Adding ${spots.length} markers to map`);
-
-    let validSpots = 0;
+    let addedMarkers = 0;
     const bounds = L.latLngBounds([]);
 
-    // Add markers for all spots
     spots.forEach((spot, index) => {
-      console.log(`Processing spot ${index + 1}/${spots.length}: ${spot.full_name} at [${spot.lat}, ${spot.lon}]`);
-      
-      if (!spot.lat || !spot.lon || isNaN(spot.lat) || isNaN(spot.lon)) {
-        console.warn(`❌ Skipping spot ${spot.full_name} - invalid coordinates: lat=${spot.lat}, lon=${spot.lon}`);
-        return;
-      }
-
-      // Check coordinate bounds
-      if (spot.lat < -90 || spot.lat > 90 || spot.lon < -180 || spot.lon > 180) {
-        console.warn(`❌ Skipping spot ${spot.full_name} - coordinates out of bounds: lat=${spot.lat}, lon=${spot.lon}`);
-        return;
-      }
-
-      validSpots++;
-      const latLng = L.latLng(spot.lat, spot.lon);
-      bounds.extend(latLng);
-
       try {
-        const isSelected = selectedSpotId === spot.id;
-        const marker = L.marker(latLng, {
-          icon: isSelected ? highlightedIcon : undefined
-        });
+        // Validate coordinates
+        const lat = Number(spot.lat);
+        const lon = Number(spot.lon);
+        
+        if (isNaN(lat) || isNaN(lon)) {
+          console.warn(`❌ Invalid coordinates for ${spot.full_name}: lat=${spot.lat}, lon=${spot.lon}`);
+          return;
+        }
 
+        // Create marker with default icon first
+        const marker = L.marker([lat, lon]);
+        
         // Add to layer group
         layerGroup.addLayer(marker);
+        addedMarkers++;
         
         // Store marker reference
         markersRef.current.set(spot.id, marker);
+
+        // Extend bounds
+        bounds.extend([lat, lon]);
 
         // Add click handler
         marker.on('click', () => {
@@ -119,34 +107,40 @@ export const useMapMarkers = ({
         const popupContent = createPopupContent(spot);
         marker.bindPopup(popupContent, { maxWidth: 300 });
 
-        console.log(`✅ Added marker for ${spot.full_name}`);
+        // Apply selection styling if needed
+        if (selectedSpotId === spot.id) {
+          marker.setIcon(highlightedIcon);
+        }
+
+        console.log(`✅ Added marker ${addedMarkers}/${spots.length}: ${spot.full_name} at [${lat}, ${lon}]`);
 
       } catch (error) {
         console.error(`❌ Error adding marker for ${spot.full_name}:`, error);
       }
     });
 
-    console.log(`✅ Successfully added ${validSpots} valid markers out of ${spots.length} total spots`);
+    console.log(`🎉 Successfully added ${addedMarkers} markers to map`);
 
-    // Auto-fit map to show all markers if we have valid spots
-    if (validSpots > 0 && bounds.isValid() && mapInstance) {
-      console.log('🔍 Fitting map bounds to show all spots');
+    // Fit bounds if we have markers
+    if (addedMarkers > 0 && bounds.isValid()) {
       try {
-        mapInstance.fitBounds(bounds, { 
-          padding: [20, 20],
-          maxZoom: 10
-        });
-        console.log('✅ Map bounds fitted successfully');
+        setTimeout(() => {
+          if (mapInstance) {
+            mapInstance.fitBounds(bounds, { 
+              padding: [20, 20],
+              maxZoom: 10
+            });
+            console.log('🔍 Map bounds fitted to show all markers');
+          }
+        }, 100);
       } catch (error) {
         console.error('❌ Error fitting bounds:', error);
       }
-    } else {
-      console.log('❗ No valid spots to fit bounds, keeping default view');
     }
 
   }, [mapInstance, layerGroup, spots, isLoading, selectedSpotId, onSpotClick, highlightedIcon, isMapReady]);
 
-  // Center map on selected spot
+  // Handle selected spot changes
   useEffect(() => {
     if (selectedSpotId && mapInstance) {
       const selectedSpot = spots.find(spot => spot.id === selectedSpotId);

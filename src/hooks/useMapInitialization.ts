@@ -30,7 +30,8 @@ export const useMapInitialization = () => {
       });
       
       mapInstanceRef.current = map;
-      
+      console.log('✅ Map instance created');
+
       // Create layer group immediately after map creation
       const layerGroup = L.layerGroup();
       layerGroup.addTo(map);
@@ -38,9 +39,8 @@ export const useMapInitialization = () => {
       console.log('✅ Layer group created and added to map');
       
       isInitializedRef.current = true;
-      console.log('✅ Map instance created');
 
-      // Add tile layer with error handling
+      // Add tile layer
       const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
@@ -50,31 +50,17 @@ export const useMapInitialization = () => {
       tileLayer.addTo(map);
       console.log('🌍 Tile layer added');
       
-      // Add event listeners for debugging
-      tileLayer.on('loading', () => {
-        console.log('🔄 Map tiles loading...');
-      });
-      
-      tileLayer.on('load', () => {
-        console.log('✅ Map tiles loaded successfully');
-        // Set map ready state after tiles load
-        setIsMapReady(true);
-      });
+      // Set map ready immediately after setup
+      setIsMapReady(true);
+      console.log('✅ Map marked as ready');
 
-      tileLayer.on('tileerror', (e) => {
-        console.error('❌ Tile loading error:', e);
-      });
-
-      // Force map to render and set ready state
+      // Force map to render
       setTimeout(() => {
         if (mapInstanceRef.current) {
           mapInstanceRef.current.invalidateSize();
-          setIsMapReady(true);
-          console.log('🔄 Map size invalidated and marked ready');
+          console.log('🔄 Map size invalidated');
         }
       }, 100);
-
-      console.log('✅ Map initialized successfully with layer group');
 
     } catch (error) {
       console.error('❌ Error initializing map:', error);
