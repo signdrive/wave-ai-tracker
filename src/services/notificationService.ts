@@ -1,3 +1,4 @@
+
 // Push notification service for surf alerts
 interface NotificationAction {
   action: string;
@@ -67,8 +68,8 @@ class NotificationService {
           badge: options.badge || '/placeholder.svg',
           tag: options.tag,
           data: options.data,
-          requireInteraction: true,
-          actions: [
+          requireInteraction: options.requireInteraction || true,
+          actions: options.actions || [
             {
               action: 'view',
               title: 'View Details'
