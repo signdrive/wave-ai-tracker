@@ -57,16 +57,37 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
   useEffect(() => {
     if (!mapRef.current) return;
 
+    console.log('Initializing map...');
+
     // Initialize map centered on California (where most spots are)
-    const map = L.map(mapRef.current).setView([34.0522, -118.2437], 6);
+    const map = L.map(mapRef.current, {
+      center: [34.0522, -118.2437],
+      zoom: 6,
+      zoomControl: true
+    });
     mapInstanceRef.current = map;
 
-    // Add tile layer
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
+    // Add tile layer with error handling
+    const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19
+    });
+    
+    tileLayer.addTo(map);
+    
+    // Add event listener to check if tiles are loading
+    tileLayer.on('loading', () => {
+      console.log('Map tiles loading...');
+    });
+    
+    tileLayer.on('load', () => {
+      console.log('Map tiles loaded successfully');
+    });
+
+    console.log('Map initialized successfully');
 
     return () => {
+      console.log('Cleaning up map...');
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
@@ -75,7 +96,12 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
   }, []);
 
   useEffect(() => {
-    if (!mapInstanceRef.current || isLoading) return;
+    if (!mapInstanceRef.current || isLoading) {
+      console.log('Map not ready or still loading data');
+      return;
+    }
+
+    console.log(`Processing ${spots.length} spots for map`);
 
     // Clear existing markers
     markersRef.current.forEach(marker => {
@@ -83,17 +109,29 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
     });
     markersRef.current.clear();
 
+    if (spots.length === 0) {
+      console.log('No spots to display on map');
+      return;
+    }
+
     console.log(`Adding ${spots.length} markers to map from database`);
+
+    let validSpots = 0;
+    const bounds = L.latLngBounds([]);
 
     // Add markers for all spots
     spots.forEach((spot) => {
-      if (!spot.lat || !spot.lon) {
-        console.warn(`Skipping spot ${spot.full_name} - missing coordinates`);
+      if (!spot.lat || !spot.lon || isNaN(spot.lat) || isNaN(spot.lon)) {
+        console.warn(`Skipping spot ${spot.full_name} - invalid coordinates: lat=${spot.lat}, lon=${spot.lon}`);
         return;
       }
 
+      validSpots++;
+      const latLng = L.latLng(spot.lat, spot.lon);
+      bounds.extend(latLng);
+
       const isSelected = selectedSpotId === spot.id;
-      const marker = L.marker([spot.lat, spot.lon], {
+      const marker = L.marker(latLng, {
         icon: isSelected ? highlightedIcon : undefined
       }).addTo(mapInstanceRef.current!);
       
@@ -102,6 +140,7 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
 
       // Add click handler
       marker.on('click', () => {
+        console.log(`Marker clicked for spot: ${spot.full_name}`);
         if (onSpotClick) {
           onSpotClick(spot.id);
         }
@@ -158,17 +197,14 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
       marker.bindPopup(popupContent, { maxWidth: 300 });
     });
 
-    // Auto-fit map to show all markers if we have spots
-    if (spots.length > 0) {
-      const group = L.featureGroup(
-        spots
-          .filter(spot => spot.lat && spot.lon)
-          .map(spot => L.marker([spot.lat, spot.lon]))
-      );
-      
-      if (group.getBounds().isValid()) {
-        mapInstanceRef.current.fitBounds(group.getBounds(), { padding: [20, 20] });
-      }
+    console.log(`Successfully added ${validSpots} valid markers out of ${spots.length} total spots`);
+
+    // Auto-fit map to show all markers if we have valid spots
+    if (validSpots > 0 && bounds.isValid()) {
+      console.log('Fitting map bounds to show all spots');
+      mapInstanceRef.current.fitBounds(bounds, { padding: [20, 20] });
+    } else {
+      console.log('No valid spots to fit bounds, keeping default view');
     }
 
   }, [spots, isLoading, selectedSpotId, onSpotClick]);
@@ -217,6 +253,7 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
       <div 
         ref={mapRef} 
         className="w-full h-full min-h-[400px]"
+        style={{ minHeight: '400px' }}
       />
       
       <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-gray-700 shadow-md">
