@@ -31,7 +31,7 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
   onSpotClick,
   selectedSpotId
 }) => {
-  console.log('🗺️ DatabaseSurfSpotMap render', {
+  console.log('🗺️ DatabaseSurfSpotMap render:', {
     spotsCount: spots.length,
     isLoading,
     selectedSpotId,
@@ -40,11 +40,19 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
       lat: spots[0].lat,
       lon: spots[0].lon,
       id: spots[0].id
-    } : null
+    } : null,
+    allSpotIds: spots.map(s => s.id).slice(0, 10)
   });
 
   const { mapRef, mapInstanceRef, layerGroupRef, isMapReady } = useMapInitialization();
   
+  console.log('🗺️ Map state:', {
+    hasMapRef: !!mapRef.current,
+    hasMapInstance: !!mapInstanceRef.current,
+    hasLayerGroup: !!layerGroupRef.current,
+    isMapReady
+  });
+
   useMapMarkers({
     mapInstance: mapInstanceRef.current,
     layerGroup: layerGroupRef.current,
@@ -113,6 +121,11 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
           </div>
         </div>
       )}
+
+      {/* Debug info overlay - remove in production */}
+      <div className="absolute bottom-2 right-2 bg-blue-500/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-medium text-white shadow-md">
+        Map: {isMapReady ? '✅' : '⏳'} | Spots: {spots.length}
+      </div>
     </div>
   );
 };
