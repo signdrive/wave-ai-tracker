@@ -31,7 +31,7 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
   onSpotClick,
   selectedSpotId
 }) => {
-  const { mapRef, mapInstanceRef, layerGroupRef } = useMapInitialization();
+  const { mapRef, mapInstanceRef, layerGroupRef, isMapReady } = useMapInitialization();
   
   useMapMarkers({
     mapInstance: mapInstanceRef.current,
@@ -39,7 +39,8 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
     spots,
     isLoading,
     onSpotClick,
-    selectedSpotId
+    selectedSpotId,
+    isMapReady
   });
 
   // Handle spot selection from popup
@@ -82,7 +83,16 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
         ✅ Live Supabase Data
       </div>
 
-      {spots.length === 0 && !isLoading && (
+      {!isMapReady && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/80">
+          <div className="text-center p-6">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+            <p className="text-sm text-gray-600">Initializing map...</p>
+          </div>
+        </div>
+      )}
+
+      {spots.length === 0 && !isLoading && isMapReady && (
         <div className="absolute inset-0 flex items-center justify-center bg-white/80">
           <div className="text-center p-6">
             <p className="text-lg font-medium text-gray-700 mb-2">No surf spots found</p>

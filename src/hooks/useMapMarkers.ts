@@ -25,6 +25,7 @@ interface UseMapMarkersProps {
   isLoading: boolean;
   onSpotClick?: (spotId: string) => void;
   selectedSpotId?: string;
+  isMapReady?: boolean;
 }
 
 export const useMapMarkers = ({ 
@@ -33,14 +34,19 @@ export const useMapMarkers = ({
   spots, 
   isLoading, 
   onSpotClick, 
-  selectedSpotId 
+  selectedSpotId,
+  isMapReady = true
 }: UseMapMarkersProps) => {
   const markersRef = useRef<Map<string, L.Marker>>(new Map());
   const highlightedIcon = createHighlightedIcon();
 
   useEffect(() => {
-    if (!mapInstance || !layerGroup) {
-      console.log('🚫 Map instance or layer group not ready for adding markers');
+    if (!mapInstance || !layerGroup || !isMapReady) {
+      console.log('🚫 Map instance, layer group not ready or map not ready for adding markers', {
+        mapInstance: !!mapInstance,
+        layerGroup: !!layerGroup,
+        isMapReady
+      });
       return;
     }
 
@@ -138,7 +144,7 @@ export const useMapMarkers = ({
       console.log('❗ No valid spots to fit bounds, keeping default view');
     }
 
-  }, [mapInstance, layerGroup, spots, isLoading, selectedSpotId, onSpotClick, highlightedIcon]);
+  }, [mapInstance, layerGroup, spots, isLoading, selectedSpotId, onSpotClick, highlightedIcon, isMapReady]);
 
   // Center map on selected spot
   useEffect(() => {

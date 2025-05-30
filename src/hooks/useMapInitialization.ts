@@ -1,5 +1,5 @@
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { initializeLeafletIcons } from '@/utils/mapUtils';
@@ -9,6 +9,7 @@ export const useMapInitialization = () => {
   const mapInstanceRef = useRef<L.Map | null>(null);
   const layerGroupRef = useRef<L.LayerGroup | null>(null);
   const isInitializedRef = useRef(false);
+  const [isMapReady, setIsMapReady] = useState(false);
 
   useEffect(() => {
     if (!mapRef.current || isInitializedRef.current) {
@@ -31,7 +32,9 @@ export const useMapInitialization = () => {
       mapInstanceRef.current = map;
       
       // Create layer group immediately after map creation
-      layerGroupRef.current = L.layerGroup().addTo(map);
+      const layerGroup = L.layerGroup();
+      layerGroup.addTo(map);
+      layerGroupRef.current = layerGroup;
       console.log('✅ Layer group created and added to map');
       
       isInitializedRef.current = true;
@@ -54,17 +57,20 @@ export const useMapInitialization = () => {
       
       tileLayer.on('load', () => {
         console.log('✅ Map tiles loaded successfully');
+        // Set map ready state after tiles load
+        setIsMapReady(true);
       });
 
       tileLayer.on('tileerror', (e) => {
         console.error('❌ Tile loading error:', e);
       });
 
-      // Force map to render
+      // Force map to render and set ready state
       setTimeout(() => {
         if (mapInstanceRef.current) {
           mapInstanceRef.current.invalidateSize();
-          console.log('🔄 Map size invalidated');
+          setIsMapReady(true);
+          console.log('🔄 Map size invalidated and marked ready');
         }
       }, 100);
 
@@ -77,6 +83,8 @@ export const useMapInitialization = () => {
 
     return () => {
       console.log('🧹 Cleaning up map...');
+      setIsMapReady(false);
+      
       if (layerGroupRef.current) {
         try {
           layerGroupRef.current.clearLayers();
@@ -102,5 +110,10 @@ export const useMapInitialization = () => {
     };
   }, []);
 
-  return { mapRef, mapInstanceRef, layerGroupRef };
+  return { 
+    mapRef, 
+    mapInstanceRef, 
+    layerGroupRef, 
+    isMapReady 
+  };
 };
