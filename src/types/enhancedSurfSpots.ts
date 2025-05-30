@@ -8,19 +8,19 @@ export interface EnhancedSurfSpot {
   region: string;
   country: string;
   state: string;
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
+  difficulty: string; // Changed from strict union to string
   point_break: boolean;
   reef_break: boolean;
   beach_break: boolean;
   description: string;
   best_season: string;
   break_type: string;
-  crowd_levels: 'Low' | 'Moderate' | 'Heavy' | 'Extreme';
-  wave_direction: 'Left' | 'Right' | 'Both';
-  bottom_type: 'Sand' | 'Reef' | 'Rock' | 'Cobblestone';
+  crowd_levels: string; // Changed from strict union to string
+  wave_direction: string; // Changed from strict union to string
+  bottom_type: string; // Changed from strict union to string
   ideal_swell_direction: string;
   wave_height_range: string;
-  best_tide: 'Low' | 'Mid' | 'High' | 'All';
+  best_tide: string; // Changed from strict union to string
   wind_direction: string;
   parking: string;
   amenities: string[];
