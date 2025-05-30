@@ -11,6 +11,17 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png',
 });
 
+// Create custom highlighted marker icon
+const highlightedIcon = L.icon({
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-icon.png',
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-icon-2x.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png',
+  iconSize: [30, 46],
+  iconAnchor: [15, 46],
+  popupAnchor: [1, -34],
+  shadowSize: [46, 46]
+});
+
 interface DatabaseSurfSpot {
   id: string;
   full_name: string;
@@ -29,14 +40,19 @@ interface DatabaseSurfSpot {
 interface DatabaseSurfSpotMapProps {
   spots: DatabaseSurfSpot[];
   isLoading: boolean;
+  onSpotClick?: (spotId: string) => void;
+  selectedSpotId?: string;
 }
 
 const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({ 
   spots,
-  isLoading
+  isLoading,
+  onSpotClick,
+  selectedSpotId
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
+  const markersRef = useRef<Map<string, L.Marker>>(new Map());
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -62,11 +78,10 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
     if (!mapInstanceRef.current || isLoading) return;
 
     // Clear existing markers
-    mapInstanceRef.current.eachLayer((layer) => {
-      if (layer instanceof L.Marker) {
-        mapInstanceRef.current!.removeLayer(layer);
-      }
+    markersRef.current.forEach(marker => {
+      mapInstanceRef.current!.removeLayer(marker);
     });
+    markersRef.current.clear();
 
     console.log(`Adding ${spots.length} markers to map from database`);
 
@@ -77,7 +92,20 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
         return;
       }
 
-      const marker = L.marker([spot.lat, spot.lon]).addTo(mapInstanceRef.current!);
+      const isSelected = selectedSpotId === spot.id;
+      const marker = L.marker([spot.lat, spot.lon], {
+        icon: isSelected ? highlightedIcon : undefined
+      }).addTo(mapInstanceRef.current!);
+      
+      // Store marker reference
+      markersRef.current.set(spot.id, marker);
+
+      // Add click handler
+      marker.on('click', () => {
+        if (onSpotClick) {
+          onSpotClick(spot.id);
+        }
+      });
       
       // Create HTML content for popup
       const popupContent = `
@@ -117,6 +145,13 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
             <div style="font-size: 12px; font-weight: 500; color: #0369a1;">Real Database Data:</div>
             <div style="font-size: 11px; color: #0284c7;">Lat: ${spot.lat.toFixed(6)}, Lon: ${spot.lon.toFixed(6)}</div>
           </div>
+
+          <button 
+            onclick="window.parent.postMessage({type: 'selectSpot', spotId: '${spot.id}'}, '*')"
+            style="width: 100%; background-color: #3b82f6; color: white; padding: 8px; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; margin-top: 8px;"
+          >
+            View Details
+          </button>
         </div>
       `;
       
@@ -136,7 +171,35 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
       }
     }
 
-  }, [spots, isLoading]);
+  }, [spots, isLoading, selectedSpotId, onSpotClick]);
+
+  // Handle spot selection from popup
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data.type === 'selectSpot' && onSpotClick) {
+        onSpotClick(event.data.spotId);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [onSpotClick]);
+
+  // Center map on selected spot
+  useEffect(() => {
+    if (selectedSpotId && mapInstanceRef.current) {
+      const selectedSpot = spots.find(spot => spot.id === selectedSpotId);
+      if (selectedSpot && selectedSpot.lat && selectedSpot.lon) {
+        mapInstanceRef.current.setView([selectedSpot.lat, selectedSpot.lon], 12);
+        
+        // Update marker icons
+        markersRef.current.forEach((marker, spotId) => {
+          const isSelected = spotId === selectedSpotId;
+          marker.setIcon(isSelected ? highlightedIcon : new L.Icon.Default());
+        });
+      }
+    }
+  }, [selectedSpotId, spots]);
 
   if (isLoading) {
     return (

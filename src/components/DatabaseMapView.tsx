@@ -3,12 +3,13 @@ import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Map, List, AlertCircle } from 'lucide-react';
+import { Map, List, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useSupabaseSurfSpots } from '@/hooks/useSupabaseSurfSpots';
 import DatabaseSurfSpotMap from './DatabaseSurfSpotMap';
+import SurfSpotSearch from './SurfSpotSearch';
+import SurfSpotInfoPanel from './SurfSpotInfoPanel';
 
 const DatabaseMapView: React.FC = () => {
   const { surfSpots, rawSpots, isLoading, error } = useSupabaseSurfSpots();
@@ -16,6 +17,8 @@ const DatabaseMapView: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
+  const [selectedSpot, setSelectedSpot] = useState<any>(null);
+  const [selectedRawSpot, setSelectedRawSpot] = useState<any>(null);
 
   // Get unique countries and difficulties
   const countries = useMemo(() => {
@@ -34,7 +37,8 @@ const DatabaseMapView: React.FC = () => {
       const matchesSearch = searchTerm === '' || 
         spot.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         spot.country.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        spot.state.toLowerCase().includes(searchTerm.toLowerCase());
+        spot.state.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        spot.difficulty.toLowerCase().includes(searchTerm.toLowerCase());
       
       const matchesCountry = selectedCountry === 'all' || spot.country === selectedCountry;
       const matchesDifficulty = selectedDifficulty === 'all' || spot.difficulty === selectedDifficulty;
@@ -42,6 +46,20 @@ const DatabaseMapView: React.FC = () => {
       return matchesSearch && matchesCountry && matchesDifficulty;
     });
   }, [surfSpots, searchTerm, selectedCountry, selectedDifficulty]);
+
+  const handleSelectSpot = (spot: any) => {
+    setSelectedSpot(spot);
+    // Find the corresponding raw spot data
+    const rawSpot = rawSpots.find(raw => raw.name === spot.full_name || raw.id === parseInt(spot.id));
+    setSelectedRawSpot(rawSpot);
+  };
+
+  const handleSpotClick = (spotId: string) => {
+    const spot = surfSpots.find(s => s.id === spotId);
+    if (spot) {
+      handleSelectSpot(spot);
+    }
+  };
 
   if (error) {
     return (
@@ -93,19 +111,16 @@ const DatabaseMapView: React.FC = () => {
           </div>
         </div>
 
-        {/* Filters */}
+        {/* Search and Filters */}
         <Card>
           <CardContent className="p-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <Input
-                  placeholder="Search surf spots..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+              <SurfSpotSearch 
+                spots={surfSpots}
+                onSearch={setSearchTerm}
+                onSelectSpot={handleSelectSpot}
+                searchTerm={searchTerm}
+              />
 
               <Select value={selectedCountry} onValueChange={setSelectedCountry}>
                 <SelectTrigger>
@@ -174,21 +189,35 @@ const DatabaseMapView: React.FC = () => {
 
       {/* Map or List View */}
       {viewMode === 'map' ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Live Database Map</span>
-              <Badge variant="outline">
-                {filteredSpots.length} spots
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="h-[600px]">
-              <DatabaseSurfSpotMap spots={filteredSpots} isLoading={isLoading} />
-            </div>
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          {/* Map */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>Live Database Map</span>
+                <Badge variant="outline">
+                  {filteredSpots.length} spots
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="h-[600px]">
+                <DatabaseSurfSpotMap 
+                  spots={filteredSpots} 
+                  isLoading={isLoading}
+                  onSpotClick={handleSpotClick}
+                  selectedSpotId={selectedSpot?.id}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Information Panel */}
+          <SurfSpotInfoPanel 
+            selectedSpot={selectedSpot}
+            rawSpotData={selectedRawSpot}
+          />
+        </div>
       ) : (
         <Card>
           <CardHeader>
@@ -202,7 +231,11 @@ const DatabaseMapView: React.FC = () => {
           <CardContent>
             <div className="space-y-4 max-h-96 overflow-y-auto">
               {filteredSpots.map((spot) => (
-                <div key={spot.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                <div 
+                  key={spot.id} 
+                  className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer"
+                  onClick={() => handleSelectSpot(spot)}
+                >
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-semibold text-ocean-dark text-lg">{spot.full_name}</h3>
                     <Badge className="bg-blue-500 text-xs">DB #{spot.id}</Badge>
