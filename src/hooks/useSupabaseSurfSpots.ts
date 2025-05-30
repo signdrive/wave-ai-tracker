@@ -61,7 +61,6 @@ export const useSupabaseSurfSpots = () => {
         console.log(`✅ Successfully loaded ${data?.length || 0} surf spots from database`);
         console.log(`📊 Total count from database: ${count}`);
         console.log('🗄️ Database connection details:');
-        console.log('- Project URL:', supabase.supabaseUrl);
         console.log('- Table: surf_spots');
         console.log('- Columns fetched: ALL (*)');
         
