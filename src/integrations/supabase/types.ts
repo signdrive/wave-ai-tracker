@@ -75,6 +75,111 @@ export type Database = {
         }
         Relationships: []
       }
+      surf_spots: {
+        Row: {
+          "amenities/0": string | null
+          "amenities/1": string | null
+          "amenities/2": string | null
+          "amenities/3": string | null
+          "amenities/4": string | null
+          best_season: string | null
+          best_tide: string | null
+          bottom_type: string | null
+          break_type: string | null
+          country: string | null
+          crowd_levels: string | null
+          description: string | null
+          difficulty: string | null
+          "hazards/0": string | null
+          "hazards/1": string | null
+          "hazards/2": string | null
+          "hazards/3": string | null
+          "hazards/4": string | null
+          "hazards/5": string | null
+          id: number
+          ideal_swell_direction: string | null
+          lat: number | null
+          lon: number | null
+          name: string | null
+          parking: string | null
+          point_break: boolean | null
+          region: string | null
+          state: string | null
+          water_temp_range: string | null
+          wave_direction: string | null
+          wave_height_range: string | null
+          wind_direction: string | null
+        }
+        Insert: {
+          "amenities/0"?: string | null
+          "amenities/1"?: string | null
+          "amenities/2"?: string | null
+          "amenities/3"?: string | null
+          "amenities/4"?: string | null
+          best_season?: string | null
+          best_tide?: string | null
+          bottom_type?: string | null
+          break_type?: string | null
+          country?: string | null
+          crowd_levels?: string | null
+          description?: string | null
+          difficulty?: string | null
+          "hazards/0"?: string | null
+          "hazards/1"?: string | null
+          "hazards/2"?: string | null
+          "hazards/3"?: string | null
+          "hazards/4"?: string | null
+          "hazards/5"?: string | null
+          id?: number
+          ideal_swell_direction?: string | null
+          lat?: number | null
+          lon?: number | null
+          name?: string | null
+          parking?: string | null
+          point_break?: boolean | null
+          region?: string | null
+          state?: string | null
+          water_temp_range?: string | null
+          wave_direction?: string | null
+          wave_height_range?: string | null
+          wind_direction?: string | null
+        }
+        Update: {
+          "amenities/0"?: string | null
+          "amenities/1"?: string | null
+          "amenities/2"?: string | null
+          "amenities/3"?: string | null
+          "amenities/4"?: string | null
+          best_season?: string | null
+          best_tide?: string | null
+          bottom_type?: string | null
+          break_type?: string | null
+          country?: string | null
+          crowd_levels?: string | null
+          description?: string | null
+          difficulty?: string | null
+          "hazards/0"?: string | null
+          "hazards/1"?: string | null
+          "hazards/2"?: string | null
+          "hazards/3"?: string | null
+          "hazards/4"?: string | null
+          "hazards/5"?: string | null
+          id?: number
+          ideal_swell_direction?: string | null
+          lat?: number | null
+          lon?: number | null
+          name?: string | null
+          parking?: string | null
+          point_break?: boolean | null
+          region?: string | null
+          state?: string | null
+          water_temp_range?: string | null
+          wave_direction?: string | null
+          wave_height_range?: string | null
+          wind_direction?: string | null
+        }
+        Relationships: []
+      }
       user_favorites: {
         Row: {
           created_at: string
