@@ -41,52 +41,40 @@ export const useMapMarkers = ({
 }: UseMapMarkersProps) => {
   const markersRef = useRef<Map<string, L.Marker>>(new Map());
 
-  // Clear all markers
-  const clearMarkers = () => {
-    console.log('🧹 Clearing markers...');
-    if (layerGroup) {
-      layerGroup.clearLayers();
-    }
-    markersRef.current.clear();
-  };
-
-  // Create and add markers
+  // Main effect to create and manage markers
   useEffect(() => {
-    console.log('🎯 useMapMarkers effect triggered:', {
+    console.log('🎯 useMapMarkers: Starting marker management', {
       hasMapInstance: !!mapInstance,
       hasLayerGroup: !!layerGroup,
       isMapReady,
       isLoading,
-      spotsCount: spots.length,
-      firstSpot: spots[0] ? {
-        id: spots[0].id,
-        name: spots[0].full_name,
-        lat: spots[0].lat,
-        lon: spots[0].lon
-      } : null
+      spotsCount: spots.length
     });
 
     // Prerequisites check
     if (!mapInstance || !layerGroup || !isMapReady || isLoading || spots.length === 0) {
-      console.log('❌ Prerequisites not met for markers');
+      console.log('❌ Prerequisites not met, skipping marker creation');
       return;
     }
 
-    console.log('✅ All prerequisites met, creating markers...');
+    console.log('✅ All prerequisites met, creating markers directly...');
 
     // Clear existing markers
-    clearMarkers();
+    console.log('🧹 Clearing existing markers...');
+    layerGroup.clearLayers();
+    markersRef.current.clear();
 
     let successCount = 0;
     const bounds = L.latLngBounds([]);
     let hasBounds = false;
 
+    // Create markers directly - no complex logic
     spots.forEach((spot, index) => {
       try {
         const lat = Number(spot.lat);
         const lon = Number(spot.lon);
         
-        console.log(`📍 Processing spot ${index + 1}/${spots.length}: ${spot.full_name}`, {
+        console.log(`📍 Creating marker ${index + 1}/${spots.length}: ${spot.full_name}`, {
           id: spot.id,
           lat,
           lon,
@@ -98,27 +86,33 @@ export const useMapMarkers = ({
           return;
         }
 
-        // Create marker
+        // Create marker with default icon
         const marker = L.marker([lat, lon]);
         
+        console.log(`✅ Leaflet marker created for ${spot.full_name}`);
+
         // Create popup content
         const popupContent = createPopupContent(spot);
         if (popupContent) {
           marker.bindPopup(popupContent, POPUP_CONFIG);
+          console.log(`✅ Popup bound for ${spot.full_name}`);
         }
 
         // Add click handler
         marker.on('click', (e) => {
           console.log(`🖱️ Marker clicked: ${spot.full_name} (${spot.id})`);
-          L.DomEvent.stopPropagation(e.originalEvent);
+          if (e.originalEvent) {
+            L.DomEvent.stopPropagation(e.originalEvent);
+          }
           marker.openPopup();
           if (onSpotClick) {
             onSpotClick(spot.id);
           }
         });
 
-        // Add to layer group
+        // Add marker directly to layer group
         marker.addTo(layerGroup);
+        console.log(`✅ Marker added to layer group for ${spot.full_name}`);
         
         // Store reference
         markersRef.current.set(spot.id, marker);
@@ -128,13 +122,12 @@ export const useMapMarkers = ({
         hasBounds = true;
         successCount++;
 
-        console.log(`✅ Marker ${successCount} added successfully: ${spot.full_name}`);
       } catch (error) {
         console.error(`❌ Error creating marker for ${spot.full_name}:`, error);
       }
     });
 
-    console.log(`🎉 Marker creation complete: ${successCount}/${spots.length} markers added`);
+    console.log(`🎉 Marker creation complete: ${successCount}/${spots.length} markers created and added`);
 
     // Fit bounds if we have markers
     if (successCount > 0 && hasBounds && bounds.isValid()) {
@@ -148,6 +141,18 @@ export const useMapMarkers = ({
       }, 100);
     }
 
+    // Verify markers are visible
+    setTimeout(() => {
+      const layerCount = layerGroup.getLayers().length;
+      console.log(`🔍 Verification: Layer group contains ${layerCount} layers`);
+      
+      if (layerCount === 0) {
+        console.error('❌ CRITICAL: No layers found in layer group after marker creation!');
+      } else {
+        console.log('✅ SUCCESS: Markers are present in layer group');
+      }
+    }, 200);
+
   }, [mapInstance, layerGroup, spots, isLoading, isMapReady, onSpotClick]);
 
   // Handle selected spot changes
@@ -157,14 +162,16 @@ export const useMapMarkers = ({
     console.log(`🎯 Updating selection for spot: ${selectedSpotId}`);
 
     markersRef.current.forEach((marker, spotId) => {
-      if (spotId === selectedSpotId) {
-        // Highlight selected marker
-        const highlightIcon = createHighlightedIcon();
-        marker.setIcon(highlightIcon);
-        marker.openPopup();
-      } else {
-        // Reset other markers to default
-        marker.setIcon(new L.Icon.Default());
+      try {
+        if (spotId === selectedSpotId) {
+          const highlightIcon = createHighlightedIcon();
+          marker.setIcon(highlightIcon);
+          marker.openPopup();
+        } else {
+          marker.setIcon(new L.Icon.Default());
+        }
+      } catch (error) {
+        console.warn(`⚠️ Error updating marker icon for spot ${spotId}:`, error);
       }
     });
 

@@ -52,6 +52,7 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
     isMapReady
   });
 
+  // Use the simplified markers hook
   useMapMarkers({
     mapInstance: mapInstanceRef.current,
     layerGroup: layerGroupRef.current,
