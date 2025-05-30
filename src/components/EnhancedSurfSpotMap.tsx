@@ -6,19 +6,12 @@ import 'leaflet/dist/leaflet.css';
 import { EnhancedSurfSpot } from '@/types/enhancedSurfSpots';
 
 // Fix for default markers in react-leaflet
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-
-let DefaultIcon = L.icon({
-  iconUrl: icon,
-  shadowUrl: iconShadow,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41]
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png',
 });
-
-L.Marker.prototype.options.icon = DefaultIcon;
 
 interface EnhancedSurfSpotMapProps {
   spots: EnhancedSurfSpot[];
@@ -77,46 +70,55 @@ const EnhancedSurfSpotMap: React.FC<EnhancedSurfSpotMapProps> = ({
             key={spot.id}
             position={[spot.lat, spot.lon]}
           >
-            <Popup>
-              <div className="w-80">
-                <h3 className="font-bold text-lg text-blue-800 mb-2">
+            <Popup maxWidth={300}>
+              <div>
+                <h3 style={{ fontWeight: 'bold', fontSize: '18px', color: '#1e40af', marginBottom: '8px' }}>
                   {spot.full_name}
                 </h3>
-                <p className="text-sm text-gray-600 mb-2">
+                <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px' }}>
                   {spot.region}, {spot.country}
                 </p>
-                <p className="text-sm mb-3">
+                <p style={{ fontSize: '14px', marginBottom: '12px' }}>
                   {spot.description}
                 </p>
                 
-                <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px', fontSize: '14px' }}>
                   <div>
-                    <span className="font-medium">Difficulty:</span> {spot.difficulty}
+                    <span style={{ fontWeight: '500' }}>Difficulty:</span> {spot.difficulty}
                   </div>
                   <div>
-                    <span className="font-medium">Break:</span> {spot.break_type}
+                    <span style={{ fontWeight: '500' }}>Break:</span> {spot.break_type}
                   </div>
                   <div>
-                    <span className="font-medium">Season:</span> {spot.best_season}
+                    <span style={{ fontWeight: '500' }}>Season:</span> {spot.best_season}
                   </div>
                   <div>
-                    <span className="font-medium">Waves:</span> {spot.wave_height_range}
+                    <span style={{ fontWeight: '500' }}>Waves:</span> {spot.wave_height_range}
                   </div>
                 </div>
 
                 {spot.pro_tip && (
-                  <div className="bg-yellow-50 p-2 rounded mb-3">
-                    <div className="text-xs font-medium text-yellow-700">Pro Tip:</div>
-                    <div className="text-xs text-yellow-800">{spot.pro_tip}</div>
+                  <div style={{ backgroundColor: '#fefce8', padding: '8px', borderRadius: '4px', marginBottom: '12px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: '500', color: '#b45309' }}>Pro Tip:</div>
+                    <div style={{ fontSize: '12px', color: '#92400e' }}>{spot.pro_tip}</div>
                   </div>
                 )}
 
-                <div className="flex gap-2">
+                <div style={{ display: 'flex', gap: '8px' }}>
                   <a 
                     href={spot.google_maps_link} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex-1 bg-blue-500 text-white text-center py-1 px-2 rounded text-sm hover:bg-blue-600"
+                    style={{ 
+                      flex: '1', 
+                      backgroundColor: '#3b82f6', 
+                      color: 'white', 
+                      textAlign: 'center', 
+                      padding: '4px 8px', 
+                      borderRadius: '4px', 
+                      fontSize: '14px', 
+                      textDecoration: 'none' 
+                    }}
                   >
                     Maps
                   </a>
@@ -125,7 +127,16 @@ const EnhancedSurfSpotMap: React.FC<EnhancedSurfSpotMapProps> = ({
                       href={spot.live_cam} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="flex-1 bg-green-500 text-white text-center py-1 px-2 rounded text-sm hover:bg-green-600"
+                      style={{ 
+                        flex: '1', 
+                        backgroundColor: '#10b981', 
+                        color: 'white', 
+                        textAlign: 'center', 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        fontSize: '14px', 
+                        textDecoration: 'none' 
+                      }}
                     >
                       Live Cam
                     </a>
@@ -137,7 +148,19 @@ const EnhancedSurfSpotMap: React.FC<EnhancedSurfSpotMapProps> = ({
         ))}
       </MapContainer>
       
-      <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-gray-700 shadow-md">
+      <div style={{ 
+        position: 'absolute', 
+        top: '8px', 
+        right: '8px', 
+        backgroundColor: 'rgba(255, 255, 255, 0.9)', 
+        backdropFilter: 'blur(4px)', 
+        padding: '4px 12px', 
+        borderRadius: '9999px', 
+        fontSize: '14px', 
+        fontWeight: '500', 
+        color: '#374151', 
+        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' 
+      }}>
         {filteredSpots.length} spots shown
       </div>
     </div>
