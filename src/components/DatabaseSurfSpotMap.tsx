@@ -125,7 +125,7 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
 
     // Auto-fit map to show all markers if we have spots
     if (spots.length > 0) {
-      const group = new L.featureGroup(
+      const group = L.featureGroup(
         spots
           .filter(spot => spot.lat && spot.lon)
           .map(spot => L.marker([spot.lat, spot.lon]))
