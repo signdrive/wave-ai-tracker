@@ -20,7 +20,7 @@ let DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-// Custom marker icons based on difficulty and wave type
+// Simplified marker icons based on difficulty
 const createSurfSpotIcon = (spot: EnhancedSurfSpot) => {
   let color = '#0EA5E9'; // Default blue
   
@@ -29,22 +29,24 @@ const createSurfSpotIcon = (spot: EnhancedSurfSpot) => {
   else if (spot.difficulty === 'Advanced') color = '#EF4444'; // Red
   else if (spot.difficulty === 'Expert') color = '#7C2D12'; // Dark red
 
-  // Create a simple colored marker
-  const iconSvg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="41" viewBox="0 0 25 41" fill="none">
-      <path d="M12.5 0C5.596 0 0 5.596 0 12.5c0 12.5 12.5 28.5 12.5 28.5s12.5-16 12.5-28.5C25 5.596 19.404 0 12.5 0z" fill="${color}"/>
-      <circle cx="12.5" cy="12.5" r="6" fill="white"/>
-      ${spot.big_wave ? '<circle cx="12.5" cy="12.5" r="3" fill="#DC2626"/>' : ''}
-      ${spot.kite_surfing ? '<circle cx="12.5" cy="8" r="2" fill="#059669"/>' : ''}
-      ${spot.longboard_friendly ? '<circle cx="12.5" cy="17" r="2" fill="#7C3AED"/>' : ''}
-    </svg>
+  // Use a simple colored circle instead of complex SVG
+  const iconHtml = `
+    <div style="
+      background-color: ${color};
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    "></div>
   `;
 
-  return new L.Icon({
-    iconUrl: 'data:image/svg+xml;base64,' + btoa(iconSvg),
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
+  return L.divIcon({
+    html: iconHtml,
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+    popupAnchor: [0, -10],
+    className: 'custom-surf-marker'
   });
 };
 
@@ -115,65 +117,78 @@ const EnhancedSurfSpotMap: React.FC<EnhancedSurfSpotMapProps> = ({
             icon={createSurfSpotIcon(spot)}
           >
             <Popup maxWidth={350} minWidth={320} closeButton={true}>
-              <div className="w-80 max-w-sm">
-                <div className="mb-3">
-                  <h3 className="font-bold text-lg text-blue-800">{spot.full_name}</h3>
-                  <div className="text-sm text-gray-600 mb-2">
+              <div style={{ width: '320px', maxWidth: '100%' }}>
+                <div style={{ marginBottom: '12px' }}>
+                  <h3 style={{ fontWeight: 'bold', fontSize: '18px', color: '#1e40af', marginBottom: '4px' }}>
+                    {spot.full_name}
+                  </h3>
+                  <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px' }}>
                     {spot.region}, {spot.country}
                   </div>
-                  <p className="text-sm text-gray-700 mb-2">{spot.description}</p>
+                  <p style={{ fontSize: '14px', color: '#374151', marginBottom: '8px' }}>
+                    {spot.description}
+                  </p>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 mb-3">
-                  <div className="bg-blue-50 p-2 rounded-md">
-                    <div className="text-xs text-gray-600 mb-1">Break Type</div>
-                    <p className="text-sm font-medium">{spot.break_type}</p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
+                  <div style={{ backgroundColor: '#eff6ff', padding: '8px', borderRadius: '6px' }}>
+                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Break Type</div>
+                    <p style={{ fontSize: '14px', fontWeight: '500' }}>{spot.break_type}</p>
                   </div>
                   
-                  <div className="bg-gray-50 p-2 rounded-md">
-                    <div className="text-xs text-gray-600 mb-1">Wave Height</div>
-                    <p className="text-sm font-medium">{spot.wave_height_range}</p>
+                  <div style={{ backgroundColor: '#f9fafb', padding: '8px', borderRadius: '6px' }}>
+                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Wave Height</div>
+                    <p style={{ fontSize: '14px', fontWeight: '500' }}>{spot.wave_height_range}</p>
                   </div>
 
-                  <div className="bg-blue-50 p-2 rounded-md">
-                    <div className="text-xs text-gray-600 mb-1">Best Season</div>
-                    <p className="text-sm font-medium">{spot.best_season}</p>
+                  <div style={{ backgroundColor: '#eff6ff', padding: '8px', borderRadius: '6px' }}>
+                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Best Season</div>
+                    <p style={{ fontSize: '14px', fontWeight: '500' }}>{spot.best_season}</p>
                   </div>
 
-                  <div className="bg-gray-50 p-2 rounded-md">
-                    <div className="text-xs text-gray-600 mb-1">Difficulty</div>
-                    <p className="text-sm font-medium">{spot.difficulty}</p>
+                  <div style={{ backgroundColor: '#f9fafb', padding: '8px', borderRadius: '6px' }}>
+                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Difficulty</div>
+                    <p style={{ fontSize: '14px', fontWeight: '500' }}>{spot.difficulty}</p>
                   </div>
                 </div>
 
-                <div className="space-y-2 mb-3">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-600">Water Temp:</span>
-                    <span className="font-medium">{spot.water_temp_range}</span>
+                <div style={{ marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
+                    <span style={{ color: '#6b7280' }}>Water Temp:</span>
+                    <span style={{ fontWeight: '500' }}>{spot.water_temp_range}</span>
                   </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-600">Best Tide:</span>
-                    <span className="font-medium">{spot.best_tide}</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
+                    <span style={{ color: '#6b7280' }}>Best Tide:</span>
+                    <span style={{ fontWeight: '500' }}>{spot.best_tide}</span>
                   </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-600">Ideal Swell:</span>
-                    <span className="font-medium">{spot.ideal_swell_direction}</span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
+                    <span style={{ color: '#6b7280' }}>Ideal Swell:</span>
+                    <span style={{ fontWeight: '500' }}>{spot.ideal_swell_direction}</span>
                   </div>
                 </div>
 
                 {spot.pro_tip && (
-                  <div className="bg-yellow-50 p-2 rounded-md mb-3">
-                    <div className="text-xs text-yellow-700 font-medium mb-1">Pro Tip</div>
-                    <p className="text-xs text-yellow-800">{spot.pro_tip}</p>
+                  <div style={{ backgroundColor: '#fefce8', padding: '8px', borderRadius: '6px', marginBottom: '12px' }}>
+                    <div style={{ fontSize: '12px', color: '#a16207', fontWeight: '500', marginBottom: '4px' }}>Pro Tip</div>
+                    <p style={{ fontSize: '12px', color: '#92400e' }}>{spot.pro_tip}</p>
                   </div>
                 )}
 
-                <div className="flex space-x-2">
+                <div style={{ display: 'flex', gap: '8px' }}>
                   <a 
                     href={spot.google_maps_link} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex-1 bg-blue-500 text-white text-center py-1 px-2 rounded text-xs hover:bg-blue-600"
+                    style={{ 
+                      flex: 1, 
+                      backgroundColor: '#3b82f6', 
+                      color: 'white', 
+                      textAlign: 'center', 
+                      padding: '4px 8px', 
+                      borderRadius: '4px', 
+                      fontSize: '12px',
+                      textDecoration: 'none'
+                    }}
                   >
                     Maps
                   </a>
@@ -182,7 +197,16 @@ const EnhancedSurfSpotMap: React.FC<EnhancedSurfSpotMapProps> = ({
                       href={spot.live_cam} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="flex-1 bg-green-500 text-white text-center py-1 px-2 rounded text-xs hover:bg-green-600"
+                      style={{ 
+                        flex: 1, 
+                        backgroundColor: '#10b981', 
+                        color: 'white', 
+                        textAlign: 'center', 
+                        padding: '4px 8px', 
+                        borderRadius: '4px', 
+                        fontSize: '12px',
+                        textDecoration: 'none'
+                      }}
                     >
                       Live Cam
                     </a>
