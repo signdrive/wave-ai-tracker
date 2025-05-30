@@ -24,11 +24,21 @@ const DatabaseMapHeader: React.FC<DatabaseMapHeaderProps> = ({
         <div>
           <h1 className="text-3xl font-bold text-ocean-dark">Real Surf Spots Database</h1>
           <p className="text-gray-600 mt-1">
-            {isLoading ? 'Loading...' : `${surfSpots.length} surf spots from Supabase database`}
+            {isLoading ? 'Loading surf spots...' : `${surfSpots.length} surf spots from Supabase database`}
           </p>
-          {!isLoading && (
-            <p className="text-sm text-green-600 font-medium">
-              ✅ Connected to live database - showing {filteredSpots.length} filtered results
+          {!isLoading && surfSpots.length > 0 && (
+            <div className="space-y-1 mt-2">
+              <p className="text-sm text-green-600 font-medium">
+                ✅ Connected to live database - showing {filteredSpots.length} filtered results
+              </p>
+              <p className="text-xs text-blue-600">
+                🗄️ Total in database: {surfSpots.length} spots | Project: Supabase
+              </p>
+            </div>
+          )}
+          {!isLoading && surfSpots.length === 0 && (
+            <p className="text-sm text-red-600 font-medium">
+              ⚠️ No surf spots loaded from database - check connection
             </p>
           )}
         </div>

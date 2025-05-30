@@ -42,31 +42,42 @@ export const useSupabaseSurfSpots = () => {
   const { data: surfSpots = [], isLoading, error } = useQuery({
     queryKey: ['supabase-surf-spots'],
     queryFn: async (): Promise<SupabaseSurfSpot[]> => {
-      console.log('🔄 Fetching surf spots from Supabase database...');
+      console.log('🔄 Fetching ALL surf spots from Supabase database...');
       
       try {
-        const { data, error } = await supabase
+        // Fetch ALL surf spots without any limits
+        const { data, error, count } = await supabase
           .from('surf_spots')
-          .select('*')
+          .select('*', { count: 'exact' })
           .not('lat', 'is', null)
-          .not('lon', 'is', null);
+          .not('lon', 'is', null)
+          .order('name');
         
         if (error) {
-          console.error('❌ Error fetching surf spots:', error);
+          console.error('❌ Supabase query error:', error);
           throw error;
         }
         
         console.log(`✅ Successfully loaded ${data?.length || 0} surf spots from database`);
-        console.log('📊 Raw data sample:', data?.slice(0, 2));
+        console.log(`📊 Total count from database: ${count}`);
+        console.log('🗄️ Database connection details:');
+        console.log('- Project URL:', supabase.supabaseUrl);
+        console.log('- Table: surf_spots');
+        console.log('- Columns fetched: ALL (*)');
+        
+        if (data && data.length > 0) {
+          console.log('📍 Sample surf spot data:', data[0]);
+          console.log('🏄‍♂️ First 5 spot names:', data.slice(0, 5).map(spot => spot.name));
+        }
         
         return data || [];
       } catch (err) {
-        console.error('❌ Database query failed:', err);
+        console.error('❌ Database connection failed:', err);
         throw err;
       }
     },
-    staleTime: 5 * 60 * 1000,
-    retry: 2,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 3,
     retryDelay: 1000,
   });
 
@@ -106,29 +117,40 @@ export const useSupabaseSurfSpots = () => {
         crowd_factor: spot.crowd_levels || 'Unknown',
         live_cam: '',
         backup_cam: '',
-        status: 'PLACEHOLDER' as const,
+        status: 'ACTIVE' as const,
         last_verified: new Date().toISOString().split('T')[0],
         source: 'Supabase Database',
         imageSrc: 'https://images.unsplash.com/photo-1505142468610-359e7d316be0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80'
       };
       
-      console.log(`🎯 Converted spot: ${converted.name} at [${converted.lat}, ${converted.lon}]`);
       return converted;
     });
 
-  console.log(`🎯 Total converted spots: ${convertedSpots.length}`);
-  console.log('📍 Sample converted spots:', convertedSpots.slice(0, 3).map(spot => ({
-    name: spot.name,
-    lat: spot.lat,
-    lon: spot.lon,
-    id: spot.id
-  })));
+  console.log(`🎯 Total spots after conversion and filtering: ${convertedSpots.length}`);
+  
+  if (convertedSpots.length > 0) {
+    console.log('📍 Sample converted spots:', convertedSpots.slice(0, 3).map(spot => ({
+      name: spot.name,
+      lat: spot.lat,
+      lon: spot.lon,
+      id: spot.id
+    })));
+    
+    // Log California spots specifically
+    const californiaSpots = convertedSpots.filter(spot => 
+      spot.state?.toLowerCase().includes('california') || 
+      spot.country?.toLowerCase().includes('usa')
+    );
+    console.log(`🏄‍♂️ California surf spots found: ${californiaSpots.length}`);
+    console.log('🌊 Sample California spots:', californiaSpots.slice(0, 5).map(spot => spot.name));
+  }
 
   return {
     surfSpots: convertedSpots,
     rawSpots: surfSpots,
     isLoading,
     error,
+    totalCount: surfSpots.length,
     getSurfSpotById: (id: string) => convertedSpots.find(spot => spot.id === id),
     getSurfSpotsByCountry: (country: string) => convertedSpots.filter(spot => spot.country === country),
     getSurfSpotsByDifficulty: (difficulty: string) => convertedSpots.filter(spot => spot.difficulty.includes(difficulty))

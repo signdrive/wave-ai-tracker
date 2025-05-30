@@ -59,6 +59,7 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-ocean mx-auto mb-2"></div>
           <p className="text-gray-600">Loading surf spots from database...</p>
+          <p className="text-sm text-gray-500 mt-1">Connecting to Supabase...</p>
         </div>
       </div>
     );
@@ -79,6 +80,15 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
       <div className="absolute bottom-2 left-2 bg-green-500/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-white shadow-md">
         ✅ Live Supabase Data
       </div>
+
+      {spots.length === 0 && !isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/80">
+          <div className="text-center p-6">
+            <p className="text-lg font-medium text-gray-700 mb-2">No surf spots found</p>
+            <p className="text-sm text-gray-500">Check database connection or filters</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
