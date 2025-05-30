@@ -99,17 +99,29 @@ export const useMapMarkers = ({
         // Extend bounds
         bounds.extend([lat, lon]);
 
-        // Add click handler
-        marker.on('click', () => {
+        // Create and bind popup first
+        const popupContent = createPopupContent(spot);
+        marker.bindPopup(popupContent, { 
+          maxWidth: 300,
+          closeButton: true,
+          autoPan: true
+        });
+
+        // Add click handler - open popup and trigger callback
+        marker.on('click', (e) => {
           console.log(`🖱️ Marker clicked for spot: ${spot.full_name}`);
+          
+          // Open the popup
+          marker.openPopup();
+          
+          // Trigger the spot click callback if provided
           if (onSpotClick) {
             onSpotClick(spot.id);
           }
+          
+          // Prevent event from bubbling to map
+          L.DomEvent.stopPropagation(e);
         });
-        
-        // Create and bind popup
-        const popupContent = createPopupContent(spot);
-        marker.bindPopup(popupContent, { maxWidth: 300 });
 
         // Apply selection styling if needed
         if (selectedSpotId === spot.id) {
@@ -152,10 +164,15 @@ export const useMapMarkers = ({
         mapInstance.setView([selectedSpot.lat, selectedSpot.lon], 12);
         console.log(`🎯 Centered map on ${selectedSpot.full_name}`);
         
-        // Update marker icons
+        // Update marker icons and open popup for selected spot
         markersRef.current.forEach((marker, spotId) => {
           const isSelected = spotId === selectedSpotId;
-          marker.setIcon(isSelected ? highlightedIcon : new L.Icon.Default());
+          if (isSelected) {
+            marker.setIcon(highlightedIcon);
+            marker.openPopup();
+          } else {
+            marker.setIcon(new L.Icon.Default());
+          }
         });
       }
     }
