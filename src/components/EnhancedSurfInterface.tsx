@@ -17,9 +17,16 @@ import AROverlaySystem from './AROverlaySystem';
 import AdvancedAnalyticsDashboard from './AdvancedAnalyticsDashboard';
 import RealTimeSurfCam from './RealTimeSurfCam';
 
-const EnhancedSurfInterface: React.FC = () => {
+interface EnhancedSurfInterfaceProps {
+  spotId?: string;
+  spotName?: string;
+}
+
+const EnhancedSurfInterface: React.FC<EnhancedSurfInterfaceProps> = ({ 
+  spotId = 'malibu-ca', 
+  spotName = 'Malibu' 
+}) => {
   const [activeTab, setActiveTab] = useState('forecast');
-  const [currentSpot] = useState('malibu-ca');
 
   const handleSpotQuery = (spotName: string) => {
     console.log('Voice query for spot:', spotName);
@@ -106,7 +113,7 @@ const EnhancedSurfInterface: React.FC = () => {
 
           {/* AI Forecast Engine */}
           <TabsContent value="forecast">
-            <AIForecastEngine />
+            <AIForecastEngine spotId={spotId} spotName={spotName} />
           </TabsContent>
 
           {/* Enhanced Surf Cams */}
@@ -120,10 +127,15 @@ const EnhancedSurfInterface: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <RealTimeSurfCam
-                  spotId={currentSpot}
-                  spotName="Malibu"
+                  spotId={spotId}
+                  spotName={spotName}
                   imageSrc="/placeholder.svg"
-                  cameraStatus={{ status: 'LIVE', lastChecked: new Date().toISOString() }}
+                  cameraStatus={{ 
+                    spotId: spotId,
+                    status: 'LIVE', 
+                    lastChecked: new Date().toISOString(),
+                    isValid: true
+                  }}
                   metadata={{
                     lat: 34.0259,
                     lon: -118.7798,
@@ -145,12 +157,12 @@ const EnhancedSurfInterface: React.FC = () => {
 
           {/* Booking Marketplace */}
           <TabsContent value="booking">
-            <BookingMarketplace />
+            <BookingMarketplace spotId={spotId} spotName={spotName} />
           </TabsContent>
 
           {/* Social Community */}
           <TabsContent value="community">
-            <SocialCommunityHub />
+            <SocialCommunityHub spotId={spotId} spotName={spotName} />
           </TabsContent>
 
           {/* Voice Commands */}
@@ -166,7 +178,7 @@ const EnhancedSurfInterface: React.FC = () => {
           <TabsContent value="session">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <SessionLogger
-                currentSpot="Malibu"
+                currentSpot={spotName}
                 onSessionSaved={handleSessionSaved}
               />
               <WearableIntegration />
