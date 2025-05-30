@@ -1,6 +1,5 @@
 
-import React, { useState } from 'react';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import React, { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { EnhancedSurfSpot } from '@/types/enhancedSurfSpots';
@@ -29,139 +28,152 @@ const EnhancedSurfSpotMap: React.FC<EnhancedSurfSpotMapProps> = ({
   spots,
   filters = {}
 }) => {
-  const [mapCenter] = useState<[number, number]>([20, 0]);
-  const [mapZoom] = useState(2);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
 
-  // Simple filtering
-  const filteredSpots = spots.filter(spot => {
-    if (filters.difficulty && filters.difficulty !== 'all' && spot.difficulty !== filters.difficulty) {
-      return false;
-    }
-    if (filters.country && filters.country !== 'all' && spot.country !== filters.country) {
-      return false;
-    }
-    if (filters.big_wave && !spot.big_wave) {
-      return false;
-    }
-    if (filters.longboard_friendly && !spot.longboard_friendly) {
-      return false;
-    }
-    if (filters.kite_surfing && !spot.kite_surfing) {
-      return false;
-    }
-    return true;
-  });
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    // Initialize map
+    const map = L.map(mapRef.current).setView([20, 0], 2);
+    mapInstanceRef.current = map;
+
+    // Add tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+
+    // Clear existing markers
+    mapInstanceRef.current.eachLayer((layer) => {
+      if (layer instanceof L.Marker) {
+        mapInstanceRef.current!.removeLayer(layer);
+      }
+    });
+
+    // Simple filtering
+    const filteredSpots = spots.filter(spot => {
+      if (filters.difficulty && filters.difficulty !== 'all' && spot.difficulty !== filters.difficulty) {
+        return false;
+      }
+      if (filters.country && filters.country !== 'all' && spot.country !== filters.country) {
+        return false;
+      }
+      if (filters.big_wave && !spot.big_wave) {
+        return false;
+      }
+      if (filters.longboard_friendly && !spot.longboard_friendly) {
+        return false;
+      }
+      if (filters.kite_surfing && !spot.kite_surfing) {
+        return false;
+      }
+      return true;
+    });
+
+    // Add markers for filtered spots
+    filteredSpots.forEach((spot) => {
+      const marker = L.marker([spot.lat, spot.lon]).addTo(mapInstanceRef.current!);
+      
+      // Create HTML content for popup
+      const popupContent = `
+        <div style="max-width: 300px;">
+          <h3 style="font-weight: bold; font-size: 18px; color: #1e40af; margin-bottom: 8px;">
+            ${spot.full_name}
+          </h3>
+          <p style="font-size: 14px; color: #6b7280; margin-bottom: 8px;">
+            ${spot.region}, ${spot.country}
+          </p>
+          <p style="font-size: 14px; margin-bottom: 12px;">
+            ${spot.description}
+          </p>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; font-size: 14px;">
+            <div>
+              <span style="font-weight: 500;">Difficulty:</span> ${spot.difficulty}
+            </div>
+            <div>
+              <span style="font-weight: 500;">Break:</span> ${spot.break_type}
+            </div>
+            <div>
+              <span style="font-weight: 500;">Season:</span> ${spot.best_season}
+            </div>
+            <div>
+              <span style="font-weight: 500;">Waves:</span> ${spot.wave_height_range}
+            </div>
+          </div>
+
+          ${spot.pro_tip ? `
+            <div style="background-color: #fefce8; padding: 8px; border-radius: 4px; margin-bottom: 12px;">
+              <div style="font-size: 12px; font-weight: 500; color: #b45309;">Pro Tip:</div>
+              <div style="font-size: 12px; color: #92400e;">${spot.pro_tip}</div>
+            </div>
+          ` : ''}
+
+          <div style="display: flex; gap: 8px;">
+            <a 
+              href="${spot.google_maps_link}" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style="flex: 1; background-color: #3b82f6; color: white; text-align: center; padding: 4px 8px; border-radius: 4px; font-size: 14px; text-decoration: none;"
+            >
+              Maps
+            </a>
+            ${spot.live_cam ? `
+              <a 
+                href="${spot.live_cam}" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style="flex: 1; background-color: #10b981; color: white; text-align: center; padding: 4px 8px; border-radius: 4px; font-size: 14px; text-decoration: none;"
+              >
+                Live Cam
+              </a>
+            ` : ''}
+          </div>
+        </div>
+      `;
+      
+      marker.bindPopup(popupContent, { maxWidth: 300 });
+    });
+
+  }, [spots, filters]);
 
   return (
     <div className="relative w-full h-full rounded-lg overflow-hidden shadow-lg">
-      <MapContainer
-        center={mapCenter}
-        zoom={mapZoom}
-        style={{ height: '100%', width: '100%' }}
-        zoomControl={true}
-      >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-        
-        {filteredSpots.map((spot) => (
-          <Marker
-            key={spot.id}
-            position={[spot.lat, spot.lon]}
-          >
-            <Popup maxWidth={300}>
-              <div>
-                <h3 style={{ fontWeight: 'bold', fontSize: '18px', color: '#1e40af', marginBottom: '8px' }}>
-                  {spot.full_name}
-                </h3>
-                <p style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px' }}>
-                  {spot.region}, {spot.country}
-                </p>
-                <p style={{ fontSize: '14px', marginBottom: '12px' }}>
-                  {spot.description}
-                </p>
-                
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px', fontSize: '14px' }}>
-                  <div>
-                    <span style={{ fontWeight: '500' }}>Difficulty:</span> {spot.difficulty}
-                  </div>
-                  <div>
-                    <span style={{ fontWeight: '500' }}>Break:</span> {spot.break_type}
-                  </div>
-                  <div>
-                    <span style={{ fontWeight: '500' }}>Season:</span> {spot.best_season}
-                  </div>
-                  <div>
-                    <span style={{ fontWeight: '500' }}>Waves:</span> {spot.wave_height_range}
-                  </div>
-                </div>
-
-                {spot.pro_tip && (
-                  <div style={{ backgroundColor: '#fefce8', padding: '8px', borderRadius: '4px', marginBottom: '12px' }}>
-                    <div style={{ fontSize: '12px', fontWeight: '500', color: '#b45309' }}>Pro Tip:</div>
-                    <div style={{ fontSize: '12px', color: '#92400e' }}>{spot.pro_tip}</div>
-                  </div>
-                )}
-
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <a 
-                    href={spot.google_maps_link} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    style={{ 
-                      flex: '1', 
-                      backgroundColor: '#3b82f6', 
-                      color: 'white', 
-                      textAlign: 'center', 
-                      padding: '4px 8px', 
-                      borderRadius: '4px', 
-                      fontSize: '14px', 
-                      textDecoration: 'none' 
-                    }}
-                  >
-                    Maps
-                  </a>
-                  {spot.live_cam && (
-                    <a 
-                      href={spot.live_cam} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      style={{ 
-                        flex: '1', 
-                        backgroundColor: '#10b981', 
-                        color: 'white', 
-                        textAlign: 'center', 
-                        padding: '4px 8px', 
-                        borderRadius: '4px', 
-                        fontSize: '14px', 
-                        textDecoration: 'none' 
-                      }}
-                    >
-                      Live Cam
-                    </a>
-                  )}
-                </div>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
+      <div 
+        ref={mapRef} 
+        className="w-full h-full min-h-[400px]"
+      />
       
-      <div style={{ 
-        position: 'absolute', 
-        top: '8px', 
-        right: '8px', 
-        backgroundColor: 'rgba(255, 255, 255, 0.9)', 
-        backdropFilter: 'blur(4px)', 
-        padding: '4px 12px', 
-        borderRadius: '9999px', 
-        fontSize: '14px', 
-        fontWeight: '500', 
-        color: '#374151', 
-        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' 
-      }}>
-        {filteredSpots.length} spots shown
+      <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-gray-700 shadow-md">
+        {spots.filter(spot => {
+          if (filters.difficulty && filters.difficulty !== 'all' && spot.difficulty !== filters.difficulty) {
+            return false;
+          }
+          if (filters.country && filters.country !== 'all' && spot.country !== filters.country) {
+            return false;
+          }
+          if (filters.big_wave && !spot.big_wave) {
+            return false;
+          }
+          if (filters.longboard_friendly && !spot.longboard_friendly) {
+            return false;
+          }
+          if (filters.kite_surfing && !spot.kite_surfing) {
+            return false;
+          }
+          return true;
+        }).length} spots shown
       </div>
     </div>
   );
