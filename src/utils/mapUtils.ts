@@ -4,9 +4,10 @@ import L from 'leaflet';
 // Fix for default markers in react-leaflet with error handling
 export const initializeLeafletIcons = () => {
   try {
-    // Check if already initialized
-    if (L.Icon.Default.prototype._getIconUrl) {
-      delete (L.Icon.Default.prototype as any)._getIconUrl;
+    // Check if already initialized by checking if the prototype has the URLs
+    const defaultIcon = L.Icon.Default.prototype as any;
+    if (defaultIcon.options && defaultIcon.options.iconUrl) {
+      return; // Already initialized
     }
     
     L.Icon.Default.mergeOptions({
