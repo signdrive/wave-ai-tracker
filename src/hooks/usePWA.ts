@@ -19,12 +19,26 @@ export function usePWA() {
     window.addEventListener('offline', handleOffline);
 
     const handleBeforeInstallPrompt = (e: BeforeInstallPromptEvent) => {
+      console.log('beforeinstallprompt event fired');
       e.preventDefault();
       setDeferredPrompt(e);
       setIsInstallable(true);
     };
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt as EventListener);
+    // Check if app is already installed
+    const checkIfInstalled = () => {
+      if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('App is already installed');
+        setIsInstallable(false);
+        return true;
+      }
+      return false;
+    };
+
+    // Only show install prompt if not already installed
+    if (!checkIfInstalled()) {
+      window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt as EventListener);
+    }
 
     // Register service worker
     if ('serviceWorker' in navigator) {
@@ -46,8 +60,10 @@ export function usePWA() {
 
   const installPWA = async () => {
     if (deferredPrompt) {
+      console.log('Triggering install prompt');
       deferredPrompt.prompt();
       const choiceResult = await deferredPrompt.userChoice;
+      console.log('User choice:', choiceResult.outcome);
       if (choiceResult.outcome === 'accepted') {
         console.log('User accepted the install prompt');
         setIsInstallable(false);

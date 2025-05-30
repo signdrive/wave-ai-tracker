@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { X, Smartphone, Download } from 'lucide-react';
@@ -9,7 +9,16 @@ const PWAInstallPrompt: React.FC = () => {
   const { isInstallable, installPWA } = usePWA();
   const [isDismissed, setIsDismissed] = useState(false);
 
-  if (!isInstallable || isDismissed) return null;
+  useEffect(() => {
+    console.log('PWAInstallPrompt - isInstallable:', isInstallable, 'isDismissed:', isDismissed);
+  }, [isInstallable, isDismissed]);
+
+  if (!isInstallable || isDismissed) {
+    console.log('Not showing install prompt - isInstallable:', isInstallable, 'isDismissed:', isDismissed);
+    return null;
+  }
+
+  console.log('Showing PWA install prompt');
 
   return (
     <div className="fixed bottom-4 left-4 right-4 z-50 animate-in slide-in-from-bottom-4 duration-300 md:left-auto md:right-4 md:w-80">
