@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { render, RenderOptions } from '@testing-library/react';
+import { render, RenderOptions, screen, fireEvent, waitFor } from '@testing-library/react';
+import { userEvent } from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@/components/ThemeProvider';
@@ -8,6 +9,9 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 // Re-export everything from testing library
 export * from '@testing-library/react';
 export { userEvent } from '@testing-library/user-event';
+
+// Explicitly export commonly used utilities
+export { screen, fireEvent, waitFor };
 
 // Create a test query client with disabled retries
 const createTestQueryClient = () => new QueryClient({
