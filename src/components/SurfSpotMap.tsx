@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import MarkerClusterGroup from 'react-leaflet-cluster';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { SurfSpot } from '@/types/surfSpots';
@@ -117,27 +116,20 @@ const SurfSpotMap: React.FC<SurfSpotMapProps> = ({
           maxZoom={18}
         />
         
-        <MarkerClusterGroup
-          chunkedLoading
-          maxClusterRadius={50}
-          spiderfyOnMaxZoom={true}
-          showCoverageOnHover={false}
-        >
-          {filteredSpots.map((spot) => (
-            <Marker
-              key={spot.id}
-              position={[spot.lat, spot.lon]}
-              icon={createSurfSpotIcon(spot.difficulty, !!spot.live_cam)}
-              eventHandlers={{
-                click: () => handleMarkerClick(spot),
-              }}
-            >
-              <Popup maxWidth={400} minWidth={300} closeButton={true}>
-                <SurfSpotPopup spot={spot} />
-              </Popup>
-            </Marker>
-          ))}
-        </MarkerClusterGroup>
+        {filteredSpots.map((spot) => (
+          <Marker
+            key={spot.id}
+            position={[spot.lat, spot.lon]}
+            icon={createSurfSpotIcon(spot.difficulty, !!spot.live_cam)}
+            eventHandlers={{
+              click: () => handleMarkerClick(spot),
+            }}
+          >
+            <Popup maxWidth={400} minWidth={300} closeButton={true}>
+              <SurfSpotPopup spot={spot} />
+            </Popup>
+          </Marker>
+        ))}
       </MapContainer>
       
       {/* Spot counter overlay */}
