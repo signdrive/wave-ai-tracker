@@ -5,39 +5,88 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import Index from "./pages/Index";
-import MapPage from "./pages/MapPage";
-import PremiumPage from "./pages/PremiumPage";
-import NotFound from "./pages/NotFound";
+import { lazy } from "react";
+import LazyLoader from "@/components/LazyLoader";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import OfflineIndicator from "./components/OfflineIndicator";
 import PWAInstallPrompt from "./components/PWAInstallPrompt";
 
-const queryClient = new QueryClient();
+// Lazy load pages for better performance
+const Index = lazy(() => import("./pages/Index"));
+const MapPage = lazy(() => import("./pages/MapPage"));
+const PremiumPage = lazy(() => import("./pages/PremiumPage"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
+      retry: (failureCount, error) => {
+        // Don't retry on 4xx errors
+        if (error && 'status' in error && typeof error.status === 'number') {
+          return error.status >= 500 && failureCount < 3;
+        }
+        return failureCount < 3;
+      },
+    },
+  },
+});
 
 const App = () => {
   console.log('App component rendering...');
   
   return (
-    <ThemeProvider defaultTheme="system" storageKey="wave-ai-theme">
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <OfflineIndicator />
-          <PWAInstallPrompt />
-          <BrowserRouter>
-            <div className="min-h-screen w-full transition-colors duration-300">
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/map" element={<MapPage />} />
-                <Route path="/premium" element={<PremiumPage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </div>
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider defaultTheme="system" storageKey="wave-ai-theme">
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <OfflineIndicator />
+            <PWAInstallPrompt />
+            <BrowserRouter>
+              <div className="min-h-screen w-full transition-colors duration-300">
+                <Routes>
+                  <Route 
+                    path="/" 
+                    element={
+                      <LazyLoader skeletonType="tabs">
+                        <Index />
+                      </LazyLoader>
+                    } 
+                  />
+                  <Route 
+                    path="/map" 
+                    element={
+                      <LazyLoader skeletonType="forecast">
+                        <MapPage />
+                      </LazyLoader>
+                    } 
+                  />
+                  <Route 
+                    path="/premium" 
+                    element={
+                      <LazyLoader skeletonType="card">
+                        <PremiumPage />
+                      </LazyLoader>
+                    } 
+                  />
+                  <Route 
+                    path="*" 
+                    element={
+                      <LazyLoader>
+                        <NotFound />
+                      </LazyLoader>
+                    } 
+                  />
+                </Routes>
+              </div>
+            </BrowserRouter>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 };
 

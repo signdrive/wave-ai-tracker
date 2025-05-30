@@ -1,0 +1,81 @@
+
+import React from 'react';
+import { render, RenderOptions } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter } from 'react-router-dom';
+import { ThemeProvider } from '@/components/ThemeProvider';
+
+// Create a test query client with disabled retries
+const createTestQueryClient = () => new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      gcTime: 0,
+    },
+    mutations: {
+      retry: false,
+    },
+  },
+});
+
+interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
+  queryClient?: QueryClient;
+}
+
+const AllTheProviders = ({ 
+  children, 
+  queryClient = createTestQueryClient() 
+}: { 
+  children: React.ReactNode;
+  queryClient?: QueryClient;
+}) => {
+  return (
+    <ThemeProvider defaultTheme="light" storageKey="test-theme">
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          {children}
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ThemeProvider>
+  );
+};
+
+const customRender = (
+  ui: React.ReactElement,
+  options: CustomRenderOptions = {}
+) => {
+  const { queryClient, ...renderOptions } = options;
+  
+  return render(ui, {
+    wrapper: (props) => <AllTheProviders {...props} queryClient={queryClient} />,
+    ...renderOptions,
+  });
+};
+
+// Mock functions for testing
+export const mockGeolocation = {
+  getCurrentPosition: jest.fn(),
+  watchPosition: jest.fn(),
+  clearWatch: jest.fn(),
+};
+
+export const mockLocalStorage = (() => {
+  let store: Record<string, string> = {};
+  
+  return {
+    getItem: (key: string) => store[key] || null,
+    setItem: (key: string, value: string) => {
+      store[key] = value.toString();
+    },
+    removeItem: (key: string) => {
+      delete store[key];
+    },
+    clear: () => {
+      store = {};
+    },
+  };
+})();
+
+// Export everything
+export * from '@testing-library/react';
+export { customRender as render, createTestQueryClient };
