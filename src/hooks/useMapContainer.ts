@@ -12,30 +12,21 @@ export const useMapContainer = () => {
 
   const validateContainer = (): boolean => {
     if (!mapRef.current) return false;
-    
-    if (!mapRef.current.offsetParent && mapRef.current.style.display !== 'block') {
-      console.warn('⚠️ Map container not visible');
-      return false;
-    }
-    
-    return true;
+    return true; // Simplified validation
   };
 
   const markAsReady = () => {
-    if (isInitializedRef.current) return;
+    console.log('🎯 markAsReady called');
     
     try {
-      if (mapInstanceRef.current?.getContainer()) {
-        const container = mapInstanceRef.current.getContainer();
-        if (!container?.offsetParent) {
-          console.warn('⚠️ Map container invalid during ready check');
-          return;
-        }
-
+      if (mapInstanceRef.current) {
+        console.log('✅ Map instance exists, marking as ready');
         mapInstanceRef.current.invalidateSize();
         isInitializedRef.current = true;
         setIsMapReady(true);
-        console.log('✅ Map marked as ready');
+        console.log('✅ Map marked as ready successfully');
+      } else {
+        console.warn('⚠️ No map instance when trying to mark as ready');
       }
     } catch (error) {
       console.error('❌ Error in markAsReady:', error);
@@ -43,6 +34,7 @@ export const useMapContainer = () => {
   };
 
   const cleanup = () => {
+    console.log('🧹 Starting cleanup...');
     setIsMapReady(false);
 
     if (cleanupRef.current) {

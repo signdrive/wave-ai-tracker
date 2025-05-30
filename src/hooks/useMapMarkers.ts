@@ -41,9 +41,9 @@ export const useMapMarkers = ({
 }: UseMapMarkersProps) => {
   const markersRef = useRef<Map<string, L.Marker>>(new Map());
 
-  // Main effect to create and manage markers
+  // Create markers when map and data are ready
   useEffect(() => {
-    console.log('🎯 useMapMarkers: Starting marker management', {
+    console.log('🎯 useMapMarkers effect triggered:', {
       hasMapInstance: !!mapInstance,
       hasLayerGroup: !!layerGroup,
       isMapReady,
@@ -51,56 +51,55 @@ export const useMapMarkers = ({
       spotsCount: spots.length
     });
 
-    // Prerequisites check
-    if (!mapInstance || !layerGroup || !isMapReady || isLoading || spots.length === 0) {
-      console.log('❌ Prerequisites not met, skipping marker creation');
+    // Don't proceed if essential components are missing
+    if (!mapInstance || !layerGroup || isLoading) {
+      console.log('❌ Missing prerequisites, skipping marker creation');
       return;
     }
 
-    console.log('✅ All prerequisites met, creating markers directly...');
+    // Don't proceed if no spots
+    if (spots.length === 0) {
+      console.log('❌ No spots to display');
+      return;
+    }
+
+    console.log('✅ All prerequisites met, creating markers...');
 
     // Clear existing markers
-    console.log('🧹 Clearing existing markers...');
     layerGroup.clearLayers();
     markersRef.current.clear();
+    console.log('🧹 Cleared existing markers');
 
     let successCount = 0;
     const bounds = L.latLngBounds([]);
     let hasBounds = false;
 
-    // Create markers directly - no complex logic
+    // Create markers immediately
     spots.forEach((spot, index) => {
       try {
         const lat = Number(spot.lat);
         const lon = Number(spot.lon);
         
-        console.log(`📍 Creating marker ${index + 1}/${spots.length}: ${spot.full_name}`, {
-          id: spot.id,
-          lat,
-          lon,
-          valid: isValidCoordinate(lat, lon)
-        });
+        console.log(`📍 Processing spot ${index + 1}/${spots.length}: ${spot.full_name} at [${lat}, ${lon}]`);
 
         if (!isValidCoordinate(lat, lon)) {
-          console.warn(`⚠️ Invalid coordinates for ${spot.full_name}`);
+          console.warn(`⚠️ Invalid coordinates for ${spot.full_name}: [${lat}, ${lon}]`);
           return;
         }
 
-        // Create marker with default icon
+        // Create marker
         const marker = L.marker([lat, lon]);
-        
-        console.log(`✅ Leaflet marker created for ${spot.full_name}`);
+        console.log(`✅ Created marker for ${spot.full_name}`);
 
-        // Create popup content
+        // Add popup
         const popupContent = createPopupContent(spot);
         if (popupContent) {
           marker.bindPopup(popupContent, POPUP_CONFIG);
-          console.log(`✅ Popup bound for ${spot.full_name}`);
         }
 
         // Add click handler
         marker.on('click', (e) => {
-          console.log(`🖱️ Marker clicked: ${spot.full_name} (${spot.id})`);
+          console.log(`🖱️ Marker clicked: ${spot.full_name}`);
           if (e.originalEvent) {
             L.DomEvent.stopPropagation(e.originalEvent);
           }
@@ -110,9 +109,9 @@ export const useMapMarkers = ({
           }
         });
 
-        // Add marker directly to layer group
+        // Add to layer group
         marker.addTo(layerGroup);
-        console.log(`✅ Marker added to layer group for ${spot.full_name}`);
+        console.log(`✅ Added marker to layer group for ${spot.full_name}`);
         
         // Store reference
         markersRef.current.set(spot.id, marker);
@@ -127,14 +126,14 @@ export const useMapMarkers = ({
       }
     });
 
-    console.log(`🎉 Marker creation complete: ${successCount}/${spots.length} markers created and added`);
+    console.log(`🎉 Marker creation complete: ${successCount}/${spots.length} markers created`);
 
-    // Fit bounds if we have markers
+    // Fit bounds
     if (successCount > 0 && hasBounds && bounds.isValid()) {
       setTimeout(() => {
         try {
           mapInstance.fitBounds(bounds, FIT_BOUNDS_CONFIG);
-          console.log('🔍 Map bounds fitted to markers');
+          console.log('🔍 Map bounds fitted');
         } catch (error) {
           console.error('❌ Error fitting bounds:', error);
         }
@@ -144,20 +143,20 @@ export const useMapMarkers = ({
     // Verify markers are visible
     setTimeout(() => {
       const layerCount = layerGroup.getLayers().length;
-      console.log(`🔍 Verification: Layer group contains ${layerCount} layers`);
+      console.log(`🔍 Final verification: ${layerCount} layers in layer group`);
       
       if (layerCount === 0) {
-        console.error('❌ CRITICAL: No layers found in layer group after marker creation!');
+        console.error('❌ CRITICAL: No markers visible after creation!');
       } else {
-        console.log('✅ SUCCESS: Markers are present in layer group');
+        console.log('✅ SUCCESS: Markers are visible on map');
       }
     }, 200);
 
-  }, [mapInstance, layerGroup, spots, isLoading, isMapReady, onSpotClick]);
+  }, [mapInstance, layerGroup, spots, isLoading, onSpotClick]);
 
-  // Handle selected spot changes
+  // Handle selection changes
   useEffect(() => {
-    if (!selectedSpotId || !mapInstance || !isMapReady) return;
+    if (!selectedSpotId || !mapInstance) return;
 
     console.log(`🎯 Updating selection for spot: ${selectedSpotId}`);
 
@@ -171,11 +170,11 @@ export const useMapMarkers = ({
           marker.setIcon(new L.Icon.Default());
         }
       } catch (error) {
-        console.warn(`⚠️ Error updating marker icon for spot ${spotId}:`, error);
+        console.warn(`⚠️ Error updating marker for spot ${spotId}:`, error);
       }
     });
 
-    // Center map on selected spot
+    // Center on selected spot
     const selectedSpot = spots.find(s => s.id === selectedSpotId);
     if (selectedSpot) {
       const lat = Number(selectedSpot.lat);
@@ -184,7 +183,7 @@ export const useMapMarkers = ({
         mapInstance.setView([lat, lon], 12, { animate: true });
       }
     }
-  }, [selectedSpotId, spots, mapInstance, isMapReady]);
+  }, [selectedSpotId, spots, mapInstance]);
 
   return { markersRef };
 };
