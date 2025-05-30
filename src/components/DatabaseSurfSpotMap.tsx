@@ -35,18 +35,17 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
     spotsCount: spots.length,
     isLoading,
     selectedSpotId,
-    firstSpot: spots[0] ? {
-      name: spots[0].full_name,
-      lat: spots[0].lat,
-      lon: spots[0].lon,
-      id: spots[0].id
-    } : null,
-    allSpotIds: spots.map(s => s.id).slice(0, 10)
+    sampleSpots: spots.slice(0, 3).map(s => ({
+      id: s.id,
+      name: s.full_name,
+      lat: s.lat,
+      lon: s.lon
+    }))
   });
 
   const { mapRef, mapInstanceRef, layerGroupRef, isMapReady } = useMapInitialization();
   
-  console.log('🗺️ Map state:', {
+  console.log('🗺️ Map initialization state:', {
     hasMapRef: !!mapRef.current,
     hasMapInstance: !!mapInstanceRef.current,
     hasLayerGroup: !!layerGroupRef.current,
@@ -63,11 +62,11 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
     isMapReady
   });
 
-  // Handle spot selection from popup
+  // Handle spot selection messages from popups
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data.type === 'selectSpot' && onSpotClick) {
-        console.log('📨 Received spot selection message:', event.data.spotId);
+        console.log('📨 Spot selection message received:', event.data.spotId);
         onSpotClick(event.data.spotId);
       }
     };
@@ -81,8 +80,8 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
       <div className="w-full h-full flex items-center justify-center bg-gray-100">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-ocean mx-auto mb-2"></div>
-          <p className="text-gray-600">Loading surf spots from database...</p>
-          <p className="text-sm text-gray-500 mt-1">Connecting to Supabase...</p>
+          <p className="text-gray-600">Loading surf spots...</p>
+          <p className="text-sm text-gray-500 mt-1">Connecting to database...</p>
         </div>
       </div>
     );
@@ -97,11 +96,11 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
       />
       
       <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium text-gray-700 shadow-md">
-        🗄️ {spots.length} database spots
+        🗄️ {spots.length} spots
       </div>
 
       <div className="absolute bottom-2 left-2 bg-green-500/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-medium text-white shadow-md">
-        ✅ Live Supabase Data
+        ✅ Live Data
       </div>
 
       {!isMapReady && (
@@ -117,14 +116,14 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
         <div className="absolute inset-0 flex items-center justify-center bg-white/80">
           <div className="text-center p-6">
             <p className="text-lg font-medium text-gray-700 mb-2">No surf spots found</p>
-            <p className="text-sm text-gray-500">Check database connection or filters</p>
+            <p className="text-sm text-gray-500">Check database connection</p>
           </div>
         </div>
       )}
 
-      {/* Debug info overlay - remove in production */}
+      {/* Debug status */}
       <div className="absolute bottom-2 right-2 bg-blue-500/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-medium text-white shadow-md">
-        Map: {isMapReady ? '✅' : '⏳'} | Spots: {spots.length}
+        Map: {isMapReady ? '✅' : '⏳'} | Data: {spots.length} | Loading: {isLoading ? '⏳' : '✅'}
       </div>
     </div>
   );

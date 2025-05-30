@@ -20,74 +20,42 @@ export const useMapInitialization = () => {
   } = useMapContainer();
 
   useEffect(() => {
-    console.log('🗺️ useMapInitialization effect triggered');
+    console.log('🗺️ Map initialization effect triggered');
     
     if (!validateContainer() || isInitializedRef.current) {
-      console.log('🚫 Map container not valid or already initialized');
+      console.log('🚫 Container invalid or already initialized');
       return cleanup;
     }
 
-    console.log('🗺️ Starting map initialization...');
+    console.log('🔧 Starting map initialization...');
     
-    let initializationTimeout: NodeJS.Timeout | null = null;
-
     try {
-      // Initialize Leaflet icons first
+      // Initialize Leaflet icons
       initializeLeafletIcons();
 
       // Create map instance
       const map = L.map(mapRef.current!, DEFAULT_MAP_CONFIG);
-      if (!map) {
-        throw new Error('Failed to create map instance');
-      }
-
       mapInstanceRef.current = map;
-      console.log('✅ Map instance created successfully');
-
-      // Add error handling for the map
-      map.on('error', (error) => {
-        console.error('❌ Map error:', error);
-      });
+      console.log('✅ Map instance created');
 
       // Add tile layer
       const tileLayer = L.tileLayer(TILE_LAYER_CONFIG.url, TILE_LAYER_CONFIG);
-      tileLayer.on('tileerror', (error) => {
-        console.warn('⚠️ Tile loading error:', error);
-      });
       tileLayer.addTo(map);
-      console.log('🌍 Tile layer added successfully');
+      console.log('🌍 Tile layer added');
 
-      // Create and add layer group
+      // Create layer group for markers
       const layerGroup = L.layerGroup();
-      if (!layerGroup) {
-        throw new Error('Failed to create layer group');
-      }
-
       layerGroupRef.current = layerGroup;
       layerGroup.addTo(map);
-      console.log('✅ Layer group created and added to map');
+      console.log('✅ Layer group created and added');
 
-      // Mark as ready immediately after setup
+      // Mark as ready
+      isInitializedRef.current = true;
       markAsReady();
       console.log('🎯 Map marked as ready');
 
-      // Fallback timeout in case markAsReady doesn't work
-      initializationTimeout = setTimeout(() => {
-        if (!isInitializedRef.current && mapInstanceRef.current) {
-          console.log('🔄 Fallback: forcing map ready state');
-          markAsReady();
-        }
-      }, 1000);
-
-      cleanupRef.current = () => {
-        if (initializationTimeout) {
-          clearTimeout(initializationTimeout);
-          initializationTimeout = null;
-        }
-      };
-
     } catch (error) {
-      console.error('❌ Error initializing map:', error);
+      console.error('❌ Map initialization failed:', error);
       cleanup();
     }
 
