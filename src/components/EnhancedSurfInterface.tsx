@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Waves, Camera, BookOpen, Users, Brain, Mic, Watch, Scan, BarChart3, Settings } from 'lucide-react';
+import { Waves, Camera, BookOpen, Users, Brain, Mic, Watch, Scan, BarChart3, Settings, Key, Bell, Share2 } from 'lucide-react';
 import { AnimatedTabs, AnimatedTabsList, AnimatedTabsTrigger, AnimatedTabsContent } from './AnimatedTabs';
 import { LoadingSkeleton } from './LoadingSkeleton';
 
@@ -16,6 +16,9 @@ import WearableIntegration from './WearableIntegration';
 import AROverlaySystem from './AROverlaySystem';
 import AdvancedAnalyticsDashboard from './AdvancedAnalyticsDashboard';
 import RealTimeSurfCam from './RealTimeSurfCam';
+import ApiConfigPanel from './ApiConfigPanel';
+import NotificationSettings from './NotificationSettings';
+import SocialShareButton from './SocialShareButton';
 
 interface EnhancedSurfInterfaceProps {
   spotId?: string;
@@ -80,6 +83,12 @@ const EnhancedSurfInterface: React.FC<EnhancedSurfInterfaceProps> = ({
               <Badge className="bg-purple-500 animate-pulse">
                 🎯 Premium
               </Badge>
+              <SocialShareButton
+                spot={spotName}
+                conditions="Epic"
+                rating={5}
+                className="ml-2"
+              />
             </div>
           </div>
         </div>
@@ -87,7 +96,7 @@ const EnhancedSurfInterface: React.FC<EnhancedSurfInterfaceProps> = ({
         {/* Main Interface */}
         <div className="animate-in fade-in-50 slide-in-from-bottom-4 duration-700">
           <AnimatedTabs value={activeTab} onValueChange={handleTabChange}>
-            <AnimatedTabsList className="grid w-full grid-cols-4 lg:grid-cols-8 gap-2">
+            <AnimatedTabsList className="grid w-full grid-cols-4 lg:grid-cols-10 gap-2">
               <AnimatedTabsTrigger value="forecast">
                 <Brain className="w-4 h-4 mr-1" />
                 <span className="hidden sm:inline">AI Forecast</span>
@@ -119,6 +128,14 @@ const EnhancedSurfInterface: React.FC<EnhancedSurfInterfaceProps> = ({
               <AnimatedTabsTrigger value="analytics">
                 <BarChart3 className="w-4 h-4 mr-1" />
                 <span className="hidden sm:inline">Analytics</span>
+              </AnimatedTabsTrigger>
+              <AnimatedTabsTrigger value="api-config">
+                <Key className="w-4 h-4 mr-1" />
+                <span className="hidden sm:inline">APIs</span>
+              </AnimatedTabsTrigger>
+              <AnimatedTabsTrigger value="notifications">
+                <Bell className="w-4 h-4 mr-1" />
+                <span className="hidden sm:inline">Alerts</span>
               </AnimatedTabsTrigger>
             </AnimatedTabsList>
 
@@ -230,6 +247,24 @@ const EnhancedSurfInterface: React.FC<EnhancedSurfInterfaceProps> = ({
                 <LoadingSkeleton type="chart" count={4} />
               ) : (
                 <AdvancedAnalyticsDashboard />
+              )}
+            </AnimatedTabsContent>
+
+            {/* New API Configuration Tab */}
+            <AnimatedTabsContent value="api-config">
+              {isLoading ? (
+                <LoadingSkeleton type="card" />
+              ) : (
+                <ApiConfigPanel />
+              )}
+            </AnimatedTabsContent>
+
+            {/* New Notifications Tab */}
+            <AnimatedTabsContent value="notifications">
+              {isLoading ? (
+                <LoadingSkeleton type="card" />
+              ) : (
+                <NotificationSettings />
               )}
             </AnimatedTabsContent>
           </AnimatedTabs>
