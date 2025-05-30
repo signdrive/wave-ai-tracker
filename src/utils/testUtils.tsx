@@ -5,6 +5,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@/components/ThemeProvider';
 
+// Re-export everything from testing library
+export * from '@testing-library/react';
+export { userEvent } from '@testing-library/user-event';
+
 // Create a test query client with disabled retries
 const createTestQueryClient = () => new QueryClient({
   defaultOptions: {
@@ -76,6 +80,5 @@ export const mockLocalStorage = (() => {
   };
 })();
 
-// Export everything
-export * from '@testing-library/react';
+// Export the custom render as the default render
 export { customRender as render, createTestQueryClient };
