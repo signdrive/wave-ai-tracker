@@ -5,10 +5,20 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check, Crown, Zap, Target, Brain, Camera, Wind } from 'lucide-react';
 
+interface PlanFeatures {
+  name: string;
+  price: number;
+  period: string;
+  icon: React.ReactElement;
+  features: string[];
+  badge?: string;
+  limitations?: string[];
+}
+
 const PremiumSubscriptionPanel: React.FC = () => {
   const [selectedPlan, setSelectedPlan] = useState<'free' | 'pro' | 'elite'>('free');
 
-  const plans = {
+  const plans: Record<'free' | 'pro' | 'elite', PlanFeatures> = {
     free: {
       name: 'Wave Tracker',
       price: 0,
