@@ -29,42 +29,66 @@ export const useMapInitialization = () => {
 
     console.log('🔧 Starting map initialization...');
     
-    try {
-      // Initialize Leaflet icons first
-      initializeLeafletIcons();
-      console.log('✅ Leaflet icons initialized');
+    // Add a small delay to ensure DOM is fully ready
+    const initTimeout = setTimeout(() => {
+      try {
+        // Double-check container is still valid
+        if (!mapRef.current) {
+          console.error('❌ Map container not available during initialization');
+          return;
+        }
 
-      // Create map instance
-      const map = L.map(mapRef.current!, DEFAULT_MAP_CONFIG);
-      mapInstanceRef.current = map;
-      console.log('✅ Map instance created');
+        // Initialize Leaflet icons first
+        initializeLeafletIcons();
+        console.log('✅ Leaflet icons initialized');
 
-      // Add tile layer
-      const tileLayer = L.tileLayer(TILE_LAYER_CONFIG.url, TILE_LAYER_CONFIG);
-      tileLayer.addTo(map);
-      console.log('🌍 Tile layer added');
+        // Create map instance with explicit container check
+        const map = L.map(mapRef.current, {
+          ...DEFAULT_MAP_CONFIG,
+          preferCanvas: true // Better performance for many markers
+        });
+        
+        mapInstanceRef.current = map;
+        console.log('✅ Map instance created');
 
-      // Create layer group for markers and immediately add to map
-      const layerGroup = L.layerGroup();
-      layerGroupRef.current = layerGroup;
-      map.addLayer(layerGroup); // This is the key fix - explicitly add to map
-      console.log('✅ Layer group created and added to map');
+        // Add tile layer
+        const tileLayer = L.tileLayer(TILE_LAYER_CONFIG.url, TILE_LAYER_CONFIG);
+        tileLayer.addTo(map);
+        console.log('🌍 Tile layer added');
 
-      // Wait for map to be fully loaded before marking as ready
-      map.whenReady(() => {
-        console.log('🎯 Map is ready, invalidating size and marking as ready');
-        map.invalidateSize();
-        isInitializedRef.current = true;
-        markAsReady();
-        console.log('✅ Map initialization complete and ready');
-      });
+        // Create and add layer group immediately
+        const layerGroup = L.layerGroup();
+        layerGroupRef.current = layerGroup;
+        map.addLayer(layerGroup);
+        console.log('✅ Layer group created and added to map');
 
-    } catch (error) {
-      console.error('❌ Map initialization failed:', error);
+        // Wait for map to be fully loaded and DOM ready
+        map.whenReady(() => {
+          console.log('🎯 Map is ready, invalidating size');
+          
+          // Force size calculation and DOM update
+          setTimeout(() => {
+            try {
+              map.invalidateSize(true);
+              isInitializedRef.current = true;
+              markAsReady();
+              console.log('✅ Map initialization complete and ready');
+            } catch (error) {
+              console.error('❌ Error in final map setup:', error);
+            }
+          }, 100);
+        });
+
+      } catch (error) {
+        console.error('❌ Map initialization failed:', error);
+        cleanup();
+      }
+    }, 50); // Small delay for DOM readiness
+
+    return () => {
+      clearTimeout(initTimeout);
       cleanup();
-    }
-
-    return cleanup;
+    };
   }, [validateContainer, isInitializedRef, markAsReady, cleanup, mapRef, mapInstanceRef, layerGroupRef]);
 
   return { 
