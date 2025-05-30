@@ -49,7 +49,7 @@ export const useMapMarkers = ({
       isMapReady,
       isLoading,
       spotsCount: spots.length,
-      containerExists: mapInstance?._container ? 'YES' : 'NO'
+      containerExists: mapInstance?.getContainer() ? 'YES' : 'NO'
     });
 
     // Essential requirements check with DOM validation
@@ -59,7 +59,7 @@ export const useMapMarkers = ({
     }
 
     // Additional check for DOM container
-    if (!mapInstance._container) {
+    if (!mapInstance.getContainer()) {
       console.error('❌ Map container DOM element not available');
       return;
     }
@@ -102,15 +102,23 @@ export const useMapMarkers = ({
           }
 
           // Verify map container still exists before creating marker
-          if (!mapInstance._container) {
+          if (!mapInstance.getContainer()) {
             console.error('❌ Map container lost during marker creation');
             return;
           }
 
-          // Create marker with default icon
-          const marker = L.marker([lat, lon], {
-            icon: new L.Icon.Default()
+          // Create marker with explicit default icon
+          const defaultIcon = L.icon({
+            iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+            iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
           });
+
+          const marker = L.marker([lat, lon], { icon: defaultIcon });
           
           // Add popup
           const popupContent = createPopupContent(spot);
@@ -130,7 +138,8 @@ export const useMapMarkers = ({
             }
           });
 
-          // Add to layer group (which is connected to map)
+          // Add to both map and layer group for redundancy
+          marker.addTo(mapInstance);
           layerGroup.addLayer(marker);
           
           // Store reference
@@ -140,7 +149,7 @@ export const useMapMarkers = ({
           bounds.extend([lat, lon]);
           successCount++;
           
-          console.log(`✅ Marker ${index + 1} added successfully`);
+          console.log(`✅ Marker ${index + 1} added successfully to both map and layer group`);
 
         } catch (error) {
           console.error(`❌ Error creating marker for ${spot.full_name}:`, error);
@@ -161,32 +170,51 @@ export const useMapMarkers = ({
         }, 200);
       }
 
-      // Final verification
+      // Force map refresh
       setTimeout(() => {
-        const layerCount = layerGroup.getLayers().length;
+        try {
+          mapInstance.invalidateSize();
+          console.log('🔄 Map size invalidated to ensure proper rendering');
+        } catch (error) {
+          console.warn('⚠️ Error invalidating map size:', error);
+        }
+      }, 300);
+
+      // Final verification with emergency fallback
+      setTimeout(() => {
         const markerCount = markersRef.current.size;
         
         console.log(`🔍 FINAL VERIFICATION:`, {
-          layersInLayerGroup: layerCount,
           markersInRef: markerCount,
           markersCreated: successCount,
-          success: layerCount > 0 && markerCount > 0
+          success: markerCount > 0
         });
         
-        if (layerCount === 0 || markerCount === 0) {
-          console.error('❌ CRITICAL: NO MARKERS VISIBLE!');
+        if (markerCount === 0) {
+          console.error('❌ CRITICAL: NO MARKERS VISIBLE! Adding emergency test marker...');
           
           // Emergency test marker
           try {
-            const testMarker = L.marker([34.0522, -118.2437]);
+            const testIcon = L.icon({
+              iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+              iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+              shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+              iconSize: [25, 41],
+              iconAnchor: [12, 41],
+              popupAnchor: [1, -34],
+              shadowSize: [41, 41]
+            });
+            
+            const testMarker = L.marker([34.0522, -118.2437], { icon: testIcon });
             testMarker.bindPopup('🆘 Emergency test marker - if you see this, the system can create markers!');
+            testMarker.addTo(mapInstance);
             layerGroup.addLayer(testMarker);
-            console.log('🚨 Emergency test marker added to layer group');
+            console.log('🚨 Emergency test marker added to both map and layer group');
           } catch (testError) {
             console.error('❌ Even emergency marker failed:', testError);
           }
         } else {
-          console.log(`✅ SUCCESS: ${layerCount} markers are visible on the map`);
+          console.log(`✅ SUCCESS: ${markerCount} markers are visible on the map`);
         }
       }, 500);
 
@@ -211,7 +239,16 @@ export const useMapMarkers = ({
           marker.setIcon(highlightIcon);
           marker.openPopup();
         } else {
-          marker.setIcon(new L.Icon.Default());
+          const defaultIcon = L.icon({
+            iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+            iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+            iconSize: [25, 41],
+            iconAnchor: [12, 41],
+            popupAnchor: [1, -34],
+            shadowSize: [41, 41]
+          });
+          marker.setIcon(defaultIcon);
         }
       } catch (error) {
         console.warn(`⚠️ Error updating marker for spot ${spotId}:`, error);
