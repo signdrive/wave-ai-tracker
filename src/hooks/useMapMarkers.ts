@@ -41,14 +41,21 @@ export const useMapMarkers = ({
   const highlightedIcon = createHighlightedIcon();
 
   useEffect(() => {
+    console.log('🎯 useMapMarkers effect triggered', {
+      mapInstance: !!mapInstance,
+      layerGroup: !!layerGroup,
+      isMapReady,
+      isLoading,
+      spotsCount: spots.length
+    });
+
     if (!mapInstance || !layerGroup || !isMapReady || isLoading) {
-      console.log('🚫 Waiting for map requirements:', {
-        mapInstance: !!mapInstance,
-        layerGroup: !!layerGroup,
-        isMapReady,
-        isLoading,
-        spotsCount: spots.length
-      });
+      console.log('🚫 Requirements not met for marker creation');
+      return;
+    }
+
+    if (spots.length === 0) {
+      console.log('❗ No spots to display');
       return;
     }
 
@@ -63,34 +70,31 @@ export const useMapMarkers = ({
       console.error('❌ Error clearing markers:', error);
     }
 
-    if (spots.length === 0) {
-      console.log('❗ No spots to display');
-      return;
-    }
-
     let addedMarkers = 0;
     const bounds = L.latLngBounds([]);
 
-    spots.forEach((spot, index) => {
+    spots.forEach((spot) => {
       try {
         // Validate coordinates
         const lat = Number(spot.lat);
         const lon = Number(spot.lon);
         
-        if (isNaN(lat) || isNaN(lon)) {
+        if (isNaN(lat) || isNaN(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
           console.warn(`❌ Invalid coordinates for ${spot.full_name}: lat=${spot.lat}, lon=${spot.lon}`);
           return;
         }
 
-        // Create marker with default icon first
+        console.log(`📍 Creating marker for ${spot.full_name} at [${lat}, ${lon}]`);
+
+        // Create marker with default Leaflet icon
         const marker = L.marker([lat, lon]);
-        
-        // Add to layer group
-        layerGroup.addLayer(marker);
-        addedMarkers++;
         
         // Store marker reference
         markersRef.current.set(spot.id, marker);
+
+        // Add marker to layer group
+        marker.addTo(layerGroup);
+        addedMarkers++;
 
         // Extend bounds
         bounds.extend([lat, lon]);
@@ -112,14 +116,14 @@ export const useMapMarkers = ({
           marker.setIcon(highlightedIcon);
         }
 
-        console.log(`✅ Added marker ${addedMarkers}/${spots.length}: ${spot.full_name} at [${lat}, ${lon}]`);
+        console.log(`✅ Successfully added marker ${addedMarkers} for ${spot.full_name}`);
 
       } catch (error) {
         console.error(`❌ Error adding marker for ${spot.full_name}:`, error);
       }
     });
 
-    console.log(`🎉 Successfully added ${addedMarkers} markers to map`);
+    console.log(`🎉 Finished adding markers. Total added: ${addedMarkers}/${spots.length}`);
 
     // Fit bounds if we have markers
     if (addedMarkers > 0 && bounds.isValid()) {
@@ -132,7 +136,7 @@ export const useMapMarkers = ({
             });
             console.log('🔍 Map bounds fitted to show all markers');
           }
-        }, 100);
+        }, 200);
       } catch (error) {
         console.error('❌ Error fitting bounds:', error);
       }

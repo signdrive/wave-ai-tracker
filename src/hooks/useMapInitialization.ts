@@ -13,7 +13,6 @@ export const useMapInitialization = () => {
 
   useEffect(() => {
     if (!mapRef.current || isInitializedRef.current) {
-      console.log('❌ Map container ref not ready or already initialized');
       return;
     }
 
@@ -21,7 +20,7 @@ export const useMapInitialization = () => {
     initializeLeafletIcons();
 
     try {
-      // Initialize map centered on California (where most spots are)
+      // Initialize map centered on California
       const map = L.map(mapRef.current, {
         center: [34.0522, -118.2437],
         zoom: 6,
@@ -32,15 +31,7 @@ export const useMapInitialization = () => {
       mapInstanceRef.current = map;
       console.log('✅ Map instance created');
 
-      // Create layer group immediately after map creation
-      const layerGroup = L.layerGroup();
-      layerGroup.addTo(map);
-      layerGroupRef.current = layerGroup;
-      console.log('✅ Layer group created and added to map');
-      
-      isInitializedRef.current = true;
-
-      // Add tile layer
+      // Add tile layer first
       const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         maxZoom: 19,
@@ -49,16 +40,21 @@ export const useMapInitialization = () => {
       
       tileLayer.addTo(map);
       console.log('🌍 Tile layer added');
-      
-      // Set map ready immediately after setup
-      setIsMapReady(true);
-      console.log('✅ Map marked as ready');
 
-      // Force map to render
+      // Create layer group after map and tiles are ready
+      const layerGroup = L.layerGroup();
+      layerGroupRef.current = layerGroup;
+      layerGroup.addTo(map);
+      console.log('✅ Layer group created and added to map');
+      
+      isInitializedRef.current = true;
+      
+      // Wait for map to be fully rendered before marking as ready
       setTimeout(() => {
         if (mapInstanceRef.current) {
           mapInstanceRef.current.invalidateSize();
-          console.log('🔄 Map size invalidated');
+          setIsMapReady(true);
+          console.log('✅ Map marked as ready');
         }
       }, 100);
 
@@ -75,7 +71,6 @@ export const useMapInitialization = () => {
         try {
           layerGroupRef.current.clearLayers();
           layerGroupRef.current = null;
-          console.log('✅ Layer group cleaned up');
         } catch (error) {
           console.warn('⚠️ Error cleaning up layer group:', error);
         }
@@ -86,7 +81,6 @@ export const useMapInitialization = () => {
           mapInstanceRef.current.remove();
           mapInstanceRef.current = null;
           isInitializedRef.current = false;
-          console.log('✅ Map cleaned up successfully');
         } catch (error) {
           console.error('❌ Error during map cleanup:', error);
           mapInstanceRef.current = null;
