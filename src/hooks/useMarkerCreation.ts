@@ -1,8 +1,7 @@
 
-import { useRef } from 'react';
 import L from 'leaflet';
-import { createHighlightedIcon, createPopupContent } from '@/utils/mapUtils';
 import { isValidCoordinate } from '@/utils/coordinateValidation';
+import { createPopupContent } from '@/utils/mapUtils';
 import { POPUP_CONFIG } from '@/utils/mapConfig';
 
 interface DatabaseSurfSpot {
@@ -20,158 +19,81 @@ interface DatabaseSurfSpot {
   crowd_factor: string;
 }
 
-interface UseMarkerCreationProps {
-  layerGroup: L.LayerGroup | null;
-  onSpotClick?: (spotId: string) => void;
-}
+export const useMarkerCreation = () => {
+  const createDefaultIcon = () => {
+    return L.icon({
+      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+      iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41]
+    });
+  };
 
-export const useMarkerCreation = ({ layerGroup, onSpotClick }: UseMarkerCreationProps) => {
-  const markersRef = useRef<Map<string, L.Marker>>(new Map());
-
-  const createMarkerForSpot = (spot: DatabaseSurfSpot): L.Marker | null => {
+  const createMarkerForSpot = (
+    spot: DatabaseSurfSpot,
+    onSpotClick?: (spotId: string) => void
+  ): L.Marker | null => {
     try {
       const lat = Number(spot.lat);
       const lon = Number(spot.lon);
       
-      console.log(`🔨 Creating marker for ${spot.full_name}`, { 
-        id: spot.id, 
-        lat, 
-        lon, 
-        isValid: isValidCoordinate(lat, lon) 
-      });
-      
+      console.log(`📍 Creating marker for ${spot.full_name} at [${lat}, ${lon}]`);
+
       if (!isValidCoordinate(lat, lon)) {
-        console.warn(`❌ Invalid coordinates for ${spot.full_name}: lat=${lat}, lon=${lon}`);
+        console.warn(`⚠️ Invalid coordinates for ${spot.full_name}: [${lat}, ${lon}]`);
         return null;
       }
 
-      // Create marker with default icon
-      const marker = L.marker([lat, lon]);
+      const defaultIcon = createDefaultIcon();
+      const marker = L.marker([lat, lon], { icon: defaultIcon });
       
-      if (!marker) {
-        console.error(`❌ Failed to create Leaflet marker for ${spot.full_name}`);
-        return null;
-      }
-
-      console.log(`✅ Leaflet marker created successfully for ${spot.full_name}`);
-
-      // Create and bind popup
-      try {
-        const popupContent = createPopupContent(spot);
-        if (popupContent) {
-          marker.bindPopup(popupContent, POPUP_CONFIG);
-          console.log(`✅ Popup content bound for ${spot.full_name}`);
-        } else {
-          console.warn(`⚠️ No popup content created for ${spot.full_name}`);
-        }
-      } catch (popupError) {
-        console.warn(`⚠️ Failed to create/bind popup for ${spot.full_name}:`, popupError);
+      // Add popup
+      const popupContent = createPopupContent(spot);
+      if (popupContent) {
+        marker.bindPopup(popupContent, POPUP_CONFIG);
       }
 
       // Add click handler
       marker.on('click', (e) => {
         try {
-          console.log(`🖱️ Marker clicked for spot: ${spot.full_name} (ID: ${spot.id})`);
-          
-          // Prevent event propagation
+          console.log(`🖱️ Marker clicked: ${spot.full_name}`);
           if (e.originalEvent) {
             L.DomEvent.stopPropagation(e.originalEvent);
           }
-          
-          // Open popup
-          try {
-            marker.openPopup();
-            console.log(`✅ Popup opened for ${spot.full_name}`);
-          } catch (popupError) {
-            console.warn(`⚠️ Failed to open popup for ${spot.full_name}:`, popupError);
-          }
-          
-          // Call click callback
+          marker.openPopup();
           if (onSpotClick) {
-            try {
-              onSpotClick(spot.id);
-              console.log(`✅ onSpotClick callback executed for ${spot.full_name}`);
-            } catch (callbackError) {
-              console.error(`❌ Error in onSpotClick callback for ${spot.full_name}:`, callbackError);
-            }
+            onSpotClick(spot.id);
           }
         } catch (clickError) {
-          console.error(`❌ Error handling click for ${spot.full_name}:`, clickError);
+          console.error('Error in marker click handler:', clickError);
         }
       });
 
+      console.log(`✅ Marker created for ${spot.full_name}`);
       return marker;
+
     } catch (error) {
-      console.error(`❌ Critical error creating marker for ${spot.full_name}:`, error);
+      console.error(`❌ Error creating marker for ${spot.full_name}:`, error);
       return null;
     }
   };
 
-  const addMarkerToMap = (marker: L.Marker, spot: DatabaseSurfSpot): boolean => {
-    if (!layerGroup) {
-      console.error(`❌ No layer group available to add marker for ${spot.full_name}`);
-      return false;
-    }
-
+  const addMarkerToMap = (marker: L.Marker, layerGroup: L.LayerGroup): boolean => {
     try {
-      // Store marker reference
-      markersRef.current.set(spot.id, marker);
-      
-      // Add to layer group (which is already added to the map)
-      marker.addTo(layerGroup);
-      
-      console.log(`✅ Marker successfully added to layer group for ${spot.full_name}`);
+      layerGroup.addLayer(marker);
       return true;
     } catch (error) {
-      console.error(`❌ Error adding marker to layer group for ${spot.full_name}:`, error);
+      console.error('❌ Error adding marker to layer group:', error);
       return false;
-    }
-  };
-
-  const updateMarkerSelection = (selectedSpotId: string | undefined) => {
-    console.log(`🎯 Updating marker selection for spot: ${selectedSpotId}`);
-    
-    markersRef.current.forEach((marker, spotId) => {
-      try {
-        const isSelected = spotId === selectedSpotId;
-        if (isSelected) {
-          const highlightedIcon = createHighlightedIcon();
-          marker.setIcon(highlightedIcon);
-          try {
-            marker.openPopup();
-          } catch (popupError) {
-            console.warn(`⚠️ Could not open popup for selected marker ${spotId}:`, popupError);
-          }
-        } else {
-          marker.setIcon(new L.Icon.Default());
-        }
-      } catch (iconError) {
-        console.warn(`⚠️ Error updating marker icon for spot ${spotId}:`, iconError);
-      }
-    });
-  };
-
-  const clearMarkers = () => {
-    try {
-      console.log(`🧹 Clearing ${markersRef.current.size} existing markers...`);
-      
-      if (layerGroup) {
-        layerGroup.clearLayers();
-        console.log(`✅ Layer group cleared successfully`);
-      }
-      
-      markersRef.current.clear();
-      console.log(`✅ Marker references cleared`);
-    } catch (error) {
-      console.error('❌ Error clearing markers:', error);
     }
   };
 
   return {
-    markersRef,
+    createDefaultIcon,
     createMarkerForSpot,
-    addMarkerToMap,
-    updateMarkerSelection,
-    clearMarkers
+    addMarkerToMap
   };
 };
