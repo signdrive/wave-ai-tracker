@@ -98,7 +98,7 @@ export const useMapMarkers = ({
     } catch (error) {
       console.error('❌ Unexpected error in marker processing:', error);
     }
-  }, [mapInstance, layerGroup, spots, isLoading, selectedSpotId, onSpotClick, isMapReady]);
+  }, [mapInstance, layerGroup, spots, isLoading, selectedSpotId, onSpotClick, isMapReady, clearMarkers, createMarkerForSpot, addMarkerToMap]);
 
   // Effect for handling selected spot changes
   useEffect(() => {

@@ -20,8 +20,11 @@ export const useMapInitialization = () => {
   } = useMapContainer();
 
   useEffect(() => {
+    // Always call cleanup function, even if we return early
+    const performCleanup = cleanup;
+
     if (!validateContainer() || isInitializedRef.current) {
-      return;
+      return performCleanup;
     }
 
     console.log('🗺️ Initializing map...');
@@ -82,10 +85,10 @@ export const useMapInitialization = () => {
 
     } catch (error) {
       console.error('❌ Error initializing map:', error);
-      cleanup();
+      performCleanup();
     }
 
-    return cleanup;
+    return performCleanup;
   }, [validateContainer, isInitializedRef, markAsReady, cleanup]);
 
   return { 
