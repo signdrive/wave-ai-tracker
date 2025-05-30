@@ -63,10 +63,18 @@ export const useSupabaseSurfSpots = () => {
         console.log('🗄️ Database connection details:');
         console.log('- Table: surf_spots');
         console.log('- Columns fetched: ALL (*)');
+        console.log('- Query filter: lat and lon NOT NULL');
+        console.log('- Sorting: by name');
         
         if (data && data.length > 0) {
           console.log('📍 Sample surf spot data:', data[0]);
-          console.log('🏄‍♂️ First 5 spot names:', data.slice(0, 5).map(spot => spot.name));
+          console.log('🏄‍♂️ First 10 spot names:', data.slice(0, 10).map(spot => spot.name));
+          
+          // Log geographic distribution
+          const countries = [...new Set(data.map(spot => spot.country))];
+          const states = [...new Set(data.map(spot => spot.state))];
+          console.log('🌍 Countries found:', countries);
+          console.log('🏛️ States/regions found:', states.length);
         }
         
         return data || [];
@@ -138,10 +146,13 @@ export const useSupabaseSurfSpots = () => {
     // Log California spots specifically
     const californiaSpots = convertedSpots.filter(spot => 
       spot.state?.toLowerCase().includes('california') || 
+      spot.state?.toLowerCase().includes('ca') ||
       spot.country?.toLowerCase().includes('usa')
     );
     console.log(`🏄‍♂️ California surf spots found: ${californiaSpots.length}`);
-    console.log('🌊 Sample California spots:', californiaSpots.slice(0, 5).map(spot => spot.name));
+    if (californiaSpots.length > 0) {
+      console.log('🌊 Sample California spots:', californiaSpots.slice(0, 5).map(spot => spot.name));
+    }
   }
 
   return {

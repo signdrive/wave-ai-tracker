@@ -7,10 +7,11 @@ import { initializeLeafletIcons } from '@/utils/mapUtils';
 export const useMapInitialization = () => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
+  const isInitializedRef = useRef(false);
 
   useEffect(() => {
-    if (!mapRef.current) {
-      console.log('❌ Map container ref not ready');
+    if (!mapRef.current || isInitializedRef.current) {
+      console.log('❌ Map container ref not ready or already initialized');
       return;
     }
 
@@ -27,6 +28,7 @@ export const useMapInitialization = () => {
       });
       
       mapInstanceRef.current = map;
+      isInitializedRef.current = true;
       console.log('✅ Map instance created');
 
       // Add tile layer with error handling
@@ -64,13 +66,33 @@ export const useMapInitialization = () => {
 
     } catch (error) {
       console.error('❌ Error initializing map:', error);
+      isInitializedRef.current = false;
     }
 
     return () => {
       console.log('🧹 Cleaning up map...');
       if (mapInstanceRef.current) {
-        mapInstanceRef.current.remove();
-        mapInstanceRef.current = null;
+        try {
+          // Clear all layers safely before removing map
+          mapInstanceRef.current.eachLayer((layer) => {
+            if (mapInstanceRef.current && layer) {
+              try {
+                mapInstanceRef.current.removeLayer(layer);
+              } catch (e) {
+                console.warn('⚠️ Error removing layer during cleanup:', e);
+              }
+            }
+          });
+          
+          mapInstanceRef.current.remove();
+          mapInstanceRef.current = null;
+          isInitializedRef.current = false;
+          console.log('✅ Map cleaned up successfully');
+        } catch (error) {
+          console.error('❌ Error during map cleanup:', error);
+          mapInstanceRef.current = null;
+          isInitializedRef.current = false;
+        }
       }
     };
   }, []);

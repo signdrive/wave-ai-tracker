@@ -34,11 +34,20 @@ export const useMapMarkers = ({
   selectedSpotId 
 }: UseMapMarkersProps) => {
   const markersRef = useRef<Map<string, L.Marker>>(new Map());
+  const layerGroupRef = useRef<L.LayerGroup | null>(null);
   const highlightedIcon = createHighlightedIcon();
 
+  // Initialize layer group
   useEffect(() => {
-    if (!mapInstance) {
-      console.log('🚫 Map not ready for adding markers');
+    if (mapInstance && !layerGroupRef.current) {
+      layerGroupRef.current = L.layerGroup().addTo(mapInstance);
+      console.log('✅ Layer group created');
+    }
+  }, [mapInstance]);
+
+  useEffect(() => {
+    if (!mapInstance || !layerGroupRef.current) {
+      console.log('🚫 Map or layer group not ready for adding markers');
       return;
     }
 
@@ -49,13 +58,14 @@ export const useMapMarkers = ({
 
     console.log(`🎯 Processing ${spots.length} spots for map display`);
 
-    // Clear existing markers
-    markersRef.current.forEach(marker => {
-      if (mapInstance) {
-        mapInstance.removeLayer(marker);
-      }
-    });
-    markersRef.current.clear();
+    // Clear existing markers safely
+    try {
+      layerGroupRef.current.clearLayers();
+      markersRef.current.clear();
+      console.log('🧹 Cleared existing markers');
+    } catch (error) {
+      console.error('❌ Error clearing markers:', error);
+    }
 
     if (spots.length === 0) {
       console.log('❗ No spots to display on map');
@@ -92,12 +102,13 @@ export const useMapMarkers = ({
           icon: isSelected ? highlightedIcon : undefined
         });
 
-        if (!mapInstance) {
-          console.error('❌ Map instance lost while adding markers');
+        if (!layerGroupRef.current) {
+          console.error('❌ Layer group lost while adding markers');
           return;
         }
 
-        marker.addTo(mapInstance);
+        // Add to layer group instead of directly to map
+        layerGroupRef.current.addLayer(marker);
         
         // Store marker reference
         markersRef.current.set(spot.id, marker);
