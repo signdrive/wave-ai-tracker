@@ -128,14 +128,16 @@ class NotificationService {
   }
 
   async setupBackgroundSync(): Promise<void> {
-    if ('serviceWorker' in navigator && 'sync' in window.ServiceWorkerRegistration.prototype) {
+    if ('serviceWorker' in navigator && 'ServiceWorkerRegistration' in window && 'sync' in window.ServiceWorkerRegistration.prototype) {
       try {
         const registration = await navigator.serviceWorker.ready;
-        await registration.sync.register('surf-conditions-sync');
+        await (registration as any).sync.register('surf-conditions-sync');
         console.log('Background sync registered for surf conditions');
       } catch (error) {
         console.error('Background sync registration failed:', error);
       }
+    } else {
+      console.warn('Background sync not supported');
     }
   }
 
