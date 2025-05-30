@@ -7,372 +7,244 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Trophy, Star, Clock, MapPin, Camera, Plus } from 'lucide-react';
-import { pointsRewardService, SurfSession, PointsBreakdown, Achievement } from '@/services/pointsRewardService';
-import { useSurfSpots } from '@/hooks/useSurfSpots';
-import { toast } from 'sonner';
+import { Trophy, Calendar, Clock, MapPin, Star, Plus } from 'lucide-react';
+import { pointsRewardService } from '@/services/pointsRewardService';
+import { useToast } from '@/hooks/use-toast';
 
-// Mock user profile for demo
-const mockUserProfile = {
-  totalPoints: 1250,
-  level: 3,
-  sessionsCount: 15,
-  spotsVisited: ['pipeline', 'mavericks', 'bells-beach'],
-  achievements: [],
-  streak: 3,
-  rank: 'Intermediate',
-};
+interface SessionLoggerProps {
+  currentSpot?: string;
+  onSessionSaved?: (session: any) => void;
+}
 
-const SessionLogger: React.FC = () => {
-  const { surfSpots } = useSurfSpots();
-  const [isLogging, setIsLogging] = useState(false);
-  const [sessionData, setSessionData] = useState({
-    spotId: '',
+const SessionLogger: React.FC<SessionLoggerProps> = ({ 
+  currentSpot = 'Malibu',
+  onSessionSaved 
+}) => {
+  const [session, setSession] = useState({
+    spot: currentSpot,
+    date: new Date().toISOString().split('T')[0],
     duration: '',
     waveHeight: '',
-    waveQuality: '3',
-    difficulty: 'intermediate' as const,
+    waveQuality: '',
+    conditions: '',
     notes: '',
-    maneuvers: [] as string[],
+    rating: 5
   });
-  const [newManeuver, setNewManeuver] = useState('');
-  const [lastSession, setLastSession] = useState<{
-    session: SurfSession;
-    points: PointsBreakdown;
-    achievements: Achievement[];
-  } | null>(null);
+  
+  const [userStats, setUserStats] = useState({
+    totalSessions: 42,
+    totalPoints: 1250,
+    currentLevel: 'Advanced',
+    streak: 7,
+    badges: ['Early Bird', 'Wave Hunter', 'Consistency King']
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const { toast } = useToast();
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLogging(true);
+    
+    // Calculate points for this session
+    const points = pointsRewardService.calculateSessionPoints({
+      duration: parseInt(session.duration) || 0,
+      waveQuality: session.waveQuality as any,
+      conditions: session.conditions,
+      rating: session.rating,
+      isNewSpot: session.spot !== currentSpot
+    });
 
-    try {
-      // Validate session data
-      const session: Omit<SurfSession, 'id' | 'timestamp'> = {
-        spotId: sessionData.spotId,
-        spotName: surfSpots.find(s => s.id === sessionData.spotId)?.full_name || 'Unknown',
-        duration: parseInt(sessionData.duration),
-        waveConditions: {
-          height: parseFloat(sessionData.waveHeight),
-          quality: parseInt(sessionData.waveQuality),
-        },
-        difficulty: sessionData.difficulty,
-        notes: sessionData.notes,
-        maneuvers: sessionData.maneuvers,
-        photos: [], // Would be populated from file uploads
-      };
+    const sessionData = {
+      ...session,
+      id: Date.now(),
+      points,
+      timestamp: new Date().toISOString()
+    };
 
-      const validation = pointsRewardService.validateSession(session);
-      
-      if (!validation.isValid) {
-        toast.error(`Validation failed: ${validation.errors.join(', ')}`);
-        return;
-      }
-
-      // Create full session object
-      const fullSession: SurfSession = {
-        ...session,
-        id: `session-${Date.now()}`,
-        timestamp: new Date(),
-      };
-
-      // Calculate points and check achievements
-      const pointsBreakdown = pointsRewardService.calculateSessionPoints(fullSession, mockUserProfile);
-      const newAchievements = pointsRewardService.checkAchievements(fullSession, mockUserProfile);
-
-      // Store the result
-      setLastSession({
-        session: fullSession,
-        points: pointsBreakdown,
-        achievements: newAchievements,
-      });
-
-      // Reset form
-      setSessionData({
-        spotId: '',
-        duration: '',
-        waveHeight: '',
-        waveQuality: '3',
-        difficulty: 'intermediate',
-        notes: '',
-        maneuvers: [],
-      });
-      setNewManeuver('');
-
-      toast.success(`Session logged! You earned ${pointsBreakdown.total} points!`);
-      
-      if (newAchievements.length > 0) {
-        toast.success(`New achievement unlocked: ${newAchievements[0].title}!`);
-      }
-
-    } catch (error) {
-      console.error('Error logging session:', error);
-      toast.error('Failed to log session. Please try again.');
-    } finally {
-      setIsLogging(false);
-    }
-  };
-
-  const addManeuver = () => {
-    if (newManeuver.trim() && !sessionData.maneuvers.includes(newManeuver.trim())) {
-      setSessionData(prev => ({
-        ...prev,
-        maneuvers: [...prev.maneuvers, newManeuver.trim()],
-      }));
-      setNewManeuver('');
-    }
-  };
-
-  const removeManeuver = (maneuver: string) => {
-    setSessionData(prev => ({
+    // Update user stats
+    setUserStats(prev => ({
       ...prev,
-      maneuvers: prev.maneuvers.filter(m => m !== maneuver),
+      totalSessions: prev.totalSessions + 1,
+      totalPoints: prev.totalPoints + points,
+      streak: prev.streak + 1
     }));
+
+    // Call the callback if provided
+    onSessionSaved?.(sessionData);
+
+    toast({
+      title: "Session Logged! 🏄‍♂️",
+      description: `Earned ${points} points! Total: ${userStats.totalPoints + points}`,
+    });
+
+    // Reset form
+    setSession({
+      spot: currentSpot,
+      date: new Date().toISOString().split('T')[0],
+      duration: '',
+      waveHeight: '',
+      waveQuality: '',
+      conditions: '',
+      notes: '',
+      rating: 5
+    });
   };
 
   return (
     <div className="space-y-6">
-      {/* Session Logging Form */}
+      {/* User Stats Dashboard */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center">
-            <Trophy className="w-5 h-5 mr-2" />
-            Log Surf Session
+            <Trophy className="w-5 h-5 mr-2 text-yellow-500" />
+            Your Surf Stats & Rewards
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Basic Info */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+            <div className="text-center p-3 bg-blue-50 rounded-lg">
+              <div className="text-2xl font-bold text-blue-600">{userStats.totalSessions}</div>
+              <div className="text-sm text-gray-600">Total Sessions</div>
+            </div>
+            <div className="text-center p-3 bg-yellow-50 rounded-lg">
+              <div className="text-2xl font-bold text-yellow-600">{userStats.totalPoints}</div>
+              <div className="text-sm text-gray-600">Points Earned</div>
+            </div>
+            <div className="text-center p-3 bg-green-50 rounded-lg">
+              <div className="text-lg font-bold text-green-600">{userStats.currentLevel}</div>
+              <div className="text-sm text-gray-600">Current Level</div>
+            </div>
+            <div className="text-center p-3 bg-purple-50 rounded-lg">
+              <div className="text-2xl font-bold text-purple-600">{userStats.streak}</div>
+              <div className="text-sm text-gray-600">Day Streak</div>
+            </div>
+          </div>
+          
+          <div className="flex flex-wrap gap-2">
+            {userStats.badges.map((badge, index) => (
+              <Badge key={index} variant="secondary" className="flex items-center">
+                <Star className="w-3 h-3 mr-1" />
+                {badge}
+              </Badge>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Session Logger Form */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <Plus className="w-5 h-5 mr-2 text-ocean" />
+            Log New Surf Session
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="spot">Surf Spot</Label>
-                <Select value={sessionData.spotId} onValueChange={(value) => setSessionData(prev => ({ ...prev, spotId: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a surf spot" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {surfSpots.slice(0, 10).map(spot => (
-                      <SelectItem key={spot.id} value={spot.id}>
-                        {spot.full_name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Input
+                  id="spot"
+                  value={session.spot}
+                  onChange={(e) => setSession({ ...session, spot: e.target.value })}
+                  placeholder="Enter surf spot name"
+                />
               </div>
+              
+              <div>
+                <Label htmlFor="date">Date</Label>
+                <Input
+                  id="date"
+                  type="date"
+                  value={session.date}
+                  onChange={(e) => setSession({ ...session, date: e.target.value })}
+                />
+              </div>
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="duration">Duration (minutes)</Label>
                 <Input
                   id="duration"
                   type="number"
-                  min="15"
-                  max="600"
-                  value={sessionData.duration}
-                  onChange={(e) => setSessionData(prev => ({ ...prev, duration: e.target.value }))}
-                  placeholder="120"
-                  required
+                  value={session.duration}
+                  onChange={(e) => setSession({ ...session, duration: e.target.value })}
+                  placeholder="90"
                 />
               </div>
-            </div>
-
-            {/* Wave Conditions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
               <div>
-                <Label htmlFor="waveHeight">Wave Height (feet)</Label>
+                <Label htmlFor="waveHeight">Wave Height (ft)</Label>
                 <Input
                   id="waveHeight"
-                  type="number"
-                  min="0.5"
-                  max="30"
-                  step="0.5"
-                  value={sessionData.waveHeight}
-                  onChange={(e) => setSessionData(prev => ({ ...prev, waveHeight: e.target.value }))}
-                  placeholder="4.5"
-                  required
+                  value={session.waveHeight}
+                  onChange={(e) => setSession({ ...session, waveHeight: e.target.value })}
+                  placeholder="3-5"
                 />
               </div>
-
+              
               <div>
                 <Label htmlFor="waveQuality">Wave Quality</Label>
-                <Select value={sessionData.waveQuality} onValueChange={(value) => setSessionData(prev => ({ ...prev, waveQuality: value }))}>
+                <Select value={session.waveQuality} onValueChange={(value) => setSession({ ...session, waveQuality: value })}>
                   <SelectTrigger>
-                    <SelectValue />
+                    <SelectValue placeholder="Select quality" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1">1 - Poor</SelectItem>
-                    <SelectItem value="2">2 - Fair</SelectItem>
-                    <SelectItem value="3">3 - Good</SelectItem>
-                    <SelectItem value="4">4 - Very Good</SelectItem>
-                    <SelectItem value="5">5 - Excellent</SelectItem>
+                    <SelectItem value="poor">Poor</SelectItem>
+                    <SelectItem value="fair">Fair</SelectItem>
+                    <SelectItem value="good">Good</SelectItem>
+                    <SelectItem value="excellent">Excellent</SelectItem>
+                    <SelectItem value="epic">Epic</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
-            {/* Difficulty */}
             <div>
-              <Label htmlFor="difficulty">Session Difficulty</Label>
-              <Select value={sessionData.difficulty} onValueChange={(value: any) => setSessionData(prev => ({ ...prev, difficulty: value }))}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="beginner">Beginner</SelectItem>
-                  <SelectItem value="intermediate">Intermediate</SelectItem>
-                  <SelectItem value="advanced">Advanced</SelectItem>
-                  <SelectItem value="expert">Expert</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="conditions">Conditions</Label>
+              <Input
+                id="conditions"
+                value={session.conditions}
+                onChange={(e) => setSession({ ...session, conditions: e.target.value })}
+                placeholder="Offshore winds, clean faces"
+              />
             </div>
 
-            {/* Maneuvers */}
             <div>
-              <Label>Maneuvers Performed</Label>
-              <div className="flex gap-2 mt-2">
-                <Input
-                  value={newManeuver}
-                  onChange={(e) => setNewManeuver(e.target.value)}
-                  placeholder="e.g., Bottom turn, Cutback"
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addManeuver())}
-                />
-                <Button type="button" onClick={addManeuver} size="sm">
-                  <Plus className="w-4 h-4" />
-                </Button>
+              <Label htmlFor="rating">Session Rating</Label>
+              <div className="flex items-center space-x-2 mt-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setSession({ ...session, rating: star })}
+                    className={`text-2xl ${star <= session.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                  >
+                    ★
+                  </button>
+                ))}
               </div>
-              {sessionData.maneuvers.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {sessionData.maneuvers.map(maneuver => (
-                    <Badge
-                      key={maneuver}
-                      variant="secondary"
-                      className="cursor-pointer"
-                      onClick={() => removeManeuver(maneuver)}
-                    >
-                      {maneuver} ×
-                    </Badge>
-                  ))}
-                </div>
-              )}
             </div>
 
-            {/* Notes */}
             <div>
-              <Label htmlFor="notes">Session Notes</Label>
+              <Label htmlFor="notes">Notes</Label>
               <Textarea
                 id="notes"
-                value={sessionData.notes}
-                onChange={(e) => setSessionData(prev => ({ ...prev, notes: e.target.value }))}
-                placeholder="How was your session? Any highlights or learnings?"
+                value={session.notes}
+                onChange={(e) => setSession({ ...session, notes: e.target.value })}
+                placeholder="How was the session? Any notable waves or experiences?"
                 rows={3}
               />
             </div>
 
-            <Button type="submit" disabled={isLogging || !sessionData.spotId || !sessionData.duration}>
-              {isLogging ? 'Logging Session...' : 'Log Session'}
+            <Button type="submit" className="w-full">
+              <Trophy className="w-4 h-4 mr-2" />
+              Log Session & Earn Points
             </Button>
           </form>
         </CardContent>
       </Card>
-
-      {/* Last Session Results */}
-      {lastSession && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center text-green-600">
-              <Trophy className="w-5 h-5 mr-2" />
-              Session Logged Successfully!
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Session Summary */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center">
-                <div className="flex items-center justify-center mb-1">
-                  <MapPin className="w-4 h-4 mr-1" />
-                </div>
-                <div className="text-sm text-gray-600">Spot</div>
-                <div className="font-semibold">{lastSession.session.spotName}</div>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center mb-1">
-                  <Clock className="w-4 h-4 mr-1" />
-                </div>
-                <div className="text-sm text-gray-600">Duration</div>
-                <div className="font-semibold">{lastSession.session.duration}m</div>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center mb-1">
-                  <Star className="w-4 h-4 mr-1" />
-                </div>
-                <div className="text-sm text-gray-600">Quality</div>
-                <div className="font-semibold">{lastSession.session.waveConditions.quality}/5</div>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center mb-1">
-                  <Trophy className="w-4 h-4 mr-1" />
-                </div>
-                <div className="text-sm text-gray-600">Points</div>
-                <div className="font-semibold text-green-600">+{lastSession.points.total}</div>
-              </div>
-            </div>
-
-            <Separator />
-
-            {/* Points Breakdown */}
-            <div>
-              <h4 className="font-semibold mb-2">Points Breakdown</h4>
-              <div className="space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <span>Session Duration</span>
-                  <span>+{lastSession.points.sessionDuration}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Wave Quality</span>
-                  <span>+{lastSession.points.waveQuality}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Difficulty Bonus</span>
-                  <span>+{lastSession.points.difficulty}</span>
-                </div>
-                {lastSession.points.newSpot > 0 && (
-                  <div className="flex justify-between text-green-600">
-                    <span>New Spot Bonus</span>
-                    <span>+{lastSession.points.newSpot}</span>
-                  </div>
-                )}
-                {lastSession.points.consistency > 0 && (
-                  <div className="flex justify-between text-blue-600">
-                    <span>Consistency Bonus</span>
-                    <span>+{lastSession.points.consistency}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Achievements */}
-            {lastSession.achievements.length > 0 && (
-              <div>
-                <h4 className="font-semibold mb-2">New Achievements!</h4>
-                <div className="space-y-2">
-                  {lastSession.achievements.map(achievement => (
-                    <div key={achievement.id} className="flex items-center p-2 bg-yellow-50 border border-yellow-200 rounded">
-                      <span className="text-2xl mr-3">{achievement.icon}</span>
-                      <div>
-                        <div className="font-medium">{achievement.title}</div>
-                        <div className="text-sm text-gray-600">{achievement.description}</div>
-                      </div>
-                      <Badge className="ml-auto bg-yellow-500">
-                        +{achievement.points} pts
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
     </div>
   );
 };
