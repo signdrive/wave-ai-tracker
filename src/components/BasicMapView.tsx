@@ -8,9 +8,10 @@ import { Badge } from '@/components/ui/badge';
 import { Search, Map, List } from 'lucide-react';
 import { EnhancedSurfSpot } from '@/types/enhancedSurfSpots';
 import enhancedSurfSpotsData from '@/data/enhancedSurfSpots.json';
+import EnhancedSurfSpotMap from './EnhancedSurfSpotMap';
 
 const BasicMapView: React.FC = () => {
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('map');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('all');
 
@@ -54,10 +55,9 @@ const BasicMapView: React.FC = () => {
               variant={viewMode === 'map' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setViewMode('map')}
-              disabled
             >
               <Map className="w-4 h-4 mr-1" />
-              Map (Coming Soon)
+              Map
             </Button>
           </div>
         </div>
@@ -129,88 +129,116 @@ const BasicMapView: React.FC = () => {
         </Card>
       </div>
 
-      {/* Surf Spots List */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Surf Spots Directory</span>
-            <Badge variant="outline">
-              {filteredSpots.length} results
-            </Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {filteredSpots.map((spot) => (
-              <div key={spot.id} className="border rounded-lg p-4 hover:bg-gray-50">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-semibold text-ocean-dark text-lg">{spot.full_name}</h3>
-                  <div className="flex space-x-1">
-                    {spot.big_wave && <Badge className="bg-red-500 text-xs">Big Wave</Badge>}
-                    {spot.longboard_friendly && <Badge className="bg-purple-500 text-xs">Longboard</Badge>}
-                    {spot.kite_surfing && <Badge className="bg-green-500 text-xs">Kite</Badge>}
+      {/* Map or List View */}
+      {viewMode === 'map' ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>Interactive Surf Map</span>
+              <Badge variant="outline">
+                {filteredSpots.length} spots
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="h-[600px]">
+              <EnhancedSurfSpotMap
+                spots={filteredSpots}
+                filters={{
+                  difficulty: 'all',
+                  break_type: 'all',
+                  country: selectedCountry,
+                  big_wave: false,
+                  longboard_friendly: false,
+                  kite_surfing: false
+                }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>Surf Spots Directory</span>
+              <Badge variant="outline">
+                {filteredSpots.length} results
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {filteredSpots.map((spot) => (
+                <div key={spot.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-semibold text-ocean-dark text-lg">{spot.full_name}</h3>
+                    <div className="flex space-x-1">
+                      {spot.big_wave && <Badge className="bg-red-500 text-xs">Big Wave</Badge>}
+                      {spot.longboard_friendly && <Badge className="bg-purple-500 text-xs">Longboard</Badge>}
+                      {spot.kite_surfing && <Badge className="bg-green-500 text-xs">Kite</Badge>}
+                    </div>
                   </div>
-                </div>
-                
-                <p className="text-gray-600 mb-3">{spot.description}</p>
-                
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
-                  <div className="text-sm">
-                    <span className="text-gray-500">Location:</span>
-                    <span className="ml-1 font-medium">{spot.region}, {spot.country}</span>
+                  
+                  <p className="text-gray-600 mb-3">{spot.description}</p>
+                  
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+                    <div className="text-sm">
+                      <span className="text-gray-500">Location:</span>
+                      <span className="ml-1 font-medium">{spot.region}, {spot.country}</span>
+                    </div>
+                    <div className="text-sm">
+                      <span className="text-gray-500">Difficulty:</span>
+                      <span className="ml-1 font-medium">{spot.difficulty}</span>
+                    </div>
+                    <div className="text-sm">
+                      <span className="text-gray-500">Break:</span>
+                      <span className="ml-1 font-medium">{spot.break_type}</span>
+                    </div>
+                    <div className="text-sm">
+                      <span className="text-gray-500">Season:</span>
+                      <span className="ml-1 font-medium">{spot.best_season}</span>
+                    </div>
                   </div>
-                  <div className="text-sm">
-                    <span className="text-gray-500">Difficulty:</span>
-                    <span className="ml-1 font-medium">{spot.difficulty}</span>
-                  </div>
-                  <div className="text-sm">
-                    <span className="text-gray-500">Break:</span>
-                    <span className="ml-1 font-medium">{spot.break_type}</span>
-                  </div>
-                  <div className="text-sm">
-                    <span className="text-gray-500">Season:</span>
-                    <span className="ml-1 font-medium">{spot.best_season}</span>
-                  </div>
-                </div>
 
-                {spot.pro_tip && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded p-2 mb-2">
-                    <div className="text-xs text-yellow-700 font-medium">Pro Tip:</div>
-                    <div className="text-xs text-yellow-800">{spot.pro_tip}</div>
-                  </div>
-                )}
+                  {spot.pro_tip && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded p-2 mb-2">
+                      <div className="text-xs text-yellow-700 font-medium">Pro Tip:</div>
+                      <div className="text-xs text-yellow-800">{spot.pro_tip}</div>
+                    </div>
+                  )}
 
-                <div className="flex space-x-2">
-                  <a 
-                    href={spot.google_maps_link} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="bg-blue-500 text-white text-center py-1 px-3 rounded text-sm hover:bg-blue-600"
-                  >
-                    View on Maps
-                  </a>
-                  {spot.live_cam && (
+                  <div className="flex space-x-2">
                     <a 
-                      href={spot.live_cam} 
+                      href={spot.google_maps_link} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      className="bg-green-500 text-white text-center py-1 px-3 rounded text-sm hover:bg-green-600"
+                      className="bg-blue-500 text-white text-center py-1 px-3 rounded text-sm hover:bg-blue-600"
                     >
-                      Live Cam
+                      View on Maps
                     </a>
-                  )}
+                    {spot.live_cam && (
+                      <a 
+                        href={spot.live_cam} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="bg-green-500 text-white text-center py-1 px-3 rounded text-sm hover:bg-green-600"
+                      >
+                        Live Cam
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
-          
-          {filteredSpots.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              <p>No surf spots found matching your criteria</p>
+              ))}
             </div>
-          )}
-        </CardContent>
-      </Card>
+            
+            {filteredSpots.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                <p>No surf spots found matching your criteria</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

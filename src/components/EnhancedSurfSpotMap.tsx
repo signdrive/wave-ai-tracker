@@ -5,6 +5,21 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { EnhancedSurfSpot } from '@/types/enhancedSurfSpots';
 
+// Fix for default markers in react-leaflet
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
+
 // Custom marker icons based on difficulty and wave type
 const createSurfSpotIcon = (spot: EnhancedSurfSpot) => {
   let color = '#0EA5E9'; // Default blue
@@ -14,26 +29,22 @@ const createSurfSpotIcon = (spot: EnhancedSurfSpot) => {
   else if (spot.difficulty === 'Advanced') color = '#EF4444'; // Red
   else if (spot.difficulty === 'Expert') color = '#7C2D12'; // Dark red
 
-  // Add special indicators
-  const indicators = [];
-  if (spot.big_wave) indicators.push('<circle cx="6" cy="6" r="2" fill="#DC2626"/>');
-  if (spot.kite_surfing) indicators.push('<circle cx="18" cy="6" r="2" fill="#059669"/>');
-  if (spot.longboard_friendly) indicators.push('<circle cx="12" cy="18" r="2" fill="#7C3AED"/>');
-
+  // Create a simple colored marker
   const iconSvg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M17 17h5l-1.5-1.5L17 17z"/>
-      <path d="M2 17h14l-3-3H2v6z"/>
-      <path d="M6 10a4 4 0 1 1 8 0"/>
-      ${indicators.join('')}
+    <svg xmlns="http://www.w3.org/2000/svg" width="25" height="41" viewBox="0 0 25 41" fill="none">
+      <path d="M12.5 0C5.596 0 0 5.596 0 12.5c0 12.5 12.5 28.5 12.5 28.5s12.5-16 12.5-28.5C25 5.596 19.404 0 12.5 0z" fill="${color}"/>
+      <circle cx="12.5" cy="12.5" r="6" fill="white"/>
+      ${spot.big_wave ? '<circle cx="12.5" cy="12.5" r="3" fill="#DC2626"/>' : ''}
+      ${spot.kite_surfing ? '<circle cx="12.5" cy="8" r="2" fill="#059669"/>' : ''}
+      ${spot.longboard_friendly ? '<circle cx="12.5" cy="17" r="2" fill="#7C3AED"/>' : ''}
     </svg>
   `;
 
   return new L.Icon({
     iconUrl: 'data:image/svg+xml;base64,' + btoa(iconSvg),
-    iconSize: [24, 24],
-    iconAnchor: [12, 24],
-    popupAnchor: [0, -24],
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
   });
 };
 
@@ -53,8 +64,8 @@ const EnhancedSurfSpotMap: React.FC<EnhancedSurfSpotMapProps> = ({
   spots,
   filters = {}
 }) => {
-  const [mapCenter, setMapCenter] = useState<[number, number]>([20, 0]);
-  const [mapZoom, setMapZoom] = useState(2);
+  const [mapCenter] = useState<[number, number]>([20, 0]);
+  const [mapZoom] = useState(2);
 
   // Filter spots based on current filters
   const filteredSpots = useMemo(() => {
@@ -81,7 +92,7 @@ const EnhancedSurfSpotMap: React.FC<EnhancedSurfSpotMapProps> = ({
   }, [spots, filters]);
 
   return (
-    <div className="relative w-full h-96 rounded-lg overflow-hidden shadow-lg">
+    <div className="relative w-full h-full rounded-lg overflow-hidden shadow-lg">
       <MapContainer
         center={mapCenter}
         zoom={mapZoom}
