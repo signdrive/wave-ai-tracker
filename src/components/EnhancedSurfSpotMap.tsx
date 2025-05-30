@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -20,36 +20,6 @@ let DefaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = DefaultIcon;
 
-// Simplified marker icons based on difficulty
-const createSurfSpotIcon = (spot: EnhancedSurfSpot) => {
-  let color = '#0EA5E9'; // Default blue
-  
-  if (spot.difficulty === 'Beginner') color = '#10B981'; // Green
-  else if (spot.difficulty === 'Intermediate') color = '#F59E0B'; // Orange
-  else if (spot.difficulty === 'Advanced') color = '#EF4444'; // Red
-  else if (spot.difficulty === 'Expert') color = '#7C2D12'; // Dark red
-
-  // Use a simple colored circle instead of complex SVG
-  const iconHtml = `
-    <div style="
-      background-color: ${color};
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      border: 2px solid white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    "></div>
-  `;
-
-  return L.divIcon({
-    html: iconHtml,
-    iconSize: [20, 20],
-    iconAnchor: [10, 10],
-    popupAnchor: [0, -10],
-    className: 'custom-surf-marker'
-  });
-};
-
 interface EnhancedSurfSpotMapProps {
   spots: EnhancedSurfSpot[];
   filters?: {
@@ -69,126 +39,84 @@ const EnhancedSurfSpotMap: React.FC<EnhancedSurfSpotMapProps> = ({
   const [mapCenter] = useState<[number, number]>([20, 0]);
   const [mapZoom] = useState(2);
 
-  // Filter spots based on current filters
-  const filteredSpots = useMemo(() => {
-    return spots.filter(spot => {
-      if (filters.difficulty && filters.difficulty !== 'all') {
-        if (spot.difficulty !== filters.difficulty) return false;
-      }
-      if (filters.break_type && filters.break_type !== 'all') {
-        const hasBreakType = 
-          (filters.break_type === 'point' && spot.point_break) ||
-          (filters.break_type === 'reef' && spot.reef_break) ||
-          (filters.break_type === 'beach' && spot.beach_break);
-        if (!hasBreakType) return false;
-      }
-      if (filters.country && filters.country !== 'all') {
-        if (spot.country !== filters.country) return false;
-      }
-      if (filters.big_wave && !spot.big_wave) return false;
-      if (filters.longboard_friendly && !spot.longboard_friendly) return false;
-      if (filters.kite_surfing && !spot.kite_surfing) return false;
-      
-      return true;
-    });
-  }, [spots, filters]);
+  // Simple filtering
+  const filteredSpots = spots.filter(spot => {
+    if (filters.difficulty && filters.difficulty !== 'all' && spot.difficulty !== filters.difficulty) {
+      return false;
+    }
+    if (filters.country && filters.country !== 'all' && spot.country !== filters.country) {
+      return false;
+    }
+    if (filters.big_wave && !spot.big_wave) {
+      return false;
+    }
+    if (filters.longboard_friendly && !spot.longboard_friendly) {
+      return false;
+    }
+    if (filters.kite_surfing && !spot.kite_surfing) {
+      return false;
+    }
+    return true;
+  });
 
   return (
     <div className="relative w-full h-full rounded-lg overflow-hidden shadow-lg">
       <MapContainer
         center={mapCenter}
         zoom={mapZoom}
-        className="w-full h-full"
+        style={{ height: '100%', width: '100%' }}
         zoomControl={true}
-        maxZoom={18}
-        minZoom={2}
-        worldCopyJump={true}
       >
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          maxZoom={18}
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
         
         {filteredSpots.map((spot) => (
           <Marker
             key={spot.id}
             position={[spot.lat, spot.lon]}
-            icon={createSurfSpotIcon(spot)}
           >
-            <Popup maxWidth={350} minWidth={320} closeButton={true}>
-              <div style={{ width: '320px', maxWidth: '100%' }}>
-                <div style={{ marginBottom: '12px' }}>
-                  <h3 style={{ fontWeight: 'bold', fontSize: '18px', color: '#1e40af', marginBottom: '4px' }}>
-                    {spot.full_name}
-                  </h3>
-                  <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px' }}>
-                    {spot.region}, {spot.country}
+            <Popup>
+              <div className="w-80">
+                <h3 className="font-bold text-lg text-blue-800 mb-2">
+                  {spot.full_name}
+                </h3>
+                <p className="text-sm text-gray-600 mb-2">
+                  {spot.region}, {spot.country}
+                </p>
+                <p className="text-sm mb-3">
+                  {spot.description}
+                </p>
+                
+                <div className="grid grid-cols-2 gap-2 mb-3 text-sm">
+                  <div>
+                    <span className="font-medium">Difficulty:</span> {spot.difficulty}
                   </div>
-                  <p style={{ fontSize: '14px', color: '#374151', marginBottom: '8px' }}>
-                    {spot.description}
-                  </p>
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
-                  <div style={{ backgroundColor: '#eff6ff', padding: '8px', borderRadius: '6px' }}>
-                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Break Type</div>
-                    <p style={{ fontSize: '14px', fontWeight: '500' }}>{spot.break_type}</p>
+                  <div>
+                    <span className="font-medium">Break:</span> {spot.break_type}
                   </div>
-                  
-                  <div style={{ backgroundColor: '#f9fafb', padding: '8px', borderRadius: '6px' }}>
-                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Wave Height</div>
-                    <p style={{ fontSize: '14px', fontWeight: '500' }}>{spot.wave_height_range}</p>
+                  <div>
+                    <span className="font-medium">Season:</span> {spot.best_season}
                   </div>
-
-                  <div style={{ backgroundColor: '#eff6ff', padding: '8px', borderRadius: '6px' }}>
-                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Best Season</div>
-                    <p style={{ fontSize: '14px', fontWeight: '500' }}>{spot.best_season}</p>
-                  </div>
-
-                  <div style={{ backgroundColor: '#f9fafb', padding: '8px', borderRadius: '6px' }}>
-                    <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Difficulty</div>
-                    <p style={{ fontSize: '14px', fontWeight: '500' }}>{spot.difficulty}</p>
-                  </div>
-                </div>
-
-                <div style={{ marginBottom: '12px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
-                    <span style={{ color: '#6b7280' }}>Water Temp:</span>
-                    <span style={{ fontWeight: '500' }}>{spot.water_temp_range}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', marginBottom: '4px' }}>
-                    <span style={{ color: '#6b7280' }}>Best Tide:</span>
-                    <span style={{ fontWeight: '500' }}>{spot.best_tide}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-                    <span style={{ color: '#6b7280' }}>Ideal Swell:</span>
-                    <span style={{ fontWeight: '500' }}>{spot.ideal_swell_direction}</span>
+                  <div>
+                    <span className="font-medium">Waves:</span> {spot.wave_height_range}
                   </div>
                 </div>
 
                 {spot.pro_tip && (
-                  <div style={{ backgroundColor: '#fefce8', padding: '8px', borderRadius: '6px', marginBottom: '12px' }}>
-                    <div style={{ fontSize: '12px', color: '#a16207', fontWeight: '500', marginBottom: '4px' }}>Pro Tip</div>
-                    <p style={{ fontSize: '12px', color: '#92400e' }}>{spot.pro_tip}</p>
+                  <div className="bg-yellow-50 p-2 rounded mb-3">
+                    <div className="text-xs font-medium text-yellow-700">Pro Tip:</div>
+                    <div className="text-xs text-yellow-800">{spot.pro_tip}</div>
                   </div>
                 )}
 
-                <div style={{ display: 'flex', gap: '8px' }}>
+                <div className="flex gap-2">
                   <a 
                     href={spot.google_maps_link} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    style={{ 
-                      flex: 1, 
-                      backgroundColor: '#3b82f6', 
-                      color: 'white', 
-                      textAlign: 'center', 
-                      padding: '4px 8px', 
-                      borderRadius: '4px', 
-                      fontSize: '12px',
-                      textDecoration: 'none'
-                    }}
+                    className="flex-1 bg-blue-500 text-white text-center py-1 px-2 rounded text-sm hover:bg-blue-600"
                   >
                     Maps
                   </a>
@@ -197,16 +125,7 @@ const EnhancedSurfSpotMap: React.FC<EnhancedSurfSpotMapProps> = ({
                       href={spot.live_cam} 
                       target="_blank" 
                       rel="noopener noreferrer"
-                      style={{ 
-                        flex: 1, 
-                        backgroundColor: '#10b981', 
-                        color: 'white', 
-                        textAlign: 'center', 
-                        padding: '4px 8px', 
-                        borderRadius: '4px', 
-                        fontSize: '12px',
-                        textDecoration: 'none'
-                      }}
+                      className="flex-1 bg-green-500 text-white text-center py-1 px-2 rounded text-sm hover:bg-green-600"
                     >
                       Live Cam
                     </a>
