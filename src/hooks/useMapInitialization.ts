@@ -30,8 +30,9 @@ export const useMapInitialization = () => {
     console.log('🔧 Starting map initialization...');
     
     try {
-      // Initialize Leaflet icons
+      // Initialize Leaflet icons first
       initializeLeafletIcons();
+      console.log('✅ Leaflet icons initialized');
 
       // Create map instance
       const map = L.map(mapRef.current!, DEFAULT_MAP_CONFIG);
@@ -43,16 +44,20 @@ export const useMapInitialization = () => {
       tileLayer.addTo(map);
       console.log('🌍 Tile layer added');
 
-      // Create layer group for markers
+      // Create layer group for markers and immediately add to map
       const layerGroup = L.layerGroup();
       layerGroupRef.current = layerGroup;
-      layerGroup.addTo(map);
-      console.log('✅ Layer group created and added');
+      map.addLayer(layerGroup); // This is the key fix - explicitly add to map
+      console.log('✅ Layer group created and added to map');
 
-      // Mark as ready
-      isInitializedRef.current = true;
-      markAsReady();
-      console.log('🎯 Map marked as ready');
+      // Wait for map to be fully loaded before marking as ready
+      map.whenReady(() => {
+        console.log('🎯 Map is ready, invalidating size and marking as ready');
+        map.invalidateSize();
+        isInitializedRef.current = true;
+        markAsReady();
+        console.log('✅ Map initialization complete and ready');
+      });
 
     } catch (error) {
       console.error('❌ Map initialization failed:', error);
@@ -60,7 +65,7 @@ export const useMapInitialization = () => {
     }
 
     return cleanup;
-  }, [validateContainer, isInitializedRef, markAsReady, cleanup]);
+  }, [validateContainer, isInitializedRef, markAsReady, cleanup, mapRef, mapInstanceRef, layerGroupRef]);
 
   return { 
     mapRef, 
