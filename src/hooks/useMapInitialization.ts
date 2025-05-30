@@ -47,20 +47,38 @@ export const useMapInitialization = () => {
       layerGroup.addTo(map);
       console.log('✅ Layer group created and added to map');
       
-      isInitializedRef.current = true;
-      
-      // Wait for map to be fully rendered before marking as ready
+      // Wait for map to be fully loaded and rendered
+      map.whenReady(() => {
+        console.log('🎯 Map whenReady callback triggered');
+        isInitializedRef.current = true;
+        
+        // Additional delay to ensure everything is properly rendered
+        setTimeout(() => {
+          if (mapInstanceRef.current && mapInstanceRef.current.getContainer()) {
+            mapInstanceRef.current.invalidateSize();
+            setIsMapReady(true);
+            console.log('✅ Map marked as ready');
+          }
+        }, 200);
+      });
+
+      // Fallback in case whenReady doesn't fire
       setTimeout(() => {
-        if (mapInstanceRef.current) {
-          mapInstanceRef.current.invalidateSize();
-          setIsMapReady(true);
-          console.log('✅ Map marked as ready');
+        if (!isInitializedRef.current && mapInstanceRef.current) {
+          console.log('🔄 Fallback map ready initialization');
+          isInitializedRef.current = true;
+          if (mapInstanceRef.current.getContainer()) {
+            mapInstanceRef.current.invalidateSize();
+            setIsMapReady(true);
+            console.log('✅ Map marked as ready (fallback)');
+          }
         }
-      }, 100);
+      }, 1000);
 
     } catch (error) {
       console.error('❌ Error initializing map:', error);
       isInitializedRef.current = false;
+      setIsMapReady(false);
     }
 
     return () => {

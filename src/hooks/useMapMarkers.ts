@@ -99,7 +99,7 @@ export const useMapMarkers = ({
         // Extend bounds
         bounds.extend([lat, lon]);
 
-        // Create and bind popup first
+        // Create and bind popup
         const popupContent = createPopupContent(spot);
         marker.bindPopup(popupContent, { 
           maxWidth: 300,
@@ -107,9 +107,12 @@ export const useMapMarkers = ({
           autoPan: true
         });
 
-        // Add click handler - open popup and trigger callback
+        // Add click handler
         marker.on('click', (e) => {
           console.log(`🖱️ Marker clicked for spot: ${spot.full_name}`);
+          
+          // Prevent event from bubbling to map
+          L.DomEvent.stopPropagation(e);
           
           // Open the popup
           marker.openPopup();
@@ -118,9 +121,6 @@ export const useMapMarkers = ({
           if (onSpotClick) {
             onSpotClick(spot.id);
           }
-          
-          // Prevent event from bubbling to map
-          L.DomEvent.stopPropagation(e);
         });
 
         // Apply selection styling if needed
@@ -137,20 +137,31 @@ export const useMapMarkers = ({
 
     console.log(`🎉 Finished adding markers. Total added: ${addedMarkers}/${spots.length}`);
 
-    // Fit bounds if we have markers
-    if (addedMarkers > 0 && bounds.isValid()) {
+    // Fit bounds if we have markers - with additional safety checks
+    if (addedMarkers > 0 && bounds.isValid() && mapInstance) {
       try {
+        // Add a delay to ensure map is fully rendered
         setTimeout(() => {
-          if (mapInstance) {
-            mapInstance.fitBounds(bounds, { 
-              padding: [20, 20],
-              maxZoom: 10
-            });
-            console.log('🔍 Map bounds fitted to show all markers');
+          // Double check that mapInstance still exists and is valid
+          if (mapInstance && mapInstance.getContainer && mapInstance.getContainer()) {
+            try {
+              mapInstance.fitBounds(bounds, { 
+                padding: [20, 20],
+                maxZoom: 10
+              });
+              console.log('🔍 Map bounds fitted to show all markers');
+            } catch (fitError) {
+              console.warn('⚠️ Could not fit bounds, trying alternative approach:', fitError);
+              // Fallback: just set view to first marker
+              if (spots.length > 0) {
+                const firstSpot = spots[0];
+                mapInstance.setView([firstSpot.lat, firstSpot.lon], 8);
+              }
+            }
           }
-        }, 200);
+        }, 300);
       } catch (error) {
-        console.error('❌ Error fitting bounds:', error);
+        console.error('❌ Error in bounds fitting logic:', error);
       }
     }
 
@@ -158,11 +169,18 @@ export const useMapMarkers = ({
 
   // Handle selected spot changes
   useEffect(() => {
-    if (selectedSpotId && mapInstance) {
+    if (selectedSpotId && mapInstance && mapInstance.getContainer && mapInstance.getContainer()) {
       const selectedSpot = spots.find(spot => spot.id === selectedSpotId);
       if (selectedSpot && selectedSpot.lat && selectedSpot.lon) {
-        mapInstance.setView([selectedSpot.lat, selectedSpot.lon], 12);
-        console.log(`🎯 Centered map on ${selectedSpot.full_name}`);
+        try {
+          // Check if map is still valid before setting view
+          if (mapInstance.getContainer()) {
+            mapInstance.setView([selectedSpot.lat, selectedSpot.lon], 12);
+            console.log(`🎯 Centered map on ${selectedSpot.full_name}`);
+          }
+        } catch (error) {
+          console.warn('⚠️ Could not set map view:', error);
+        }
         
         // Update marker icons and open popup for selected spot
         markersRef.current.forEach((marker, spotId) => {
