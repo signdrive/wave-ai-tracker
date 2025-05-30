@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from '@/components/ui/badge';
 import SurfCamHeader from './SurfCamHeader';
-import SurfCamContent from './SurfCamContent';
+import RealTimeSurfCam from './RealTimeSurfCam';
 import CameraValidationDashboard from './CameraValidationDashboard';
 import CameraStatusIndicator from './CameraStatusIndicator';
 import { useSurfSpots } from '@/hooks/useSurfSpots';
@@ -65,7 +65,6 @@ const SurfCamDisplay: React.FC = () => {
                   key={id}
                   value={id}
                   className="flex flex-col items-center p-2 relative"
-                  onClick={() => setSelectedLocation(id)}
                 >
                   <div className="absolute top-1 right-1">
                     <CameraStatusIndicator 
@@ -90,10 +89,18 @@ const SurfCamDisplay: React.FC = () => {
               ))}
             </TabsList>
             
-            <SurfCamContent 
-              surfLocations={surfLocations}
-              cameraStatuses={cameraStatuses}
-            />
+            {/* Individual TabsContent for each location */}
+            {locations.map(([id, location]) => (
+              <TabsContent key={id} value={id}>
+                <RealTimeSurfCam
+                  spotId={id}
+                  spotName={location.name}
+                  imageSrc={location.imageSrc}
+                  cameraStatus={cameraStatuses[id]}
+                  metadata={location.metadata}
+                />
+              </TabsContent>
+            ))}
           </Tabs>
         </div>
       </div>
