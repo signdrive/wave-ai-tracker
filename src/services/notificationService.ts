@@ -1,4 +1,3 @@
-
 // Push notification service for surf alerts
 interface NotificationAction {
   action: string;
@@ -62,7 +61,8 @@ class NotificationService {
     try {
       if ('serviceWorker' in navigator) {
         const registration = await navigator.serviceWorker.ready;
-        await registration.showNotification(options.title, {
+        // Use proper typing for service worker notifications
+        const swNotificationOptions: any = {
           body: options.body,
           icon: options.icon || '/placeholder.svg',
           badge: options.badge || '/placeholder.svg',
@@ -79,7 +79,8 @@ class NotificationService {
               title: 'Dismiss'
             }
           ]
-        });
+        };
+        await registration.showNotification(options.title, swNotificationOptions);
       } else {
         new Notification(options.title, {
           body: options.body,
