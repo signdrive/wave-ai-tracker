@@ -54,11 +54,22 @@ export const useMapMarkers = ({
       layerGroup: !!layerGroup,
       isMapReady,
       isLoading,
-      spotsCount: spots.length
+      spotsCount: spots.length,
+      spotsData: spots.slice(0, 3) // Log first 3 spots for debugging
     });
 
-    if (!mapInstance || !layerGroup || !isMapReady || isLoading || spots.length === 0) {
-      console.log('🚫 Requirements not met for marker creation');
+    if (!mapInstance || !layerGroup || !isMapReady || isLoading) {
+      console.log('🚫 Requirements not met for marker creation', {
+        mapInstance: !!mapInstance,
+        layerGroup: !!layerGroup,
+        isMapReady,
+        isLoading
+      });
+      return;
+    }
+
+    if (spots.length === 0) {
+      console.log('🚫 No spots to display');
       return;
     }
 
@@ -69,13 +80,27 @@ export const useMapMarkers = ({
       let addedMarkers = 0;
       const bounds = L.latLngBounds([]);
 
-      spots.forEach((spot) => {
+      spots.forEach((spot, index) => {
+        console.log(`🏄‍♂️ Processing spot ${index + 1}/${spots.length}: ${spot.full_name}`, {
+          lat: spot.lat,
+          lon: spot.lon,
+          id: spot.id
+        });
+
         const marker = createMarkerForSpot(spot);
         if (marker && addMarkerToMap(marker, spot)) {
           const lat = Number(spot.lat);
           const lon = Number(spot.lon);
-          bounds.extend([lat, lon]);
-          addedMarkers++;
+          
+          if (isValidCoordinate(lat, lon)) {
+            bounds.extend([lat, lon]);
+            addedMarkers++;
+            console.log(`✅ Successfully added marker ${addedMarkers} for ${spot.full_name}`);
+          } else {
+            console.warn(`⚠️ Invalid coordinates for ${spot.full_name}: lat=${lat}, lon=${lon}`);
+          }
+        } else {
+          console.error(`❌ Failed to add marker for ${spot.full_name}`);
         }
       });
 
@@ -86,19 +111,21 @@ export const useMapMarkers = ({
         try {
           setTimeout(() => {
             if (mapInstance?.getContainer?.()) {
+              console.log('🔍 Fitting map bounds to show all markers');
               mapInstance.fitBounds(bounds, FIT_BOUNDS_CONFIG);
-              console.log('🔍 Map bounds fitted to show all markers');
             }
           }, 300);
         } catch (error) {
           console.error('❌ Error fitting bounds:', error);
         }
+      } else {
+        console.warn('⚠️ No valid markers to fit bounds for');
       }
 
     } catch (error) {
       console.error('❌ Unexpected error in marker processing:', error);
     }
-  }, [mapInstance, layerGroup, spots, isLoading, selectedSpotId, onSpotClick, isMapReady, clearMarkers, createMarkerForSpot, addMarkerToMap]);
+  }, [mapInstance, layerGroup, spots, isLoading, isMapReady]);
 
   // Effect for handling selected spot changes
   useEffect(() => {
@@ -137,7 +164,7 @@ export const useMapMarkers = ({
     } catch (error) {
       console.error('❌ Error in selected spot effect:', error);
     }
-  }, [selectedSpotId, spots, mapInstance, updateMarkerSelection]);
+  }, [selectedSpotId, spots, mapInstance]);
 
   return { markersRef };
 };

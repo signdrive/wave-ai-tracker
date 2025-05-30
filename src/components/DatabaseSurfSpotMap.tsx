@@ -31,6 +31,18 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
   onSpotClick,
   selectedSpotId
 }) => {
+  console.log('🗺️ DatabaseSurfSpotMap render', {
+    spotsCount: spots.length,
+    isLoading,
+    selectedSpotId,
+    firstSpot: spots[0] ? {
+      name: spots[0].full_name,
+      lat: spots[0].lat,
+      lon: spots[0].lon,
+      id: spots[0].id
+    } : null
+  });
+
   const { mapRef, mapInstanceRef, layerGroupRef, isMapReady } = useMapInitialization();
   
   useMapMarkers({
@@ -47,6 +59,7 @@ const DatabaseSurfSpotMap: React.FC<DatabaseSurfSpotMapProps> = ({
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       if (event.data.type === 'selectSpot' && onSpotClick) {
+        console.log('📨 Received spot selection message:', event.data.spotId);
         onSpotClick(event.data.spotId);
       }
     };

@@ -32,6 +32,8 @@ export const useMarkerCreation = ({ layerGroup, onSpotClick }: UseMarkerCreation
     const lat = Number(spot.lat);
     const lon = Number(spot.lon);
     
+    console.log(`🔨 Creating marker for ${spot.full_name}`, { lat, lon, id: spot.id });
+    
     if (!isValidCoordinate(lat, lon)) {
       console.warn(`❌ Invalid coordinates for ${spot.full_name}: lat=${lat}, lon=${lon}`);
       return null;
@@ -45,11 +47,14 @@ export const useMarkerCreation = ({ layerGroup, onSpotClick }: UseMarkerCreation
         return null;
       }
 
+      console.log(`✅ Marker created for ${spot.full_name}`);
+
       // Create and bind popup
       try {
         const popupContent = createPopupContent(spot);
         if (popupContent) {
           marker.bindPopup(popupContent, POPUP_CONFIG);
+          console.log(`✅ Popup bound for ${spot.full_name}`);
         }
       } catch (popupError) {
         console.warn(`⚠️ Failed to create popup for ${spot.full_name}:`, popupError);
@@ -90,12 +95,15 @@ export const useMarkerCreation = ({ layerGroup, onSpotClick }: UseMarkerCreation
   };
 
   const addMarkerToMap = (marker: L.Marker, spot: DatabaseSurfSpot): boolean => {
-    if (!layerGroup) return false;
+    if (!layerGroup) {
+      console.error('❌ No layer group available to add marker');
+      return false;
+    }
 
     try {
       markersRef.current.set(spot.id, marker);
       marker.addTo(layerGroup);
-      console.log(`✅ Successfully added marker for ${spot.full_name}`);
+      console.log(`✅ Marker added to map for ${spot.full_name}`);
       return true;
     } catch (error) {
       console.error(`❌ Error adding marker to map for ${spot.full_name}:`, error);
@@ -104,6 +112,7 @@ export const useMarkerCreation = ({ layerGroup, onSpotClick }: UseMarkerCreation
   };
 
   const updateMarkerSelection = (selectedSpotId: string | undefined) => {
+    console.log(`🎯 Updating marker selection for spot: ${selectedSpotId}`);
     markersRef.current.forEach((marker, spotId) => {
       try {
         const isSelected = spotId === selectedSpotId;
@@ -126,9 +135,11 @@ export const useMarkerCreation = ({ layerGroup, onSpotClick }: UseMarkerCreation
 
   const clearMarkers = () => {
     try {
-      layerGroup?.clearLayers();
+      if (layerGroup) {
+        layerGroup.clearLayers();
+        console.log(`🧹 Cleared ${markersRef.current.size} existing markers from layer group`);
+      }
       markersRef.current.clear();
-      console.log('🧹 Cleared existing markers');
     } catch (error) {
       console.error('❌ Error clearing markers:', error);
     }
