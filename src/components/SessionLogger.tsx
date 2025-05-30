@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -41,17 +40,32 @@ const SessionLogger: React.FC<SessionLoggerProps> = ({
 
   const { toast } = useToast();
 
+  // Helper function to calculate points with simplified parameters
+  const calculateSessionPoints = (sessionData: any) => {
+    const qualityMap: Record<string, number> = {
+      'poor': 1,
+      'fair': 2,
+      'good': 3,
+      'excellent': 4,
+      'epic': 5
+    };
+    
+    const duration = parseInt(sessionData.duration) || 0;
+    const quality = qualityMap[sessionData.waveQuality] || 3;
+    
+    // Base points calculation
+    const durationPoints = Math.floor(duration / 10);
+    const qualityPoints = quality * 10;
+    const ratingBonus = sessionData.rating * 5;
+    
+    return durationPoints + qualityPoints + ratingBonus;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Calculate points for this session
-    const points = pointsRewardService.calculateSessionPoints({
-      duration: parseInt(session.duration) || 0,
-      waveQuality: session.waveQuality as any,
-      conditions: session.conditions,
-      rating: session.rating,
-      isNewSpot: session.spot !== currentSpot
-    });
+    // Calculate points for this session using simplified calculation
+    const points = calculateSessionPoints(session);
 
     const sessionData = {
       ...session,
