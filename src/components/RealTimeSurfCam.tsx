@@ -8,6 +8,7 @@ import SurfForecast from './SurfForecast';
 import HistoricalCharts from './HistoricalCharts';
 import FavoriteButton from './FavoriteButton';
 import AlertPreferencesDialog from './AlertPreferencesDialog';
+import EnhancedSurfInterface from './EnhancedSurfInterface';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { CameraValidationResult } from '@/utils/cameraValidation';
@@ -72,6 +73,9 @@ const RealTimeSurfCam: React.FC<RealTimeSurfCamProps> = ({
         isLoading={isWeatherLoading} 
         spotName={spotName}
       />
+
+      {/* Enhanced Surf Interface - NEW AI-POWERED FEATURES */}
+      <EnhancedSurfInterface spotId={spotId} spotName={spotName} />
 
       {/* Current Surf Conditions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
