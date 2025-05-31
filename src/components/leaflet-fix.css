@@ -1,8 +1,8 @@
 
 /* Leaflet CSS fixes for proper rendering */
 .leaflet-container {
-  height: 100%;
-  width: 100%;
+  height: 100vh !important;
+  width: 100% !important;
   z-index: 1;
   background: #aad3df;
 }
@@ -10,7 +10,6 @@
 .leaflet-marker-icon {
   border: none !important;
   background: none !important;
-  border-radius: 50%;
 }
 
 .leaflet-popup-content-wrapper {
@@ -27,11 +26,6 @@
   background: white;
 }
 
-/* Fix for marker icons not loading */
-.leaflet-default-icon-path {
-  background-image: url('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png');
-}
-
 /* Ensure proper z-index for popups */
 .leaflet-popup-pane {
   z-index: 700;
@@ -41,7 +35,13 @@
   z-index: 600;
 }
 
-/* Prevent blank screen during load */
-.leaflet-container {
-  min-height: 400px;
+/* Custom mentor marker styling */
+.custom-mentor-marker {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Fix for any remaining icon issues */
+.leaflet-default-icon-path {
+  background-image: url('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png');
 }
