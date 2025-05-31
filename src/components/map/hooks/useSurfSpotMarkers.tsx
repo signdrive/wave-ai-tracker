@@ -21,7 +21,7 @@ export const useSurfSpotMarkers = ({
     if (!mapRef.current || surfSpots.length === 0 || isLoading || (viewMode === 'mentors')) return;
 
     console.log('🏄 Adding surf spot markers', surfSpots.length);
-    console.log('🏄 First 3 spots:', surfSpots.slice(0, 3).map(s => ({ id: s.id, name: s.full_name })));
+    console.log('🏄 First 3 spots:', surfSpots.slice(0, 3).map(s => ({ id: s.id, name: s.full_name, type: typeof s.id })));
 
     const spotLayer = L.layerGroup().addTo(mapRef.current);
 
@@ -60,9 +60,10 @@ export const useSurfSpotMarkers = ({
 
       // Add click event to marker for direct selection
       spotMarker.on('click', (e) => {
-        console.log('🖱️ Marker clicked for spot:', spot.full_name, 'ID:', spot.id);
+        console.log('🖱️ Marker clicked for spot:', spot.full_name, 'ID:', spot.id, 'Type:', typeof spot.id);
         L.DomEvent.stopPropagation(e);
-        handleSpotSelection(spot.id);
+        // Ensure ID is passed as string
+        handleSpotSelection(String(spot.id));
       });
 
       const spotPopupContent = `
@@ -83,7 +84,7 @@ export const useSurfSpotMarkers = ({
             </div>
           </div>
           <button 
-            onclick="window.selectSurfSpot('${spot.id}')"
+            onclick="window.selectSurfSpot('${String(spot.id)}')"
             style="
               margin-top: 8px;
               width: 100%;
