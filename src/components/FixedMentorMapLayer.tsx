@@ -1,6 +1,5 @@
 
 import React, { useEffect, useRef } from 'react';
-import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 
 type Mentor = {
@@ -14,29 +13,24 @@ type Mentor = {
   is_available?: boolean;
 };
 
-const isValidUrl = (url: string): boolean => {
-  try {
-    new URL(url);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
 interface FixedMentorMapLayerProps {
   mentors: Mentor[];
   onBookSession?: (mentorId: string) => void;
+  map?: L.Map;
 }
 
 const FixedMentorMapLayer: React.FC<FixedMentorMapLayerProps> = ({ 
   mentors, 
-  onBookSession 
+  onBookSession,
+  map
 }) => {
-  const map = useMap();
   const layerGroupRef = useRef<L.LayerGroup | null>(null);
 
   useEffect(() => {
-    if (!map) return;
+    if (!map) {
+      console.log('⏳ Map not ready yet');
+      return;
+    }
 
     console.log('🗺️ FixedMentorMapLayer rendering', mentors.length, 'mentors');
 
@@ -47,17 +41,6 @@ const FixedMentorMapLayer: React.FC<FixedMentorMapLayerProps> = ({
 
     // Clear existing markers
     layerGroupRef.current.clearLayers();
-
-    // Default icon
-    const defaultIcon = L.icon({
-      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
-      iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
-      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowSize: [41, 41]
-    });
 
     // Add markers for each mentor
     mentors.forEach((mentor) => {
