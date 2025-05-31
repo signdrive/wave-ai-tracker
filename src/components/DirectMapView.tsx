@@ -48,6 +48,17 @@ export default function DirectMapView() {
   
   const { surfSpots, rawSpots, isLoading, error } = useSupabaseSurfSpots();
 
+  // Function to handle spot selection
+  const handleSpotSelection = (spotId: string) => {
+    const spot = surfSpots.find(s => s.id === spotId);
+    const rawSpot = rawSpots.find(r => r.id === parseInt(spotId));
+    if (spot) {
+      setSelectedSpot(spot);
+      setSelectedRawSpot(rawSpot);
+      console.log('Spot selected:', spot.full_name);
+    }
+  };
+
   // Initialize Map
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
@@ -112,6 +123,7 @@ export default function DirectMapView() {
             font-size: 11px;
             color: ${color};
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            cursor: pointer;
           ">${mockSwell.toFixed(1)}ft</div>
         `,
         iconSize: [28, 28],
@@ -121,6 +133,11 @@ export default function DirectMapView() {
 
       const spotMarker = L.marker([spot.lat, spot.lon], {
         icon: spotIcon
+      });
+
+      // Add click event to marker for direct selection
+      spotMarker.on('click', () => {
+        handleSpotSelection(spot.id);
       });
 
       const spotPopupContent = `
@@ -259,15 +276,10 @@ export default function DirectMapView() {
     };
   }, [viewMode]);
 
-  // Global function to handle surf spot selection
+  // Global function to handle surf spot selection (for popup button)
   useEffect(() => {
     (window as any).selectSurfSpot = (spotId: string) => {
-      const spot = surfSpots.find(s => s.id === spotId);
-      const rawSpot = rawSpots.find(r => r.id === parseInt(spotId));
-      if (spot) {
-        setSelectedSpot(spot);
-        setSelectedRawSpot(rawSpot);
-      }
+      handleSpotSelection(spotId);
     };
 
     return () => {
@@ -337,7 +349,7 @@ export default function DirectMapView() {
         )}
       </div>
 
-      {/* Information Panel - Only shows when a spot is selected */}
+      {/* Information Panel - Shows under the map when a spot is selected */}
       {selectedSpot && (
         <div className="bg-white border-t max-h-96 overflow-y-auto">
           <SurfSpotInfoPanel 
