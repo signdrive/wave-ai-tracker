@@ -26,6 +26,15 @@ interface StudentDashboardProps {
   onBookSession: () => void;
 }
 
+// Type guard function to check if mentor data is valid
+const isValidMentorData = (mentorData: any): mentorData is { full_name: string } => {
+  return mentorData !== null && 
+         mentorData !== undefined && 
+         typeof mentorData === 'object' && 
+         'full_name' in mentorData && 
+         typeof mentorData.full_name === 'string';
+};
+
 const StudentDashboard: React.FC<StudentDashboardProps> = ({ onBookSession }) => {
   const { user } = useAuth();
 
@@ -59,16 +68,22 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ onBookSession }) =>
   }
 
   // Process sessions with proper typing and null safety
-  const processedSessions: Session[] = sessions.map(session => ({
-    ...session,
-    mentor: session.mentor && 
-            typeof session.mentor === 'object' && 
-            session.mentor !== null &&
-            'full_name' in session.mentor && 
-            session.mentor.full_name
-      ? { full_name: session.mentor.full_name }
-      : null
-  }));
+  const processedSessions: Session[] = sessions.map(session => {
+    const mentorData = session.mentor;
+    
+    if (isValidMentorData(mentorData)) {
+      // TypeScript now knows mentorData is { full_name: string }
+      return {
+        ...session,
+        mentor: { full_name: mentorData.full_name }
+      };
+    }
+
+    return {
+      ...session,
+      mentor: null
+    };
+  });
 
   const totalSessions = processedSessions.length;
   const upcomingSessions = processedSessions.filter(s => 
