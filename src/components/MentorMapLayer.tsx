@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
@@ -8,6 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calendar, Star, MapPin, Clock, Shield, Award } from 'lucide-react';
+import { useMentorClick } from '@/hooks/useMentorClick';
+import { useMonitoring } from '@/lib/monitoring';
+import { validateMentorId } from '@/utils/mentorValidation';
 
 interface Instructor {
   id: string;
@@ -56,11 +58,50 @@ interface InstructorCardProps {
 }
 
 const InstructorCard: React.FC<InstructorCardProps> = ({ instructor, onBookSession }) => {
+  const { captureException } = useMonitoring();
+  const { handleMentorClick } = useMentorClick();
+  
   const topCertification = instructor.certifications[0] || 'Certified';
   const rating = 4.2 + Math.random() * 0.8; // Mock rating for now
 
+  const handleCardClick = () => {
+    try {
+      // Validate instructor first
+      const validation = validateMentorId(instructor.id);
+      if (!validation.isValid) {
+        console.warn('⚠️ Invalid instructor:', validation.errors);
+        captureException(new Error(`Invalid instructor: ${validation.errors.join(', ')}`), {
+          instructorId: instructor.id,
+          errors: validation.errors
+        });
+        return;
+      }
+
+      handleMentorClick(instructor.id);
+    } catch (error) {
+      console.error('❌ Error in instructor card click:', error);
+      captureException(error as Error, {
+        instructorId: instructor.id,
+        action: 'card_click'
+      });
+    }
+  };
+
+  const handleBookingClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    try {
+      onBookSession(instructor.id);
+    } catch (error) {
+      console.error('❌ Error in booking click:', error);
+      captureException(error as Error, {
+        instructorId: instructor.id,
+        action: 'booking_click'
+      });
+    }
+  };
+
   return (
-    <Card className="w-72 border-0 shadow-lg">
+    <Card className="w-72 border-0 shadow-lg cursor-pointer hover:shadow-xl transition-shadow" onClick={handleCardClick}>
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center justify-between">
           <div className="flex items-center space-x-2">
@@ -69,6 +110,11 @@ const InstructorCard: React.FC<InstructorCardProps> = ({ instructor, onBookSessi
                 src={instructor.profile_image_url} 
                 alt={instructor.name}
                 className="w-8 h-8 rounded-full"
+                onError={(e) => {
+                  // Fallback to initials if image fails
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                }}
               />
             ) : (
               <div className="w-8 h-8 rounded-full bg-ocean flex items-center justify-center text-white text-sm">
@@ -131,7 +177,7 @@ const InstructorCard: React.FC<InstructorCardProps> = ({ instructor, onBookSessi
           <Button 
             size="sm" 
             className="w-full"
-            onClick={() => onBookSession(instructor.id)}
+            onClick={handleBookingClick}
             disabled={!instructor.is_available}
           >
             <Calendar className="w-4 h-4 mr-1" />
@@ -143,7 +189,7 @@ const InstructorCard: React.FC<InstructorCardProps> = ({ instructor, onBookSessi
               size="sm" 
               variant="outline" 
               className="w-full"
-              onClick={() => onBookSession(instructor.id)}
+              onClick={handleBookingClick}
             >
               🌊 Instant Session
             </Button>
@@ -167,22 +213,49 @@ const MentorMapLayer: React.FC<MentorMapLayerProps> = ({
   userLocation = [34.0522, -118.2437], // Default to LA
   radius = 50 
 }) => {
-  const { data: instructors = [], isLoading } = useQuery({
+  const { captureException, addBreadcrumb } = useMonitoring();
+  
+  const { data: instructors = [], isLoading, error } = useQuery({
     queryKey: ['nearby-instructors', userLocation, radius],
     queryFn: async (): Promise<Instructor[]> => {
       console.log('🔍 Fetching nearby instructors...');
+      addBreadcrumb('Fetching nearby instructors', 'query', { userLocation, radius });
       
-      // For now, generate mock data since the database migration hasn't been applied
-      console.log('📝 Generating mock instructor data...');
-      return generateMockInstructors(userLocation, 15, radius);
+      try {
+        // For now, generate mock data since the database migration hasn't been applied
+        console.log('📝 Generating mock instructor data...');
+        return generateMockInstructors(userLocation, 15, radius);
+      } catch (error) {
+        console.error('❌ Error fetching instructors:', error);
+        captureException(error as Error, {
+          userLocation,
+          radius,
+          action: 'fetch_instructors'
+        });
+        throw error;
+      }
     },
     enabled: visible,
-    staleTime: 5 * 60 * 1000 // 5 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: (failureCount, error) => {
+      // Only retry network errors, not validation errors
+      if (failureCount < 2) {
+        addBreadcrumb(`Retrying instructor fetch (attempt ${failureCount + 1})`, 'retry');
+        return true;
+      }
+      return false;
+    }
   });
 
   if (!visible) return null;
 
+  if (error) {
+    console.error('❌ Error in MentorMapLayer:', error);
+    captureException(error as Error, { component: 'MentorMapLayer' });
+  }
+
   console.log(`🗺️ Rendering ${instructors.length} instructor markers`);
+  addBreadcrumb(`Rendering ${instructors.length} instructor markers`, 'render');
 
   return (
     <>

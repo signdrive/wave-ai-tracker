@@ -11,6 +11,8 @@ import PremiumPage from './pages/PremiumPage';
 import AdminPage from './pages/AdminPage';
 import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import { monitoring } from './lib/monitoring';
+import { useEffect } from 'react';
 import './App.css';
 
 const queryClient = new QueryClient({
@@ -18,11 +20,26 @@ const queryClient = new QueryClient({
     queries: {
       staleTime: 5 * 60 * 1000, // 5 minutes
       retry: 1,
+      onError: (error) => {
+        console.error('Query error:', error);
+        monitoring.captureException(error as Error, { source: 'react-query' });
+      }
     },
   },
 });
 
 function App() {
+  useEffect(() => {
+    // Initialize monitoring
+    monitoring.init({
+      environment: import.meta.env.MODE,
+      // dsn: process.env.SENTRY_DSN, // Add this when you have Sentry DSN
+    });
+
+    // Add breadcrumb for app initialization
+    monitoring.addBreadcrumb('App initialized', 'lifecycle');
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
