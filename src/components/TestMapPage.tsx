@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import SafeMap from './SafeMap';
 import FixedMentorMapLayer from './FixedMentorMapLayer';
 import { Button } from '@/components/ui/button';
@@ -39,9 +39,17 @@ const testMentors = [
 const TestMapPage: React.FC = () => {
   const navigate = useNavigate();
 
+  useEffect(() => {
+    console.log('🎯 TestMapPage mounted');
+    console.log('📍 Test mentors:', testMentors);
+  }, []);
+
   const handleBookSession = (mentorId: string) => {
-    console.log('Booking session with mentor:', mentorId);
-    alert(`Booking session with mentor ${mentorId}`);
+    console.log('📅 Booking session with mentor:', mentorId);
+    const mentor = testMentors.find(m => m.id === mentorId);
+    if (mentor) {
+      alert(`Booking session with ${mentor.name} - $${mentor.hourly_rate}/hr`);
+    }
   };
 
   return (
@@ -51,7 +59,7 @@ const TestMapPage: React.FC = () => {
           variant="outline" 
           size="sm" 
           onClick={() => navigate('/')}
-          className="bg-white/90 backdrop-blur-sm"
+          className="bg-white/90 backdrop-blur-sm shadow-lg"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Home
@@ -59,15 +67,17 @@ const TestMapPage: React.FC = () => {
       </div>
       
       <div className="absolute top-4 right-4 z-10">
-        <div className="bg-white/90 backdrop-blur-sm rounded-lg p-3 text-sm">
-          <div className="font-semibold">Test Map</div>
-          <div className="text-gray-600">{testMentors.length} mentors</div>
+        <div className="bg-white/90 backdrop-blur-sm rounded-lg p-3 text-sm shadow-lg">
+          <div className="font-semibold text-blue-600">Surf Mentor Map</div>
+          <div className="text-gray-600">{testMentors.length} mentors available</div>
+          <div className="text-xs text-gray-500 mt-1">Click markers for details</div>
         </div>
       </div>
 
       <SafeMap 
         center={[34.0522, -118.2437]} 
         zoom={6}
+        className="z-0"
       >
         <FixedMentorMapLayer 
           mentors={testMentors} 
