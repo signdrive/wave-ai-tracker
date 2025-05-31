@@ -15,37 +15,36 @@ export const useSpotSelection = ({
   setSelectedRawSpot 
 }: UseSpotSelectionProps) => {
   const handleSpotSelection = (spotId: string) => {
-    console.log('🎯 Attempting to select spot with ID:', spotId);
+    console.log('🎯 handleSpotSelection called with ID:', spotId, 'Type:', typeof spotId);
     console.log('🗄️ Available surfSpots:', surfSpots.length);
     console.log('🗄️ Available rawSpots:', rawSpots.length);
     
-    // Try different ID matching strategies for surfSpots
-    let spot = surfSpots.find(s => s.id === spotId);
-    if (!spot) {
-      spot = surfSpots.find(s => s.id?.toString() === spotId);
+    if (!spotId) {
+      console.warn('❌ No spotId provided');
+      return;
     }
-    if (!spot) {
-      spot = surfSpots.find(s => String(s.id) === String(spotId));
-    }
+
+    // Convert spotId to string for consistent comparison
+    const spotIdStr = String(spotId);
     
-    // Try different ID matching strategies for rawSpots
-    let rawSpot = rawSpots.find(r => r.id === spotId);
-    if (!rawSpot) {
-      rawSpot = rawSpots.find(r => r.id?.toString() === spotId);
-    }
-    if (!rawSpot) {
-      rawSpot = rawSpots.find(r => String(r.id) === String(spotId));
-    }
+    // Try different ID matching strategies for surfSpots
+    let spot = surfSpots.find(s => String(s.id) === spotIdStr);
+    
+    // Try different ID matching strategies for rawSpots  
+    let rawSpot = rawSpots.find(r => String(r.id) === spotIdStr);
     
     console.log('✅ Found spot:', spot ? spot.full_name : 'NOT FOUND');
     console.log('✅ Found rawSpot:', rawSpot ? rawSpot.name : 'NOT FOUND');
     
     // Debug: log first few spots to see their structure
-    if (surfSpots.length > 0) {
+    if (surfSpots.length > 0 && !spot) {
       console.log('🔍 First surfSpot structure:', surfSpots[0]);
-    }
-    if (rawSpots.length > 0) {
-      console.log('🔍 First rawSpot structure:', rawSpots[0]);
+      console.log('🔍 Available spot IDs:', surfSpots.slice(0, 5).map(s => ({ 
+        id: s.id, 
+        type: typeof s.id, 
+        name: s.full_name,
+        stringId: String(s.id)
+      })));
     }
     
     if (spot) {
@@ -60,9 +59,8 @@ export const useSpotSelection = ({
         setSelectedRawSpot(null);
       }
     } else {
-      console.warn('❌ No spot found for ID:', spotId);
-      // Log available IDs for debugging
-      console.log('🔍 Available spot IDs:', surfSpots.slice(0, 5).map(s => ({ id: s.id, type: typeof s.id, name: s.full_name })));
+      console.warn('❌ No spot found for ID:', spotIdStr);
+      console.log('🔍 Searching spotId:', spotIdStr, 'in available IDs:', surfSpots.map(s => String(s.id)));
     }
   };
 
