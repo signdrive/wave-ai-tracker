@@ -1,7 +1,5 @@
 
 import React from 'react';
-import NavBar from '@/components/NavBar';
-import Footer from '@/components/Footer';
 import PremiumSubscriptionPanel from '@/components/PremiumSubscriptionPanel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Crown, Zap, Users, TrendingUp } from 'lucide-react';
@@ -9,7 +7,6 @@ import { Crown, Zap, Users, TrendingUp } from 'lucide-react';
 const PremiumPage = () => {
   return (
     <div className="min-h-screen flex flex-col">
-      <NavBar />
       <main className="flex-1 py-12">
         <div className="container mx-auto px-4">
           {/* Hero Section */}
@@ -130,7 +127,6 @@ const PremiumPage = () => {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 };
