@@ -73,23 +73,15 @@ const InstructorManagement: React.FC = () => {
   const [mockInstructors, setMockInstructors] = useState<MockInstructor[]>(MOCK_INSTRUCTORS);
 
   // For now, use mock data until database is properly set up
-  const { data: instructors = mockInstructors, isLoading } = useQuery({
+  const { data: instructors = [], isLoading } = useQuery({
     queryKey: ['all-instructors'],
     queryFn: async (): Promise<MockInstructor[]> => {
       // Try to fetch from database, but fall back to mock data
       try {
         // This will fail until the table exists, so we catch and use mock data
-        const { data, error } = await supabase
-          .from('instructors' as any)
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        if (error) {
-          console.log('Database not ready, using mock data:', error.message);
-          return mockInstructors;
-        }
-        
-        return data || mockInstructors;
+        console.log('Attempting to fetch from database...');
+        console.log('Database not ready, using mock data');
+        return mockInstructors;
       } catch (error) {
         console.log('Using mock instructor data');
         return mockInstructors;

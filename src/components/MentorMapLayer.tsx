@@ -240,7 +240,7 @@ const generateMockInstructors = (center: [number, number], count: number): Instr
 
   return Array.from({ length: count }, (_, i) => {
     // Spread instructors around the center point
-    const latOffset = (Math.random() - 0.5) * 0.2; // ~11km radius
+    const latOffset = (Math.random() - 0.5) * 0.2; // ~11km radius spread
     const lngOffset = (Math.random() - 0.5) * 0.2;
     
     return {
