@@ -1,9 +1,8 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Waves, Menu, X, Crown, Map, Home, Users, Shield, Award, BookOpen } from 'lucide-react';
+import { Waves, Menu, X, Crown, Map, Home, Users } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { useUserRole } from '@/hooks/useUserRole';
 import AuthDialog from './AuthDialog';
 import { ThemeToggle } from './ThemeToggle';
 import { Link, useLocation } from 'react-router-dom';
@@ -12,7 +11,6 @@ const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
   const { user, signOut } = useAuth();
-  const { userRole, isAdmin, isMentor, isStudent } = useUserRole();
   const location = useLocation();
 
   const handleSignOut = async () => {
@@ -22,13 +20,6 @@ const NavBar = () => {
 
   const isActivePath = (path: string) => {
     return location.pathname === path;
-  };
-
-  const getUserDisplayName = () => {
-    if (user?.user_metadata?.full_name) {
-      return user.user_metadata.full_name.split(' ')[0];
-    }
-    return user?.email?.split('@')[0] || 'User';
   };
 
   return (
@@ -64,69 +55,6 @@ const NavBar = () => {
                 <span>Surf Map</span>
               </Link>
 
-              {/* Role-specific menu items */}
-              {user && (
-                <>
-                  {isAdmin() && (
-                    <Link 
-                      to="/admin" 
-                      className={`flex items-center space-x-1 text-sm font-medium transition-all duration-200 hover:scale-105 ${
-                        isActivePath('/admin') ? 'text-red-600 dark:text-red-400' : 'text-gray-600 dark:text-gray-300 hover:text-red-600 dark:hover:text-red-400'
-                      }`}
-                    >
-                      <Shield className="w-4 h-4" />
-                      <span>Admin</span>
-                    </Link>
-                  )}
-
-                  {isMentor() && (
-                    <>
-                      <Link 
-                        to="/mentor/students" 
-                        className={`flex items-center space-x-1 text-sm font-medium transition-all duration-200 hover:scale-105 ${
-                          isActivePath('/mentor/students') ? 'text-ocean dark:text-ocean-light' : 'text-gray-600 dark:text-gray-300 hover:text-ocean dark:hover:text-ocean-light'
-                        }`}
-                      >
-                        <Users className="w-4 h-4" />
-                        <span>My Students</span>
-                      </Link>
-                      <Link 
-                        to="/mentor/availability" 
-                        className={`flex items-center space-x-1 text-sm font-medium transition-all duration-200 hover:scale-105 ${
-                          isActivePath('/mentor/availability') ? 'text-ocean dark:text-ocean-light' : 'text-gray-600 dark:text-gray-300 hover:text-ocean dark:hover:text-ocean-light'
-                        }`}
-                      >
-                        <Award className="w-4 h-4" />
-                        <span>Availability</span>
-                      </Link>
-                    </>
-                  )}
-
-                  {isStudent() && (
-                    <>
-                      <Link 
-                        to="/student/mentors" 
-                        className={`flex items-center space-x-1 text-sm font-medium transition-all duration-200 hover:scale-105 ${
-                          isActivePath('/student/mentors') ? 'text-ocean dark:text-ocean-light' : 'text-gray-600 dark:text-gray-300 hover:text-ocean dark:hover:text-ocean-light'
-                        }`}
-                      >
-                        <Award className="w-4 h-4" />
-                        <span>Find Mentors</span>
-                      </Link>
-                      <Link 
-                        to="/student/progress" 
-                        className={`flex items-center space-x-1 text-sm font-medium transition-all duration-200 hover:scale-105 ${
-                          isActivePath('/student/progress') ? 'text-ocean dark:text-ocean-light' : 'text-gray-600 dark:text-gray-300 hover:text-ocean dark:hover:text-ocean-light'
-                        }`}
-                      >
-                        <BookOpen className="w-4 h-4" />
-                        <span>My Progress</span>
-                      </Link>
-                    </>
-                  )}
-                </>
-              )}
-
               <Link 
                 to="/premium" 
                 className={`flex items-center space-x-1 text-sm font-medium transition-all duration-200 hover:scale-105 ${
@@ -136,6 +64,18 @@ const NavBar = () => {
                 <Crown className="w-4 h-4" />
                 <span>Premium</span>
               </Link>
+
+              <a 
+                href="#surf-cams" 
+                className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-ocean dark:hover:text-ocean-light transition-all duration-200 hover:scale-105"
+              >
+                <span>Live Cams</span>
+              </a>
+
+              <div className="flex items-center space-x-1 text-sm font-medium text-gray-600 dark:text-gray-300 transition-all duration-200 hover:scale-105">
+                <Users className="w-4 h-4" />
+                <span>Community</span>
+              </div>
             </div>
 
             {/* Auth Buttons & Theme Toggle */}
@@ -144,16 +84,9 @@ const NavBar = () => {
               
               {user ? (
                 <div className="flex items-center space-x-4">
-                  <div className="text-sm">
-                    <span className="text-gray-600 dark:text-gray-300">
-                      Welcome, {getUserDisplayName()}
-                    </span>
-                    {userRole && (
-                      <div className="text-xs text-gray-500 capitalize">
-                        {userRole}
-                      </div>
-                    )}
-                  </div>
+                  <span className="text-sm text-gray-600 dark:text-gray-300">
+                    Welcome, {user.email?.split('@')[0]}
+                  </span>
                   <Button
                     variant="outline"
                     size="sm"
@@ -213,66 +146,6 @@ const NavBar = () => {
                   <span>Surf Map</span>
                 </Link>
 
-                {/* Mobile role-specific items */}
-                {user && (
-                  <>
-                    {isAdmin() && (
-                      <Link 
-                        to="/admin" 
-                        className={`flex items-center space-x-2 text-base font-medium ${
-                          isActivePath('/admin') ? 'text-red-600' : 'text-gray-600'
-                        }`}
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <Shield className="w-5 h-5" />
-                        <span>Admin Dashboard</span>
-                      </Link>
-                    )}
-
-                    {isMentor() && (
-                      <>
-                        <Link 
-                          to="/mentor/students" 
-                          className="flex items-center space-x-2 text-base font-medium text-gray-600"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          <Users className="w-5 h-5" />
-                          <span>My Students</span>
-                        </Link>
-                        <Link 
-                          to="/mentor/availability" 
-                          className="flex items-center space-x-2 text-base font-medium text-gray-600"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          <Award className="w-5 h-5" />
-                          <span>Set Availability</span>
-                        </Link>
-                      </>
-                    )}
-
-                    {isStudent() && (
-                      <>
-                        <Link 
-                          to="/student/mentors" 
-                          className="flex items-center space-x-2 text-base font-medium text-gray-600"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          <Award className="w-5 h-5" />
-                          <span>Find Mentors</span>
-                        </Link>
-                        <Link 
-                          to="/student/progress" 
-                          className="flex items-center space-x-2 text-base font-medium text-gray-600"
-                          onClick={() => setIsMenuOpen(false)}
-                        >
-                          <BookOpen className="w-5 h-5" />
-                          <span>My Progress</span>
-                        </Link>
-                      </>
-                    )}
-                  </>
-                )}
-
                 <Link 
                   to="/premium" 
                   className={`flex items-center space-x-2 text-base font-medium ${
@@ -284,15 +157,25 @@ const NavBar = () => {
                   <span>Premium</span>
                 </Link>
 
+                <a 
+                  href="#surf-cams" 
+                  className="flex items-center space-x-2 text-base font-medium text-gray-600"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  <span>Live Cams</span>
+                </a>
+
+                <div className="flex items-center space-x-2 text-base font-medium text-gray-600">
+                  <Users className="w-5 h-5" />
+                  <span>Community</span>
+                </div>
+
                 <div className="pt-4 border-t border-gray-200">
                   {user ? (
                     <div className="space-y-3">
-                      <div className="text-sm">
-                        <p className="text-gray-600">Welcome, {getUserDisplayName()}</p>
-                        {userRole && (
-                          <p className="text-xs text-gray-500 capitalize">{userRole}</p>
-                        )}
-                      </div>
+                      <p className="text-sm text-gray-600">
+                        Welcome, {user.email?.split('@')[0]}
+                      </p>
                       <Button
                         variant="outline"
                         className="w-full"
