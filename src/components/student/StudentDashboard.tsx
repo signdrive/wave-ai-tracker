@@ -59,16 +59,24 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ onBookSession }) =>
   }
 
   // Process sessions with proper typing and null safety
-  const processedSessions: Session[] = sessions.map(session => ({
-    ...session,
-    mentor: session.mentor && 
-            typeof session.mentor === 'object' && 
-            session.mentor !== null &&
-            'full_name' in session.mentor && 
-            session.mentor.full_name
-      ? { full_name: session.mentor.full_name }
-      : null
-  }));
+  const processedSessions: Session[] = sessions.map(session => {
+    // Extract mentor data safely
+    const mentorData = session.mentor;
+    let processedMentor: { full_name: string } | null = null;
+    
+    if (mentorData && 
+        typeof mentorData === 'object' && 
+        mentorData !== null &&
+        'full_name' in mentorData && 
+        typeof mentorData.full_name === 'string') {
+      processedMentor = { full_name: mentorData.full_name };
+    }
+
+    return {
+      ...session,
+      mentor: processedMentor
+    };
+  });
 
   const totalSessions = processedSessions.length;
   const upcomingSessions = processedSessions.filter(s => 
