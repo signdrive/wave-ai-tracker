@@ -174,7 +174,7 @@ const MentorMapLayer: React.FC<MentorMapLayerProps> = ({
       
       // For now, generate mock data since the database migration hasn't been applied
       console.log('📝 Generating mock instructor data...');
-      return generateMockInstructors(userLocation, 15);
+      return generateMockInstructors(userLocation, 15, radius);
     },
     enabled: visible,
     staleTime: 5 * 60 * 1000 // 5 minutes
@@ -202,7 +202,7 @@ const MentorMapLayer: React.FC<MentorMapLayerProps> = ({
 };
 
 // Mock data generator for demonstration
-const generateMockInstructors = (center: [number, number], count: number): Instructor[] => {
+const generateMockInstructors = (center: [number, number], count: number, maxRadius: number): Instructor[] => {
   const certifications = [
     ['ISA Level 2', 'First Aid'],
     ['VDWS Instructor', 'Rescue Certified'],
@@ -254,7 +254,7 @@ const generateMockInstructors = (center: [number, number], count: number): Instr
       hourly_rate: Math.floor(Math.random() * 100) + 80,
       bio: bios[i % bios.length],
       is_available: Math.random() > 0.3, // 70% available
-      distance_km: Math.random() * radius,
+      distance_km: Math.random() * maxRadius,
       profile_image_url: `https://images.unsplash.com/photo-150724055${i.toString().padStart(2, '0')}?w=64&h=64&fit=crop&crop=face`
     };
   });
