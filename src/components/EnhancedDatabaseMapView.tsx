@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,6 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import DatabaseSurfSpotMap from './DatabaseSurfSpotMap';
 import MentorMapLayer from './MentorMapLayer';
+import SafeLeafletMap from './SafeLeafletMap';
 import SurfSpotInfoPanel from './SurfSpotInfoPanel';
 import DatabaseMapHeader from './DatabaseMapHeader';
 import DatabaseMapFilters from './DatabaseMapFilters';
@@ -246,7 +246,7 @@ const EnhancedDatabaseMapView: React.FC = () => {
         countries={countries}
       />
 
-      {/* Enhanced Map */}
+      {/* Enhanced Map with SafeLeafletMap wrapper */}
       <div className="space-y-6">
         <Card>
           <CardHeader>
@@ -267,26 +267,31 @@ const EnhancedDatabaseMapView: React.FC = () => {
           </CardHeader>
           <CardContent className="p-0">
             <div className="h-[600px] relative">
-              <DatabaseSurfSpotMap 
-                spots={viewMode !== 'mentors' ? filteredSpots : []} 
-                isLoading={isLoading}
-                onSpotClick={handleSpotClick}
-                selectedSpotId={selectedSpot?.id}
-              />
-              
-              {/* Mentor Layer */}
-              {(viewMode === 'mentors' || viewMode === 'both') && (
-                <div className="absolute inset-0 pointer-events-none">
-                  <div className="w-full h-full pointer-events-auto">
-                    <MentorMapLayer
-                      visible={true}
-                      onBookSession={handleBookSession}
-                      userLocation={userLocation}
-                      radius={50}
-                    />
-                  </div>
-                </div>
-              )}
+              <SafeLeafletMap
+                center={userLocation}
+                zoom={10}
+                style={{ height: '100%', width: '100%' }}
+              >
+                {/* Surf Spots Layer */}
+                {viewMode !== 'mentors' && (
+                  <DatabaseSurfSpotMap 
+                    spots={filteredSpots} 
+                    isLoading={isLoading}
+                    onSpotClick={handleSpotClick}
+                    selectedSpotId={selectedSpot?.id}
+                  />
+                )}
+                
+                {/* Mentor Layer */}
+                {(viewMode === 'mentors' || viewMode === 'both') && (
+                  <MentorMapLayer
+                    visible={true}
+                    onBookSession={handleBookSession}
+                    userLocation={userLocation}
+                    radius={50}
+                  />
+                )}
+              </SafeLeafletMap>
             </div>
           </CardContent>
         </Card>
