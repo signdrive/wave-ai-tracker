@@ -143,7 +143,7 @@ const MentorDashboard: React.FC = () => {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold">
-                        {session.student && typeof session.student === 'object' && 'full_name' in session.student 
+                        {session.student && typeof session.student === 'object' && 'full_name' in session.student
                           ? session.student.full_name 
                           : 'Unknown Student'}
                       </h3>
@@ -180,7 +180,7 @@ const MentorDashboard: React.FC = () => {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold">
-                        {session.student && typeof session.student === 'object' && 'full_name' in session.student 
+                        {session.student && typeof session.student === 'object' && 'full_name' in session.student
                           ? session.student.full_name 
                           : 'Unknown Student'}
                       </h3>
@@ -218,7 +218,7 @@ const MentorDashboard: React.FC = () => {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold">
-                        {session.student && typeof session.student === 'object' && 'full_name' in session.student 
+                        {session.student && typeof session.student === 'object' && 'full_name' in session.student
                           ? session.student.full_name 
                           : 'Unknown Student'}
                       </h3>
