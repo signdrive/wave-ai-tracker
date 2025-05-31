@@ -25,7 +25,7 @@ const SafeMap: React.FC<SafeMapProps> = ({
   useEffect(() => {
     if (!mapRef.current || mapInstanceRef.current) return;
 
-    console.log('🗺️ Initializing map...');
+    console.log('🗺️ Starting map initialization...');
 
     // Fix Leaflet default marker icons
     delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -35,25 +35,47 @@ const SafeMap: React.FC<SafeMapProps> = ({
       shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
     });
 
-    // Create map instance
-    const map = L.map(mapRef.current, {
-      center,
-      zoom,
-      zoomControl: true,
-      attributionControl: true,
-    });
+    try {
+      // Create map instance
+      const map = L.map(mapRef.current, {
+        center,
+        zoom,
+        zoomControl: true,
+        attributionControl: true,
+      });
 
-    // Add tile layer
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom: 19,
-    }).addTo(map);
+      console.log('🗺️ Map instance created');
 
-    mapInstanceRef.current = map;
+      // Add tile layer
+      const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19,
+      });
 
-    // Set ready immediately
-    setIsMapReady(true);
-    console.log('✅ Map ready!');
+      tileLayer.addTo(map);
+      console.log('🗺️ Tile layer added');
+
+      mapInstanceRef.current = map;
+
+      // Wait for map to be ready
+      map.whenReady(() => {
+        console.log('✅ Map is ready!');
+        setIsMapReady(true);
+      });
+
+      // Also set ready after a short timeout as backup
+      setTimeout(() => {
+        if (!isMapReady) {
+          console.log('⏰ Fallback: Setting map ready after timeout');
+          setIsMapReady(true);
+        }
+      }, 1000);
+
+    } catch (error) {
+      console.error('❌ Error initializing map:', error);
+      // Set ready anyway to prevent infinite loading
+      setIsMapReady(true);
+    }
 
     return () => {
       if (mapInstanceRef.current) {
@@ -63,7 +85,7 @@ const SafeMap: React.FC<SafeMapProps> = ({
         setIsMapReady(false);
       }
     };
-  }, [center, zoom]);
+  }, []);
 
   if (!isMapReady) {
     return (
