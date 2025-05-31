@@ -42,6 +42,15 @@ export default function DirectMapView() {
   
   const { surfSpots, rawSpots, isLoading, error } = useSupabaseSurfSpots();
 
+  console.log('🗺️ DirectMapView render state:', {
+    viewMode,
+    selectedSpot: selectedSpot ? selectedSpot.full_name : 'none',
+    selectedRawSpot: selectedRawSpot ? selectedRawSpot.name : 'none',
+    surfSpotsCount: surfSpots.length,
+    rawSpotsCount: rawSpots.length,
+    isLoading
+  });
+
   if (error) {
     return (
       <div className="p-4">
