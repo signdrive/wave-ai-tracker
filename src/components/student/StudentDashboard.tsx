@@ -61,7 +61,11 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ onBookSession }) =>
   // Process sessions with proper typing and null safety
   const processedSessions: Session[] = sessions.map(session => ({
     ...session,
-    mentor: session.mentor && typeof session.mentor === 'object' && session.mentor.full_name
+    mentor: session.mentor && 
+            typeof session.mentor === 'object' && 
+            session.mentor !== null &&
+            'full_name' in session.mentor && 
+            session.mentor.full_name
       ? { full_name: session.mentor.full_name }
       : null
   }));
