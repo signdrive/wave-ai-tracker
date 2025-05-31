@@ -60,17 +60,17 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ onBookSession }) =>
 
   // Process sessions with proper typing and null safety
   const processedSessions: Session[] = sessions.map(session => {
-    // Extract mentor data safely
+    // Extract mentor data safely with explicit type checking
     const mentorData = session.mentor;
     let processedMentor: { full_name: string } | null = null;
     
-    // Check if mentorData exists and has the required properties
-    if (mentorData !== null && 
-        mentorData !== undefined &&
-        typeof mentorData === 'object' && 
-        'full_name' in mentorData && 
-        typeof mentorData.full_name === 'string') {
-      processedMentor = { full_name: mentorData.full_name };
+    // Use type guards to ensure TypeScript understands the null safety
+    if (mentorData !== null && mentorData !== undefined) {
+      if (typeof mentorData === 'object' && 'full_name' in mentorData) {
+        if (typeof mentorData.full_name === 'string') {
+          processedMentor = { full_name: mentorData.full_name };
+        }
+      }
     }
 
     return {
