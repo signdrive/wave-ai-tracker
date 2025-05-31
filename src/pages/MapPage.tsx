@@ -1,13 +1,17 @@
 
 import React from 'react';
-import DatabaseMapView from '@/components/DatabaseMapView';
+import TestMapPage from '@/components/TestMapPage';
+import MapErrorBoundary from '@/components/MapErrorBoundary';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 const MapPage = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ocean/5 to-sand/20">
-      <main className="pt-16">
-        <DatabaseMapView />
-      </main>
+    <div className="min-h-screen">
+      <ErrorBoundary>
+        <MapErrorBoundary>
+          <TestMapPage />
+        </MapErrorBoundary>
+      </ErrorBoundary>
     </div>
   );
 };
