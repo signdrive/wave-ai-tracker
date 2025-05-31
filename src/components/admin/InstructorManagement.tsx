@@ -7,10 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
-import { seedInstructorData, checkInstructorData } from '@/utils/instructorDataSeeder';
 import { Upload, Users, CheckCircle, XCircle, MapPin, RefreshCw } from 'lucide-react';
 
-interface Instructor {
+interface MockInstructor {
   id: string;
   name: string;
   email?: string;
@@ -24,38 +23,114 @@ interface Instructor {
   created_at: string;
 }
 
+// Mock data for demonstration until database is set up
+const MOCK_INSTRUCTORS: MockInstructor[] = [
+  {
+    id: 'isa_001',
+    name: 'Jake Morrison',
+    email: 'jake.morrison@surfpro.com',
+    certifications: ['ISA Level 2', 'Lifeguard Certified', 'First Aid'],
+    specialties: ['Beginner Lessons', 'Group Sessions', 'Ocean Safety'],
+    years_experience: 15,
+    hourly_rate: 120,
+    is_verified: true,
+    is_available: true,
+    data_source: 'isa',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'vdws_002',
+    name: 'Sarah Chen',
+    email: 'sarah.chen@malibusurf.com',
+    certifications: ['VDWS Instructor', 'WSI Certified', 'CPR/AED'],
+    specialties: ['Longboard', 'Classic Style', 'Photography'],
+    years_experience: 12,
+    hourly_rate: 140,
+    is_verified: true,
+    is_available: true,
+    data_source: 'vdws',
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'pro_003',
+    name: 'Marcus "Barrel" Rodriguez',
+    email: 'marcus@huntingtonsurf.com',
+    certifications: ['Professional Surfer', 'Surf Coach', 'Water Safety'],
+    specialties: ['Advanced Techniques', 'Competition Prep', 'Video Analysis'],
+    years_experience: 22,
+    hourly_rate: 200,
+    is_verified: true,
+    is_available: false,
+    data_source: 'manual',
+    created_at: new Date().toISOString()
+  }
+];
+
 const InstructorManagement: React.FC = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isSeeding, setIsSeeding] = useState(false);
+  const [mockInstructors, setMockInstructors] = useState<MockInstructor[]>(MOCK_INSTRUCTORS);
 
-  // Fetch all instructors
-  const { data: instructors = [], isLoading } = useQuery({
+  // For now, use mock data until database is properly set up
+  const { data: instructors = mockInstructors, isLoading } = useQuery({
     queryKey: ['all-instructors'],
-    queryFn: async (): Promise<Instructor[]> => {
-      const { data, error } = await supabase
-        .from('instructors')
-        .select('*')
-        .order('created_at', { ascending: false });
+    queryFn: async (): Promise<MockInstructor[]> => {
+      // Try to fetch from database, but fall back to mock data
+      try {
+        // This will fail until the table exists, so we catch and use mock data
+        const { data, error } = await supabase
+          .from('instructors' as any)
+          .select('*')
+          .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      return data || [];
+        if (error) {
+          console.log('Database not ready, using mock data:', error.message);
+          return mockInstructors;
+        }
+        
+        return data || mockInstructors;
+      } catch (error) {
+        console.log('Using mock instructor data');
+        return mockInstructors;
+      }
     }
   });
 
-  // Seed data mutation
+  // Mock seed data function
   const seedDataMutation = useMutation({
     mutationFn: async () => {
       setIsSeeding(true);
-      await seedInstructorData();
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // For now, just add more mock data
+      const newMockData = [
+        ...MOCK_INSTRUCTORS,
+        {
+          id: 'local_004',
+          name: 'Luna Waves',
+          email: 'luna@venicebeachsurf.com',
+          certifications: ['ISA Level 1', 'Youth Instructor', 'Ocean Rescue'],
+          specialties: ['Kids Classes', 'Family Lessons', 'SUP'],
+          years_experience: 8,
+          hourly_rate: 95,
+          is_verified: false,
+          is_available: true,
+          data_source: 'manual',
+          created_at: new Date().toISOString()
+        }
+      ];
+      
+      setMockInstructors(newMockData);
+      return newMockData;
     },
     onSuccess: () => {
       toast({
-        title: "Data Seeded Successfully",
-        description: "Sample instructor data has been added to the database.",
+        title: "Mock Data Added",
+        description: "Sample instructor data has been generated (database setup required for real persistence).",
       });
       queryClient.invalidateQueries({ queryKey: ['all-instructors'] });
-      queryClient.invalidateQueries({ queryKey: ['nearby-instructors'] });
     },
     onError: (error) => {
       toast({
@@ -69,21 +144,21 @@ const InstructorManagement: React.FC = () => {
     }
   });
 
-  // Toggle verification mutation
+  // Mock verification toggle
   const toggleVerificationMutation = useMutation({
     mutationFn: async ({ id, verified }: { id: string; verified: boolean }) => {
-      const { error } = await supabase
-        .from('instructors')
-        .update({ is_verified: verified })
-        .eq('id', id);
-
-      if (error) throw error;
+      // Update mock data
+      const updatedInstructors = mockInstructors.map(instructor => 
+        instructor.id === id ? { ...instructor, is_verified: verified } : instructor
+      );
+      setMockInstructors(updatedInstructors);
+      return updatedInstructors;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['all-instructors'] });
       toast({
         title: "Verification Updated",
-        description: "Instructor verification status has been updated.",
+        description: "Instructor verification status has been updated (mock data).",
       });
     },
     onError: (error) => {
@@ -158,27 +233,24 @@ const InstructorManagement: React.FC = () => {
               ) : (
                 <Upload className="w-4 h-4 mr-2" />
               )}
-              Seed Sample Data
+              Add Mock Data
             </Button>
           </CardContent>
         </Card>
       </div>
 
       {/* Instructions */}
-      {instructors.length === 0 && (
-        <Alert>
-          <Upload className="h-4 w-4" />
-          <AlertDescription>
-            No instructors found in the database. Click "Seed Sample Data" to add sample surf instructors for testing, 
-            or connect to external instructor APIs for real data.
-          </AlertDescription>
-        </Alert>
-      )}
+      <Alert>
+        <Upload className="h-4 w-4" />
+        <AlertDescription>
+          Currently showing mock instructor data. Complete the database setup to enable real instructor management and persistence.
+        </AlertDescription>
+      </Alert>
 
       {/* Instructors List */}
       <Card>
         <CardHeader>
-          <CardTitle>Instructor Directory</CardTitle>
+          <CardTitle>Instructor Directory (Mock Data)</CardTitle>
         </CardHeader>
         <CardContent>
           {isLoading ? (
@@ -244,14 +316,6 @@ const InstructorManagement: React.FC = () => {
                   </div>
                 </div>
               ))}
-              
-              {instructors.length === 0 && !isLoading && (
-                <div className="text-center py-8 text-gray-500">
-                  <Users className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                  <p>No instructors in database</p>
-                  <p className="text-sm">Seed sample data or import real instructor profiles</p>
-                </div>
-              )}
             </div>
           )}
         </CardContent>

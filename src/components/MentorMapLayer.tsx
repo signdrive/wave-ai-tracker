@@ -172,29 +172,8 @@ const MentorMapLayer: React.FC<MentorMapLayerProps> = ({
     queryFn: async (): Promise<Instructor[]> => {
       console.log('🔍 Fetching nearby instructors...');
       
-      // First, try to get real instructors from the database
-      const { data: realInstructors, error } = await supabase
-        .rpc('get_nearby_instructors', {
-          center_lat: userLocation[0],
-          center_lng: userLocation[1],
-          radius_km: radius
-        });
-
-      if (error) {
-        console.warn('Database query failed, using mock data:', error);
-        // If database query fails, return mock data for demonstration
-        return generateMockInstructors(userLocation, 15);
-      }
-
-      console.log(`✅ Found ${realInstructors?.length || 0} real instructors`);
-      
-      // If we have real instructors, return them
-      if (realInstructors && realInstructors.length > 0) {
-        return realInstructors;
-      }
-
-      // If no real instructors, generate some mock data for demonstration
-      console.log('📝 No real instructors found, generating mock data...');
+      // For now, generate mock data since the database migration hasn't been applied
+      console.log('📝 Generating mock instructor data...');
       return generateMockInstructors(userLocation, 15);
     },
     enabled: visible,
