@@ -27,10 +27,10 @@ export const useSpotSelection = ({
     // Convert spotId to string for consistent comparison
     const spotIdStr = String(spotId);
     
-    // Try different ID matching strategies for surfSpots
+    // Find the spot in surfSpots (database spots)
     let spot = surfSpots.find(s => String(s.id) === spotIdStr);
     
-    // Try different ID matching strategies for rawSpots  
+    // Find the corresponding raw spot data
     let rawSpot = rawSpots.find(r => String(r.id) === spotIdStr);
     
     console.log('✅ Found spot:', spot ? spot.full_name : 'NOT FOUND');
@@ -49,8 +49,12 @@ export const useSpotSelection = ({
     
     if (spot) {
       console.log('🎉 Setting selected spot:', spot.full_name);
+      console.log('🎉 Spot data:', spot);
+      
+      // Set the selected spot
       setSelectedSpot(spot);
       
+      // Set the raw spot data if found
       if (rawSpot) {
         console.log('🎉 Setting selected raw spot:', rawSpot.name);
         setSelectedRawSpot(rawSpot);

@@ -51,9 +51,6 @@ export default function DirectMapView() {
     isLoading
   });
 
-  // Force re-render when selectedSpot changes
-  console.log('🔄 DirectMapView selectedSpot state:', selectedSpot);
-
   if (error) {
     return (
       <div className="p-4">
@@ -83,23 +80,22 @@ export default function DirectMapView() {
         setSelectedRawSpot={setSelectedRawSpot}
       />
 
-      {/* Force show panel if we have a selected spot */}
-      {selectedSpot && (
+      {/* Information Panel */}
+      {selectedSpot ? (
         <div className="bg-white border-t max-h-96 overflow-y-auto">
-          <div className="p-2 bg-blue-100 text-sm">
-            Selected: {selectedSpot.full_name} (ID: {selectedSpot.id})
+          <div className="p-2 bg-blue-100 text-sm font-medium">
+            📍 {selectedSpot.full_name} 
           </div>
           <SurfSpotInfoPanel 
             selectedSpot={selectedSpot}
             rawSpotData={selectedRawSpot}
           />
         </div>
+      ) : (
+        <div className="bg-gray-50 border-t p-4 text-center text-gray-500">
+          Click on a surf spot marker to view details
+        </div>
       )}
-
-      {/* Debug info */}
-      <div className="bg-gray-100 p-2 text-xs">
-        Debug: Selected spot = {selectedSpot ? `${selectedSpot.full_name} (${selectedSpot.id})` : 'none'}
-      </div>
     </div>
   );
 }
