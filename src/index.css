@@ -1,4 +1,6 @@
 
+@import './components/leaflet-fix.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -100,6 +102,3 @@
 .border-ocean {
   border-color: hsl(var(--ocean));
 }
-
-/* Import Leaflet CSS fixes - moved to end to avoid @import order issues */
-@import './components/leaflet-fix.css';
