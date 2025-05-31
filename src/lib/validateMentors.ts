@@ -21,28 +21,35 @@ export const validateMentors = (mentors: any[]): ValidMentor[] => {
   }
 
   return mentors.filter(mentor => {
-    const isValid = 
-      mentor?.id &&
-      mentor?.name &&
-      typeof mentor.lat === 'number' &&
-      typeof mentor.lng === 'number' &&
-      Array.isArray(mentor.certifications) &&
-      typeof mentor.is_available === 'boolean';
-    
+    const isValid = validateMentorData(mentor);
     if (!isValid) {
       console.warn('Invalid mentor data:', mentor);
-      return false;
     }
-    return true;
+    return isValid;
   });
 };
 
 export const validateMentorData = (mentor: any): boolean => {
-  return !!(
-    mentor?.id &&
-    mentor?.name &&
+  if (!mentor || typeof mentor !== 'object') {
+    return false;
+  }
+
+  // Required fields validation
+  const hasRequiredFields = !!(
+    mentor.id &&
+    mentor.name &&
     typeof mentor.lat === 'number' &&
     typeof mentor.lng === 'number' &&
-    Array.isArray(mentor.certifications)
+    Array.isArray(mentor.certifications) &&
+    typeof mentor.is_available === 'boolean'
   );
+
+  // Coordinate validation
+  const hasValidCoordinates = (
+    mentor.lat >= -90 && mentor.lat <= 90 &&
+    mentor.lng >= -180 && mentor.lng <= 180 &&
+    !isNaN(mentor.lat) && !isNaN(mentor.lng)
+  );
+
+  return hasRequiredFields && hasValidCoordinates;
 };

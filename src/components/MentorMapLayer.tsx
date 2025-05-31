@@ -1,7 +1,9 @@
 
 import React from 'react';
+import { useMap, useMapEvents } from 'react-leaflet';
 import { useMentorMapData } from '@/hooks/useMentorMapData';
 import MentorMarker from '@/components/mentor/MentorMarker';
+import { validateLeafletContext } from '@/lib/leafletUtils';
 
 interface MentorMapLayerProps {
   visible: boolean;
@@ -16,13 +18,24 @@ const MentorMapLayer: React.FC<MentorMapLayerProps> = ({
   userLocation = [34.0522, -118.2437], // Default to LA
   radius = 50 
 }) => {
+  const map = useMap();
   const { instructors } = useMentorMapData({
     visible,
     userLocation,
     radius
   });
 
-  if (!visible) return null;
+  // Validate Leaflet context before rendering
+  if (!visible || !validateLeafletContext() || !map) {
+    return null;
+  }
+
+  // Use map events to ensure proper context
+  useMapEvents({
+    ready: () => {
+      console.log('🗺️ Map is ready for mentor markers');
+    }
+  });
 
   return (
     <>
