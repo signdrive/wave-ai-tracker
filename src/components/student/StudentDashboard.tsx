@@ -19,7 +19,7 @@ interface Session {
   video_call_url?: string;
   mentor?: {
     full_name: string;
-  };
+  } | null;
 }
 
 interface StudentDashboardProps {
@@ -58,12 +58,12 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ onBookSession }) =>
     );
   }
 
-  // Process sessions with proper typing
+  // Process sessions with proper typing and null safety
   const processedSessions: Session[] = sessions.map(session => ({
     ...session,
     mentor: session.mentor && typeof session.mentor === 'object' && 'full_name' in session.mentor 
       ? { full_name: session.mentor.full_name }
-      : undefined
+      : null
   }));
 
   const totalSessions = processedSessions.length;

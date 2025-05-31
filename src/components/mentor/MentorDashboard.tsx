@@ -22,7 +22,7 @@ const MentorDashboard: React.FC = () => {
           *,
           student:profiles!mentorship_sessions_student_id_fkey(full_name, email)
         `)
-        .eq('mentor_id', user.id)
+        .eq('mentor_id', user?.id)
         .order('scheduled_at', { ascending: false });
 
       if (error) throw error;
@@ -38,7 +38,7 @@ const MentorDashboard: React.FC = () => {
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', user?.id)
         .single();
 
       if (error) throw error;
@@ -142,7 +142,11 @@ const MentorDashboard: React.FC = () => {
                 <div key={session.id} className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold">{session.student?.full_name || 'Unknown Student'}</h3>
+                      <h3 className="font-semibold">
+                        {session.student && typeof session.student === 'object' && 'full_name' in session.student 
+                          ? session.student.full_name 
+                          : 'Unknown Student'}
+                      </h3>
                       <Badge variant="secondary">Pending</Badge>
                     </div>
                     <p className="text-sm text-gray-600">
@@ -175,7 +179,11 @@ const MentorDashboard: React.FC = () => {
                 <div key={session.id} className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold">{session.student?.full_name || 'Unknown Student'}</h3>
+                      <h3 className="font-semibold">
+                        {session.student && typeof session.student === 'object' && 'full_name' in session.student 
+                          ? session.student.full_name 
+                          : 'Unknown Student'}
+                      </h3>
                       <Badge variant="outline">Confirmed</Badge>
                     </div>
                     <p className="text-sm text-gray-600">
@@ -209,7 +217,11 @@ const MentorDashboard: React.FC = () => {
                 <div key={session.id} className="flex items-center justify-between p-4 border rounded-lg">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold">{session.student?.full_name || 'Unknown Student'}</h3>
+                      <h3 className="font-semibold">
+                        {session.student && typeof session.student === 'object' && 'full_name' in session.student 
+                          ? session.student.full_name 
+                          : 'Unknown Student'}
+                      </h3>
                       <Badge variant="outline">Completed</Badge>
                       {session.rating && (
                         <Badge variant="outline" className="flex items-center gap-1">
