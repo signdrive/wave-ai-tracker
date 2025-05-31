@@ -67,6 +67,13 @@ const MentorDashboard: React.FC = () => {
     return sum + (mentorProfile?.hourly_rate || 0) * (session.duration_minutes / 60);
   }, 0);
 
+  const getStudentName = (session: any) => {
+    if (session.student && typeof session.student === 'object' && session.student.full_name) {
+      return session.student.full_name;
+    }
+    return 'Unknown Student';
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-6xl mx-auto space-y-6">
@@ -143,9 +150,7 @@ const MentorDashboard: React.FC = () => {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold">
-                        {session.student && typeof session.student === 'object' && 'full_name' in session.student
-                          ? session.student.full_name 
-                          : 'Unknown Student'}
+                        {getStudentName(session)}
                       </h3>
                       <Badge variant="secondary">Pending</Badge>
                     </div>
@@ -180,9 +185,7 @@ const MentorDashboard: React.FC = () => {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold">
-                        {session.student && typeof session.student === 'object' && 'full_name' in session.student
-                          ? session.student.full_name 
-                          : 'Unknown Student'}
+                        {getStudentName(session)}
                       </h3>
                       <Badge variant="outline">Confirmed</Badge>
                     </div>
@@ -218,9 +221,7 @@ const MentorDashboard: React.FC = () => {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold">
-                        {session.student && typeof session.student === 'object' && 'full_name' in session.student
-                          ? session.student.full_name 
-                          : 'Unknown Student'}
+                        {getStudentName(session)}
                       </h3>
                       <Badge variant="outline">Completed</Badge>
                       {session.rating && (
