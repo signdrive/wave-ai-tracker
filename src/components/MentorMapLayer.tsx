@@ -1,14 +1,113 @@
 
-import React, { useEffect, useRef } from 'react';
-import { useMap } from 'react-leaflet';
+import React from 'react';
+import { Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
-import { useMentorMapData } from '@/hooks/useMentorMapData';
-import { validateMentorData } from '@/lib/validateMentors';
-import InstructorCard from '@/components/mentor/InstructorCard';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Calendar, Star, MapPin, Clock } from 'lucide-react';
+
+interface Mentor {
+  id: string;
+  full_name: string;
+  certification_level: string;
+  years_experience: number;
+  hourly_rate: number;
+  lat: number;
+  lon: number;
+  is_available: boolean;
+  bio: string;
+  rating: number;
+}
+
+// Custom mentor marker icons
+const createMentorIcon = (isAvailable: boolean, certification: string) => {
+  const color = isAvailable ? '#10B981' : '#EF4444'; // Green for available, red for busy
+  const badge = certification?.includes('ISA') ? '🏆' : certification?.includes('VDWS') ? '⭐' : '👨‍🏫';
+  
+  const iconSvg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="10" fill="${color}" stroke="white" stroke-width="2"/>
+      <text x="12" y="16" text-anchor="middle" font-size="12" fill="white">${badge}</text>
+    </svg>
+  `;
+
+  return new L.Icon({
+    iconUrl: 'data:image/svg+xml;base64,' + btoa(iconSvg),
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32],
+  });
+};
+
+interface MentorCardProps {
+  mentor: Mentor;
+  onBookSession: (mentorId: string) => void;
+}
+
+const MentorCard: React.FC<MentorCardProps> = ({ mentor, onBookSession }) => {
+  return (
+    <Card className="w-64 border-0 shadow-lg">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg flex items-center justify-between">
+          {mentor.full_name}
+          <div className="flex items-center">
+            <Star className="w-4 h-4 text-yellow-500 mr-1" />
+            <span className="text-sm">{mentor.rating}</span>
+          </div>
+        </CardTitle>
+        <div className="flex items-center space-x-2">
+          <Badge variant={mentor.is_available ? 'default' : 'secondary'}>
+            {mentor.is_available ? 'Available Now' : 'Busy'}
+          </Badge>
+          <Badge variant="outline">{mentor.certification_level}</Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <p className="text-sm text-gray-600 line-clamp-2">{mentor.bio}</p>
+        
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          <div className="flex items-center">
+            <Clock className="w-3 h-3 mr-1" />
+            {mentor.years_experience}y exp
+          </div>
+          <div className="flex items-center">
+            <span className="text-green-600 font-semibold">${mentor.hourly_rate}/hr</span>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Button 
+            size="sm" 
+            className="w-full"
+            onClick={() => onBookSession(mentor.id)}
+            disabled={!mentor.is_available}
+          >
+            <Calendar className="w-4 h-4 mr-1" />
+            Book Session
+          </Button>
+          
+          {mentor.is_available && (
+            <Button 
+              size="sm" 
+              variant="outline" 
+              className="w-full"
+              onClick={() => onBookSession(mentor.id)}
+            >
+              🌊 Instant Session
+            </Button>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 interface MentorMapLayerProps {
   visible: boolean;
-  onBookSession: (instructorId: string) => void;
+  onBookSession: (mentorId: string) => void;
   userLocation?: [number, number];
   radius?: number;
 }
@@ -16,148 +115,60 @@ interface MentorMapLayerProps {
 const MentorMapLayer: React.FC<MentorMapLayerProps> = ({ 
   visible, 
   onBookSession, 
-  userLocation = [34.0522, -118.2437],
+  userLocation,
   radius = 50 
 }) => {
-  const map = useMap();
-  const layerGroupRef = useRef<L.LayerGroup | null>(null);
-  const { instructors } = useMentorMapData({
-    visible,
-    userLocation,
-    radius
+  const { data: mentors = [], isLoading } = useQuery({
+    queryKey: ['nearby-mentors', userLocation, radius],
+    queryFn: async (): Promise<Mentor[]> => {
+      // Get mentors from profiles table with mentor role
+      const { data: mentorProfiles, error } = await supabase
+        .from('profiles')
+        .select(`
+          id,
+          full_name,
+          certification_level,
+          years_experience,
+          hourly_rate,
+          bio,
+          user_roles!inner(role)
+        `)
+        .eq('user_roles.role', 'mentor');
+
+      if (error) throw error;
+
+      // For demo purposes, add mock location data
+      // In production, you'd have a mentors_location table
+      const mentorsWithLocation = mentorProfiles?.map(mentor => ({
+        ...mentor,
+        lat: userLocation ? userLocation[0] + (Math.random() - 0.5) * 0.1 : 34.0522 + (Math.random() - 0.5) * 0.1,
+        lon: userLocation ? userLocation[1] + (Math.random() - 0.5) * 0.1 : -118.2437 + (Math.random() - 0.5) * 0.1,
+        is_available: Math.random() > 0.3, // 70% chance of being available
+        rating: 4.2 + Math.random() * 0.8, // Random rating between 4.2-5.0
+      })) || [];
+
+      return mentorsWithLocation;
+    },
+    enabled: visible && !!userLocation
   });
 
-  useEffect(() => {
-    if (!visible || !map) {
-      return;
-    }
+  if (!visible) return null;
 
-    console.log('🗺️ MentorMapLayer mounted with', instructors.length, 'instructors');
-
-    // Create layer group if it doesn't exist
-    if (!layerGroupRef.current) {
-      layerGroupRef.current = L.layerGroup().addTo(map);
-    }
-
-    // Clear existing markers
-    layerGroupRef.current.clearLayers();
-
-    // Add markers for each instructor
-    instructors.forEach((instructor) => {
-      if (!validateMentorData(instructor)) {
-        console.warn('Skipping invalid instructor:', instructor);
-        return;
-      }
-
-      // Create safe mentor icon
-      const color = instructor.is_available ? '#10B981' : '#EF4444';
-      const badge = instructor.certifications.some(cert => cert.includes('ISA')) ? '🏆' : '👨‍🏫';
-
-      const iconHtml = `
-        <div style="
-          width: 36px; 
-          height: 36px; 
-          background-color: ${color}; 
-          border: 2px solid white; 
-          border-radius: 50%; 
-          display: flex; 
-          align-items: center; 
-          justify-content: center; 
-          font-size: 16px;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        ">${badge}</div>
-      `;
-
-      const customIcon = L.divIcon({
-        html: iconHtml,
-        iconSize: [36, 36],
-        iconAnchor: [18, 36],
-        popupAnchor: [0, -36],
-        className: 'custom-mentor-marker'
-      });
-
-      // Create marker
-      const marker = L.marker([instructor.lat, instructor.lng], {
-        icon: customIcon
-      });
-
-      // Create popup content
-      const popupDiv = document.createElement('div');
-      popupDiv.style.width = '300px';
-      popupDiv.style.padding = '0';
-      popupDiv.innerHTML = `
-        <div style="font-family: system-ui; padding: 16px;">
-          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-            <div style="width: 40px; height: 40px; border-radius: 50%; background: ${color}; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
-              ${instructor.name.charAt(0)}
-            </div>
-            <div>
-              <h3 style="margin: 0; font-size: 18px; font-weight: 600;">${instructor.name}</h3>
-              <p style="margin: 0; color: #666; font-size: 14px;">${instructor.certifications[0] || 'Certified Instructor'}</p>
-            </div>
-          </div>
-          <p style="margin: 8px 0; color: #333; font-size: 14px;">${instructor.bio || 'Professional surf instructor'}</p>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
-            <span style="color: #059669; font-weight: 600;">$${instructor.hourly_rate}/hr</span>
-            <button 
-              onclick="window.parent.postMessage({type: 'bookSession', instructorId: '${instructor.id}'}, '*')"
-              style="background: #059669; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px;"
-              ${!instructor.is_available ? 'disabled style="background: #ccc;"' : ''}
-            >
-              ${instructor.is_available ? 'Book Session' : 'Unavailable'}
-            </button>
-          </div>
-        </div>
-      `;
-
-      marker.bindPopup(popupDiv, {
-        maxWidth: 300,
-        minWidth: 280,
-        closeButton: true,
-        autoPan: true
-      });
-
-      marker.on('click', () => {
-        console.log('🖱️ Mentor marker clicked:', instructor.name);
-      });
-
-      // Add marker to layer group
-      if (layerGroupRef.current) {
-        marker.addTo(layerGroupRef.current);
-      }
-    });
-
-    // Cleanup function
-    return () => {
-      if (layerGroupRef.current) {
-        layerGroupRef.current.clearLayers();
-      }
-    };
-  }, [map, visible, instructors, onBookSession]);
-
-  // Handle booking messages from popups
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === 'bookSession') {
-        onBookSession(event.data.instructorId);
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, [onBookSession]);
-
-  // Cleanup layer group on unmount
-  useEffect(() => {
-    return () => {
-      if (layerGroupRef.current) {
-        layerGroupRef.current.remove();
-        layerGroupRef.current = null;
-      }
-    };
-  }, []);
-
-  return null;
+  return (
+    <>
+      {mentors.map((mentor) => (
+        <Marker
+          key={mentor.id}
+          position={[mentor.lat, mentor.lon]}
+          icon={createMentorIcon(mentor.is_available, mentor.certification_level)}
+        >
+          <Popup maxWidth={280} minWidth={260} closeButton={true}>
+            <MentorCard mentor={mentor} onBookSession={onBookSession} />
+          </Popup>
+        </Marker>
+      ))}
+    </>
+  );
 };
 
 export default MentorMapLayer;

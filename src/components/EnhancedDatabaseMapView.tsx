@@ -1,22 +1,21 @@
+
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
-import { AlertCircle, Users, Waves, MapPin, Calendar, Settings } from 'lucide-react';
+import { AlertCircle, Users, Waves, MapPin, Calendar } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useSupabaseSurfSpots } from '@/hooks/useSupabaseSurfSpots';
 import { useAuth } from '@/hooks/useAuth';
 import { useUserRole } from '@/hooks/useUserRole';
 import DatabaseSurfSpotMap from './DatabaseSurfSpotMap';
 import MentorMapLayer from './MentorMapLayer';
-import SafeLeafletMap from './SafeLeafletMap';
 import SurfSpotInfoPanel from './SurfSpotInfoPanel';
 import DatabaseMapHeader from './DatabaseMapHeader';
 import DatabaseMapFilters from './DatabaseMapFilters';
 import DatabaseMapStats from './DatabaseMapStats';
-import InstructorManagement from './admin/InstructorManagement';
 import { checkIdealConditions } from '@/lib/booking';
 import { useToast } from '@/hooks/use-toast';
 
@@ -35,7 +34,6 @@ const EnhancedDatabaseMapView: React.FC = () => {
   const [selectedRawSpot, setSelectedRawSpot] = useState<any>(null);
   const [userLocation, setUserLocation] = useState<[number, number]>([34.0522, -118.2437]);
   const [adminEmergencyMode, setAdminEmergencyMode] = useState(false);
-  const [showAdminPanel, setShowAdminPanel] = useState(false);
 
   // Get user's location
   React.useEffect(() => {
@@ -111,7 +109,7 @@ const EnhancedDatabaseMapView: React.FC = () => {
     }
   };
 
-  const handleBookSession = async (instructorId: string) => {
+  const handleBookSession = async (mentorId: string) => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -124,7 +122,7 @@ const EnhancedDatabaseMapView: React.FC = () => {
     // In a real app, this would open a booking modal/flow
     toast({
       title: "Booking Session",
-      description: `Opening booking calendar for instructor ${instructorId}...`,
+      description: "Opening booking calendar...",
     });
   };
 
@@ -154,7 +152,7 @@ const EnhancedDatabaseMapView: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Enhanced Header with Admin Controls */}
+      {/* Enhanced Header with Mentor Controls */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -164,27 +162,17 @@ const EnhancedDatabaseMapView: React.FC = () => {
             </p>
           </div>
           
-          <div className="flex items-center space-x-4">
-            {isAdmin && (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowAdminPanel(!showAdminPanel)}
-                >
-                  <Settings className="w-4 h-4 mr-1" />
-                  Admin Panel
-                </Button>
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm font-medium">Emergency Mode</span>
-                  <Switch
-                    checked={adminEmergencyMode}
-                    onCheckedChange={handleEmergencyToggle}
-                  />
-                </div>
-              </>
-            )}
-          </div>
+          {isAdmin && (
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-medium">Emergency Mode</span>
+                <Switch
+                  checked={adminEmergencyMode}
+                  onCheckedChange={handleEmergencyToggle}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {adminEmergencyMode && (
@@ -194,18 +182,6 @@ const EnhancedDatabaseMapView: React.FC = () => {
               🚨 Emergency Mode Active: All surf spots are closed for safety reasons.
             </AlertDescription>
           </Alert>
-        )}
-
-        {/* Admin Panel */}
-        {showAdminPanel && isAdmin && (
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>Admin: Instructor Management</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <InstructorManagement />
-            </CardContent>
-          </Card>
         )}
 
         <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as any)} className="mb-4">
@@ -246,7 +222,7 @@ const EnhancedDatabaseMapView: React.FC = () => {
         countries={countries}
       />
 
-      {/* Enhanced Map with SafeLeafletMap wrapper */}
+      {/* Enhanced Map */}
       <div className="space-y-6">
         <Card>
           <CardHeader>
@@ -267,31 +243,26 @@ const EnhancedDatabaseMapView: React.FC = () => {
           </CardHeader>
           <CardContent className="p-0">
             <div className="h-[600px] relative">
-              <SafeLeafletMap
-                center={userLocation}
-                zoom={10}
-                style={{ height: '100%', width: '100%' }}
-              >
-                {/* Surf Spots Layer */}
-                {viewMode !== 'mentors' && (
-                  <DatabaseSurfSpotMap 
-                    spots={filteredSpots} 
-                    isLoading={isLoading}
-                    onSpotClick={handleSpotClick}
-                    selectedSpotId={selectedSpot?.id}
-                  />
-                )}
-                
-                {/* Mentor Layer */}
-                {(viewMode === 'mentors' || viewMode === 'both') && (
-                  <MentorMapLayer
-                    visible={true}
-                    onBookSession={handleBookSession}
-                    userLocation={userLocation}
-                    radius={50}
-                  />
-                )}
-              </SafeLeafletMap>
+              <DatabaseSurfSpotMap 
+                spots={viewMode !== 'mentors' ? filteredSpots : []} 
+                isLoading={isLoading}
+                onSpotClick={handleSpotClick}
+                selectedSpotId={selectedSpot?.id}
+              />
+              
+              {/* Mentor Layer */}
+              {(viewMode === 'mentors' || viewMode === 'both') && (
+                <div className="absolute inset-0 pointer-events-none">
+                  <div className="w-full h-full pointer-events-auto">
+                    <MentorMapLayer
+                      visible={true}
+                      onBookSession={handleBookSession}
+                      userLocation={userLocation}
+                      radius={50}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
