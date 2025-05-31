@@ -7,94 +7,143 @@ import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, Star, MapPin, Clock } from 'lucide-react';
+import { Calendar, Star, MapPin, Clock, Shield, Award } from 'lucide-react';
 
-interface Mentor {
+interface Instructor {
   id: string;
-  full_name: string;
-  certification_level: string;
+  name: string;
+  email?: string;
+  lat: number;
+  lng: number;
+  certifications: string[];
+  specialties: string[];
   years_experience: number;
   hourly_rate: number;
-  lat: number;
-  lon: number;
-  is_available: boolean;
   bio: string;
-  rating: number;
+  profile_image_url?: string;
+  is_available: boolean;
+  distance_km: number;
 }
 
-// Custom mentor marker icons
-const createMentorIcon = (isAvailable: boolean, certification: string) => {
-  const color = isAvailable ? '#10B981' : '#EF4444'; // Green for available, red for busy
-  const badge = certification?.includes('ISA') ? '🏆' : certification?.includes('VDWS') ? '⭐' : '👨‍🏫';
+// Custom mentor marker icons based on certifications
+const createMentorIcon = (isAvailable: boolean, certifications: string[]) => {
+  const color = isAvailable ? '#10B981' : '#EF4444';
+  const hasISA = certifications.some(cert => cert.includes('ISA'));
+  const hasVDWS = certifications.some(cert => cert.includes('VDWS'));
+  
+  let badge = '👨‍🏫';
+  if (hasISA) badge = '🏆';
+  else if (hasVDWS) badge = '⭐';
   
   const iconSvg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none">
+    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="12" r="10" fill="${color}" stroke="white" stroke-width="2"/>
-      <text x="12" y="16" text-anchor="middle" font-size="12" fill="white">${badge}</text>
+      <text x="12" y="16" text-anchor="middle" font-size="10" fill="white">${badge}</text>
     </svg>
   `;
 
   return new L.Icon({
     iconUrl: 'data:image/svg+xml;base64,' + btoa(iconSvg),
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-    popupAnchor: [0, -32],
+    iconSize: [36, 36],
+    iconAnchor: [18, 36],
+    popupAnchor: [0, -36],
   });
 };
 
-interface MentorCardProps {
-  mentor: Mentor;
-  onBookSession: (mentorId: string) => void;
+interface InstructorCardProps {
+  instructor: Instructor;
+  onBookSession: (instructorId: string) => void;
 }
 
-const MentorCard: React.FC<MentorCardProps> = ({ mentor, onBookSession }) => {
+const InstructorCard: React.FC<InstructorCardProps> = ({ instructor, onBookSession }) => {
+  const topCertification = instructor.certifications[0] || 'Certified';
+  const rating = 4.2 + Math.random() * 0.8; // Mock rating for now
+
   return (
-    <Card className="w-64 border-0 shadow-lg">
-      <CardHeader className="pb-2">
+    <Card className="w-72 border-0 shadow-lg">
+      <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center justify-between">
-          {mentor.full_name}
+          <div className="flex items-center space-x-2">
+            {instructor.profile_image_url ? (
+              <img 
+                src={instructor.profile_image_url} 
+                alt={instructor.name}
+                className="w-8 h-8 rounded-full"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-ocean flex items-center justify-center text-white text-sm">
+                {instructor.name.charAt(0)}
+              </div>
+            )}
+            <span className="truncate">{instructor.name}</span>
+          </div>
           <div className="flex items-center">
             <Star className="w-4 h-4 text-yellow-500 mr-1" />
-            <span className="text-sm">{mentor.rating}</span>
+            <span className="text-sm">{rating.toFixed(1)}</span>
           </div>
         </CardTitle>
-        <div className="flex items-center space-x-2">
-          <Badge variant={mentor.is_available ? 'default' : 'secondary'}>
-            {mentor.is_available ? 'Available Now' : 'Busy'}
+        
+        <div className="flex flex-wrap gap-1">
+          <Badge variant={instructor.is_available ? 'default' : 'secondary'}>
+            {instructor.is_available ? 'Available Now' : 'Busy'}
           </Badge>
-          <Badge variant="outline">{mentor.certification_level}</Badge>
+          <Badge variant="outline" className="text-xs">
+            <Award className="w-3 h-3 mr-1" />
+            {topCertification}
+          </Badge>
+          {instructor.distance_km && (
+            <Badge variant="outline" className="text-xs">
+              <MapPin className="w-3 h-3 mr-1" />
+              {instructor.distance_km.toFixed(1)}km
+            </Badge>
+          )}
         </div>
       </CardHeader>
+      
       <CardContent className="space-y-3">
-        <p className="text-sm text-gray-600 line-clamp-2">{mentor.bio}</p>
+        {instructor.bio && (
+          <p className="text-sm text-gray-600 line-clamp-2">{instructor.bio}</p>
+        )}
         
         <div className="grid grid-cols-2 gap-2 text-xs">
           <div className="flex items-center">
             <Clock className="w-3 h-3 mr-1" />
-            {mentor.years_experience}y exp
+            {instructor.years_experience}y exp
           </div>
           <div className="flex items-center">
-            <span className="text-green-600 font-semibold">${mentor.hourly_rate}/hr</span>
+            <span className="text-green-600 font-semibold">
+              ${instructor.hourly_rate}/hr
+            </span>
           </div>
         </div>
+
+        {instructor.specialties && instructor.specialties.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {instructor.specialties.slice(0, 3).map((specialty, idx) => (
+              <Badge key={idx} variant="outline" className="text-xs">
+                {specialty}
+              </Badge>
+            ))}
+          </div>
+        )}
 
         <div className="space-y-2">
           <Button 
             size="sm" 
             className="w-full"
-            onClick={() => onBookSession(mentor.id)}
-            disabled={!mentor.is_available}
+            onClick={() => onBookSession(instructor.id)}
+            disabled={!instructor.is_available}
           >
             <Calendar className="w-4 h-4 mr-1" />
             Book Session
           </Button>
           
-          {mentor.is_available && (
+          {instructor.is_available && (
             <Button 
               size="sm" 
               variant="outline" 
               className="w-full"
-              onClick={() => onBookSession(mentor.id)}
+              onClick={() => onBookSession(instructor.id)}
             >
               🌊 Instant Session
             </Button>
@@ -107,7 +156,7 @@ const MentorCard: React.FC<MentorCardProps> = ({ mentor, onBookSession }) => {
 
 interface MentorMapLayerProps {
   visible: boolean;
-  onBookSession: (mentorId: string) => void;
+  onBookSession: (instructorId: string) => void;
   userLocation?: [number, number];
   radius?: number;
 }
@@ -115,60 +164,121 @@ interface MentorMapLayerProps {
 const MentorMapLayer: React.FC<MentorMapLayerProps> = ({ 
   visible, 
   onBookSession, 
-  userLocation,
+  userLocation = [34.0522, -118.2437], // Default to LA
   radius = 50 
 }) => {
-  const { data: mentors = [], isLoading } = useQuery({
-    queryKey: ['nearby-mentors', userLocation, radius],
-    queryFn: async (): Promise<Mentor[]> => {
-      // Get mentors from profiles table with mentor role
-      const { data: mentorProfiles, error } = await supabase
-        .from('profiles')
-        .select(`
-          id,
-          full_name,
-          certification_level,
-          years_experience,
-          hourly_rate,
-          bio,
-          user_roles!inner(role)
-        `)
-        .eq('user_roles.role', 'mentor');
+  const { data: instructors = [], isLoading } = useQuery({
+    queryKey: ['nearby-instructors', userLocation, radius],
+    queryFn: async (): Promise<Instructor[]> => {
+      console.log('🔍 Fetching nearby instructors...');
+      
+      // First, try to get real instructors from the database
+      const { data: realInstructors, error } = await supabase
+        .rpc('get_nearby_instructors', {
+          center_lat: userLocation[0],
+          center_lng: userLocation[1],
+          radius_km: radius
+        });
 
-      if (error) throw error;
+      if (error) {
+        console.warn('Database query failed, using mock data:', error);
+        // If database query fails, return mock data for demonstration
+        return generateMockInstructors(userLocation, 15);
+      }
 
-      // For demo purposes, add mock location data
-      // In production, you'd have a mentors_location table
-      const mentorsWithLocation = mentorProfiles?.map(mentor => ({
-        ...mentor,
-        lat: userLocation ? userLocation[0] + (Math.random() - 0.5) * 0.1 : 34.0522 + (Math.random() - 0.5) * 0.1,
-        lon: userLocation ? userLocation[1] + (Math.random() - 0.5) * 0.1 : -118.2437 + (Math.random() - 0.5) * 0.1,
-        is_available: Math.random() > 0.3, // 70% chance of being available
-        rating: 4.2 + Math.random() * 0.8, // Random rating between 4.2-5.0
-      })) || [];
+      console.log(`✅ Found ${realInstructors?.length || 0} real instructors`);
+      
+      // If we have real instructors, return them
+      if (realInstructors && realInstructors.length > 0) {
+        return realInstructors;
+      }
 
-      return mentorsWithLocation;
+      // If no real instructors, generate some mock data for demonstration
+      console.log('📝 No real instructors found, generating mock data...');
+      return generateMockInstructors(userLocation, 15);
     },
-    enabled: visible && !!userLocation
+    enabled: visible,
+    staleTime: 5 * 60 * 1000 // 5 minutes
   });
 
   if (!visible) return null;
 
+  console.log(`🗺️ Rendering ${instructors.length} instructor markers`);
+
   return (
     <>
-      {mentors.map((mentor) => (
+      {instructors.map((instructor) => (
         <Marker
-          key={mentor.id}
-          position={[mentor.lat, mentor.lon]}
-          icon={createMentorIcon(mentor.is_available, mentor.certification_level)}
+          key={instructor.id}
+          position={[instructor.lat, instructor.lng]}
+          icon={createMentorIcon(instructor.is_available, instructor.certifications)}
         >
-          <Popup maxWidth={280} minWidth={260} closeButton={true}>
-            <MentorCard mentor={mentor} onBookSession={onBookSession} />
+          <Popup maxWidth={300} minWidth={280} closeButton={true}>
+            <InstructorCard instructor={instructor} onBookSession={onBookSession} />
           </Popup>
         </Marker>
       ))}
     </>
   );
+};
+
+// Mock data generator for demonstration
+const generateMockInstructors = (center: [number, number], count: number): Instructor[] => {
+  const certifications = [
+    ['ISA Level 2', 'First Aid'],
+    ['VDWS Instructor', 'Rescue Certified'],
+    ['ISA Level 1', 'CPR Certified'],
+    ['WSA Certified', 'Bronze Medallion'],
+    ['Professional Surfer', 'Surf Coach']
+  ];
+
+  const specialties = [
+    ['Beginner Friendly', 'Group Lessons'],
+    ['Advanced Techniques', 'Competition Prep'],
+    ['Longboard', 'Classic Style'],
+    ['Shortboard', 'Performance'],
+    ['SUP', 'Paddleboard'],
+    ['Big Wave', 'Tow-in'],
+    ['Kids Classes', 'Family Lessons'],
+    ['Photography', 'Video Analysis']
+  ];
+
+  const names = [
+    'Jake "Pipeline" Morrison', 'Sarah Wave Rider', 'Marcus Barrel King',
+    'Luna Ocean Flow', 'Kai Storm Chaser', 'Zoe Reef Master',
+    'Diego Big Wave', 'Aria Surf Goddess', 'Reef Break Ryan',
+    'Maya Current Queen', 'Storm Surge Sam', 'Coral Bay Clara',
+    'Tide Pool Tim', 'Swell Sister Sophie', 'Offshore Ollie'
+  ];
+
+  const bios = [
+    "20+ years riding the world's best breaks. Specialized in helping beginners catch their first wave safely.",
+    "Former pro competitor turned coach. Expert in performance surfing and wave reading.",
+    "Local legend with deep knowledge of secret spots and optimal conditions.",
+    "Certified rescue swimmer with a passion for ocean safety and surf education.",
+    "Photographer and surfer documenting the perfect wave for over a decade."
+  ];
+
+  return Array.from({ length: count }, (_, i) => {
+    // Spread instructors around the center point
+    const latOffset = (Math.random() - 0.5) * 0.2; // ~11km radius
+    const lngOffset = (Math.random() - 0.5) * 0.2;
+    
+    return {
+      id: `mock_instructor_${i}`,
+      name: names[i % names.length],
+      lat: center[0] + latOffset,
+      lng: center[1] + lngOffset,
+      certifications: certifications[i % certifications.length],
+      specialties: specialties[i % specialties.length],
+      years_experience: Math.floor(Math.random() * 20) + 3,
+      hourly_rate: Math.floor(Math.random() * 100) + 80,
+      bio: bios[i % bios.length],
+      is_available: Math.random() > 0.3, // 70% available
+      distance_km: Math.random() * radius,
+      profile_image_url: `https://images.unsplash.com/photo-150724055${i.toString().padStart(2, '0')}?w=64&h=64&fit=crop&crop=face`
+    };
+  });
 };
 
 export default MentorMapLayer;

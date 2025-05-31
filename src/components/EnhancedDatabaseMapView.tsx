@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Switch } from '@/components/ui/switch';
-import { AlertCircle, Users, Waves, MapPin, Calendar } from 'lucide-react';
+import { AlertCircle, Users, Waves, MapPin, Calendar, Settings } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useSupabaseSurfSpots } from '@/hooks/useSupabaseSurfSpots';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,6 +16,7 @@ import SurfSpotInfoPanel from './SurfSpotInfoPanel';
 import DatabaseMapHeader from './DatabaseMapHeader';
 import DatabaseMapFilters from './DatabaseMapFilters';
 import DatabaseMapStats from './DatabaseMapStats';
+import InstructorManagement from './admin/InstructorManagement';
 import { checkIdealConditions } from '@/lib/booking';
 import { useToast } from '@/hooks/use-toast';
 
@@ -34,6 +35,7 @@ const EnhancedDatabaseMapView: React.FC = () => {
   const [selectedRawSpot, setSelectedRawSpot] = useState<any>(null);
   const [userLocation, setUserLocation] = useState<[number, number]>([34.0522, -118.2437]);
   const [adminEmergencyMode, setAdminEmergencyMode] = useState(false);
+  const [showAdminPanel, setShowAdminPanel] = useState(false);
 
   // Get user's location
   React.useEffect(() => {
@@ -109,7 +111,7 @@ const EnhancedDatabaseMapView: React.FC = () => {
     }
   };
 
-  const handleBookSession = async (mentorId: string) => {
+  const handleBookSession = async (instructorId: string) => {
     if (!user) {
       toast({
         title: "Authentication Required",
@@ -122,7 +124,7 @@ const EnhancedDatabaseMapView: React.FC = () => {
     // In a real app, this would open a booking modal/flow
     toast({
       title: "Booking Session",
-      description: "Opening booking calendar...",
+      description: `Opening booking calendar for instructor ${instructorId}...`,
     });
   };
 
@@ -152,7 +154,7 @@ const EnhancedDatabaseMapView: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Enhanced Header with Mentor Controls */}
+      {/* Enhanced Header with Admin Controls */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <div>
@@ -162,17 +164,27 @@ const EnhancedDatabaseMapView: React.FC = () => {
             </p>
           </div>
           
-          {isAdmin && (
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <span className="text-sm font-medium">Emergency Mode</span>
-                <Switch
-                  checked={adminEmergencyMode}
-                  onCheckedChange={handleEmergencyToggle}
-                />
-              </div>
-            </div>
-          )}
+          <div className="flex items-center space-x-4">
+            {isAdmin && (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowAdminPanel(!showAdminPanel)}
+                >
+                  <Settings className="w-4 h-4 mr-1" />
+                  Admin Panel
+                </Button>
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm font-medium">Emergency Mode</span>
+                  <Switch
+                    checked={adminEmergencyMode}
+                    onCheckedChange={handleEmergencyToggle}
+                  />
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         {adminEmergencyMode && (
@@ -182,6 +194,18 @@ const EnhancedDatabaseMapView: React.FC = () => {
               🚨 Emergency Mode Active: All surf spots are closed for safety reasons.
             </AlertDescription>
           </Alert>
+        )}
+
+        {/* Admin Panel */}
+        {showAdminPanel && isAdmin && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Admin: Instructor Management</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <InstructorManagement />
+            </CardContent>
+          </Card>
         )}
 
         <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as any)} className="mb-4">
