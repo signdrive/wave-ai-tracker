@@ -11,13 +11,11 @@ import MentorOnboardingWizard from './mentor/MentorOnboardingWizard';
 import MentorDashboard from './mentor/MentorDashboard';
 import StudentDashboard from './student/StudentDashboard';
 import EnhancedSurfInterface from './EnhancedSurfInterface';
-import BookingFlow from './booking/BookingFlow';
 
 const SurfMentorPro: React.FC = () => {
   const { user, loading: authLoading } = useAuth();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [currentView, setCurrentView] = useState<'tracker' | 'mentorship'>('tracker');
-  const [showBookingFlow, setShowBookingFlow] = useState(false);
 
   const { data: profile, isLoading: profileLoading, refetch } = useQuery({
     queryKey: ['user-profile', user?.id],
@@ -38,15 +36,6 @@ const SurfMentorPro: React.FC = () => {
 
   // Check if user needs to complete mentor onboarding
   const needsMentorOnboarding = profile?.user_type === 'mentor' && !profile?.bio;
-
-  const handleBookSession = () => {
-    setShowBookingFlow(true);
-    setCurrentView('mentorship');
-  };
-
-  const handleBookingComplete = () => {
-    setShowBookingFlow(false);
-  };
 
   if (authLoading || profileLoading) {
     return (
@@ -86,16 +75,6 @@ const SurfMentorPro: React.FC = () => {
               refetch();
             }} 
           />
-        </div>
-      </div>
-    );
-  }
-
-  if (showBookingFlow) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-ocean/5 to-sand/20 py-8">
-        <div className="container mx-auto px-4">
-          <BookingFlow onBookingComplete={handleBookingComplete} />
         </div>
       </div>
     );
@@ -173,7 +152,7 @@ const SurfMentorPro: React.FC = () => {
             {profile?.user_type === 'mentor' ? (
               <MentorDashboard />
             ) : (
-              <StudentDashboard onBookSession={handleBookSession} />
+              <StudentDashboard />
             )}
           </div>
         )}
