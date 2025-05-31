@@ -64,9 +64,10 @@ const StudentDashboard: React.FC<StudentDashboardProps> = ({ onBookSession }) =>
     const mentorData = session.mentor;
     let processedMentor: { full_name: string } | null = null;
     
-    if (mentorData && 
+    // Check if mentorData exists and has the required properties
+    if (mentorData !== null && 
+        mentorData !== undefined &&
         typeof mentorData === 'object' && 
-        mentorData !== null &&
         'full_name' in mentorData && 
         typeof mentorData.full_name === 'string') {
       processedMentor = { full_name: mentorData.full_name };
