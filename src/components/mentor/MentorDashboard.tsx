@@ -22,7 +22,7 @@ const MentorDashboard: React.FC = () => {
         .from('mentorship_sessions')
         .select(`
           *,
-          student:profiles!mentorship_sessions_student_id_fkey(full_name, email)
+          student:student_id(full_name, email)
         `)
         .eq('mentor_id', user.id)
         .order('scheduled_at', { ascending: false });
