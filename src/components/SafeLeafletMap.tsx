@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { MapContainer } from 'react-leaflet';
+import { MapContainer, TileLayer } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
 interface SafeLeafletMapProps {
@@ -16,16 +16,23 @@ const SafeLeafletMap: React.FC<SafeLeafletMapProps> = ({
   center, 
   zoom, 
   style = { height: '100%', width: '100%' },
-  className = '',
-  ...props 
+  className = ''
 }) => {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    // Fix Leaflet default marker icons
+    delete (L.Icon.Default.prototype as any)._getIconUrl;
+    L.Icon.Default.mergeOptions({
+      iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+    });
+    
     setIsMounted(true);
   }, []);
 
-  // Don't render on server-side
+  // Don't render on server-side or before mount
   if (!isMounted || typeof window === 'undefined') {
     return (
       <div style={style} className={`${className} bg-gray-100 flex items-center justify-center`}>
@@ -40,9 +47,12 @@ const SafeLeafletMap: React.FC<SafeLeafletMapProps> = ({
       zoom={zoom}
       style={style}
       className={className}
-      preferCanvas={true}
-      {...props}
+      scrollWheelZoom={true}
     >
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
       {children}
     </MapContainer>
   );
