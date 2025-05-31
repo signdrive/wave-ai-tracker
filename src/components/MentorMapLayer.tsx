@@ -1,11 +1,7 @@
 
 import React from 'react';
-import { Marker, Popup } from 'react-leaflet';
-import { useMonitoring } from '@/lib/monitoring';
-import { validateMentorData } from '@/lib/validateMentors';
-import { createSafeMentorIcon } from '@/utils/iconUtils';
-import { useInstructorData } from '@/hooks/useInstructorData';
-import InstructorCard, { Instructor } from '@/components/mentor/InstructorCard';
+import { useMentorMapData } from '@/hooks/useMentorMapData';
+import MentorMarker from '@/components/mentor/MentorMarker';
 
 interface MentorMapLayerProps {
   visible: boolean;
@@ -20,45 +16,23 @@ const MentorMapLayer: React.FC<MentorMapLayerProps> = ({
   userLocation = [34.0522, -118.2437], // Default to LA
   radius = 50 
 }) => {
-  const { captureException, addBreadcrumb } = useMonitoring();
-  
-  const { data: instructors = [], isLoading, error } = useInstructorData({
+  const { instructors } = useMentorMapData({
+    visible,
     userLocation,
-    radius,
-    visible
+    radius
   });
 
   if (!visible) return null;
 
-  if (error) {
-    console.error('❌ Error in MentorMapLayer:', error);
-    captureException(error as Error, { component: 'MentorMapLayer' });
-  }
-
-  console.log(`🗺️ Rendering ${instructors.length} instructor markers`);
-  addBreadcrumb(`Rendering ${instructors.length} instructor markers`, 'render');
-
   return (
     <>
-      {instructors.map((instructor) => {
-        // Additional validation before rendering
-        if (!validateMentorData(instructor)) {
-          console.warn('Skipping invalid instructor:', instructor);
-          return null;
-        }
-
-        return (
-          <Marker
-            key={instructor.id}
-            position={[instructor.lat, instructor.lng]}
-            icon={createSafeMentorIcon(instructor.is_available, instructor.certifications, instructor.profile_image_url)}
-          >
-            <Popup maxWidth={300} minWidth={280} closeButton={true}>
-              <InstructorCard instructor={instructor} onBookSession={onBookSession} />
-            </Popup>
-          </Marker>
-        );
-      })}
+      {instructors.map((instructor) => (
+        <MentorMarker
+          key={instructor.id}
+          instructor={instructor}
+          onBookSession={onBookSession}
+        />
+      ))}
     </>
   );
 };
