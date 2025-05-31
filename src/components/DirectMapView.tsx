@@ -283,6 +283,8 @@ export default function DirectMapView() {
     );
   }
 
+  const availableMentors = testMentors.filter(mentor => mentor.is_available).length;
+
   return (
     <div className="h-full w-full flex flex-col">
       {/* Tabs for switching between views */}
@@ -300,12 +302,15 @@ export default function DirectMapView() {
               <Users className="w-4 h-4" />
               Mentors
               <Badge variant="outline" className="ml-1">
-                {testMentors.length}
+                {availableMentors}
               </Badge>
             </TabsTrigger>
             <TabsTrigger value="both" className="flex items-center gap-2">
               <MapPin className="w-4 h-4" />
-              All
+              Both
+              <Badge variant="outline" className="ml-1">
+                {surfSpots.length + availableMentors}
+              </Badge>
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -332,7 +337,7 @@ export default function DirectMapView() {
         )}
       </div>
 
-      {/* Information Panel */}
+      {/* Information Panel - Only shows when a spot is selected */}
       {selectedSpot && (
         <div className="bg-white border-t max-h-96 overflow-y-auto">
           <SurfSpotInfoPanel 
