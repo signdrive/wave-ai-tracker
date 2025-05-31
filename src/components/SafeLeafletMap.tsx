@@ -22,7 +22,7 @@ const SafeLeafletMap: React.FC<SafeLeafletMapProps> = ({
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    // Fix Leaflet default marker icons
+    // Fix Leaflet default marker icons for React-Leaflet v4
     delete (L.Icon.Default.prototype as any)._getIconUrl;
     L.Icon.Default.mergeOptions({
       iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
@@ -33,7 +33,7 @@ const SafeLeafletMap: React.FC<SafeLeafletMapProps> = ({
     setIsMounted(true);
   }, []);
 
-  // Don't render on server-side or before mount
+  // Prevent SSR issues - only render on client
   if (!isMounted || typeof window === 'undefined') {
     return (
       <div style={style} className={`${className} bg-gray-100 flex items-center justify-center`}>
@@ -49,6 +49,8 @@ const SafeLeafletMap: React.FC<SafeLeafletMapProps> = ({
       style={style}
       className={className}
       scrollWheelZoom={true}
+      attributionControl={true}
+      zoomControl={true}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
