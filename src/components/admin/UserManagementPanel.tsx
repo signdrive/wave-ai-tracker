@@ -42,7 +42,7 @@ const UserManagementPanel: React.FC = () => {
         id: user.id,
         email: user.email || '',
         full_name: user.full_name || '',
-        role: (user.user_roles as any)?.[0]?.role as UserRole || 'student',
+        role: user.user_roles[0]?.role as UserRole || 'student',
         created_at: user.created_at
       }));
     }
