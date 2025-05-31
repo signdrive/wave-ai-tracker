@@ -51,29 +51,166 @@ export type Database = {
         }
         Relationships: []
       }
+      mentor_availability: {
+        Row: {
+          created_at: string | null
+          day_of_week: number | null
+          end_time: string
+          id: string
+          is_available: boolean | null
+          mentor_id: string | null
+          start_time: string
+        }
+        Insert: {
+          created_at?: string | null
+          day_of_week?: number | null
+          end_time: string
+          id?: string
+          is_available?: boolean | null
+          mentor_id?: string | null
+          start_time: string
+        }
+        Update: {
+          created_at?: string | null
+          day_of_week?: number | null
+          end_time?: string
+          id?: string
+          is_available?: boolean | null
+          mentor_id?: string | null
+          start_time?: string
+        }
+        Relationships: []
+      }
+      mentorship_sessions: {
+        Row: {
+          created_at: string | null
+          duration_minutes: number | null
+          id: string
+          mentor_feedback: string | null
+          mentor_id: string | null
+          rating: number | null
+          scheduled_at: string
+          session_notes: string | null
+          spot_id: string
+          status: string | null
+          student_feedback: string | null
+          student_id: string | null
+          updated_at: string | null
+          video_call_url: string | null
+          wave_conditions: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          mentor_feedback?: string | null
+          mentor_id?: string | null
+          rating?: number | null
+          scheduled_at: string
+          session_notes?: string | null
+          spot_id: string
+          status?: string | null
+          student_feedback?: string | null
+          student_id?: string | null
+          updated_at?: string | null
+          video_call_url?: string | null
+          wave_conditions?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          mentor_feedback?: string | null
+          mentor_id?: string | null
+          rating?: number | null
+          scheduled_at?: string
+          session_notes?: string | null
+          spot_id?: string
+          status?: string | null
+          student_feedback?: string | null
+          student_id?: string | null
+          updated_at?: string | null
+          video_call_url?: string | null
+          wave_conditions?: Json | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
+          bio: string | null
+          certification_level: string | null
           created_at: string
           email: string | null
           full_name: string | null
+          hourly_rate: number | null
           id: string
+          timezone: string | null
           updated_at: string
+          user_type: string | null
+          years_experience: number | null
         }
         Insert: {
+          bio?: string | null
+          certification_level?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
+          hourly_rate?: number | null
           id: string
+          timezone?: string | null
           updated_at?: string
+          user_type?: string | null
+          years_experience?: number | null
         }
         Update: {
+          bio?: string | null
+          certification_level?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
+          hourly_rate?: number | null
           id?: string
+          timezone?: string | null
           updated_at?: string
+          user_type?: string | null
+          years_experience?: number | null
         }
         Relationships: []
+      }
+      session_recordings: {
+        Row: {
+          ai_analysis: Json | null
+          created_at: string | null
+          duration_seconds: number | null
+          id: string
+          recording_url: string
+          session_id: string | null
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          recording_url: string
+          session_id?: string | null
+        }
+        Update: {
+          ai_analysis?: Json | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          recording_url?: string
+          session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_recordings_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "mentorship_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       surf_spots: {
         Row: {
