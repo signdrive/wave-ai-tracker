@@ -3,7 +3,6 @@ import React from 'react';
 import { useMapInitialization } from './hooks/useMapInitialization';
 import { useSurfSpotMarkers } from './hooks/useSurfSpotMarkers';
 import { useMentorMarkers } from './hooks/useMentorMarkers';
-import { useSpotSelection } from './hooks/useSpotSelection';
 import MapLoadingOverlay from './MapLoadingOverlay';
 
 interface MapContainerProps {
@@ -12,8 +11,7 @@ interface MapContainerProps {
   isLoading: boolean;
   viewMode: 'spots' | 'mentors' | 'both';
   selectedSpot: any;
-  setSelectedSpot: (spot: any) => void;
-  setSelectedRawSpot: (spot: any) => void;
+  onSpotSelection: (spotId: string) => void;
 }
 
 const MapContainer: React.FC<MapContainerProps> = ({
@@ -22,15 +20,14 @@ const MapContainer: React.FC<MapContainerProps> = ({
   isLoading,
   viewMode,
   selectedSpot,
-  setSelectedSpot,
-  setSelectedRawSpot
+  onSpotSelection
 }) => {
   const { mapRef, containerRef } = useMapInitialization();
-  const { handleSpotSelection } = useSpotSelection({
-    surfSpots,
-    rawSpots,
-    setSelectedSpot,
-    setSelectedRawSpot
+
+  console.log('🗺️ MapContainer render:', {
+    surfSpotsCount: surfSpots.length,
+    onSpotSelectionType: typeof onSpotSelection,
+    selectedSpot: selectedSpot ? selectedSpot.full_name : 'none'
   });
 
   useSurfSpotMarkers({
@@ -38,7 +35,7 @@ const MapContainer: React.FC<MapContainerProps> = ({
     surfSpots,
     isLoading,
     viewMode,
-    handleSpotSelection
+    handleSpotSelection: onSpotSelection
   });
 
   useMentorMarkers({ mapRef, viewMode });

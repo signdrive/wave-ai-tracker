@@ -42,6 +42,28 @@ export default function DirectMapView() {
   
   const { surfSpots, rawSpots, isLoading, error } = useSupabaseSurfSpots();
 
+  // Create a safer spot selection handler
+  const handleSpotSelection = (spotId: string) => {
+    console.log('🎯 DirectMapView handleSpotSelection called with:', spotId);
+    
+    // Find both the database spot and raw spot
+    const dbSpot = surfSpots.find(s => String(s.id) === String(spotId));
+    const rawSpot = rawSpots.find(r => String(r.id) === String(spotId));
+    
+    console.log('🔍 Found database spot:', dbSpot ? `${dbSpot.full_name}` : 'NOT FOUND');
+    console.log('🔍 Found raw spot:', rawSpot ? `${rawSpot.name}` : 'NOT FOUND');
+    
+    if (dbSpot) {
+      console.log('✅ Setting selected spots...');
+      setSelectedSpot(dbSpot);
+      setSelectedRawSpot(rawSpot || null);
+      console.log('✅ State updated successfully');
+    } else {
+      console.warn('❌ No spot found for ID:', spotId);
+      console.log('Available spot IDs:', surfSpots.map(s => ({ id: s.id, name: s.full_name })));
+    }
+  };
+
   console.log('🗺️ DirectMapView render state:', {
     viewMode,
     selectedSpot: selectedSpot ? `${selectedSpot.full_name} (${selectedSpot.id})` : 'none',
@@ -49,8 +71,7 @@ export default function DirectMapView() {
     surfSpotsCount: surfSpots.length,
     rawSpotsCount: rawSpots.length,
     isLoading,
-    setSelectedSpotType: typeof setSelectedSpot,
-    setSelectedRawSpotType: typeof setSelectedRawSpot
+    handleSpotSelectionType: typeof handleSpotSelection
   });
 
   if (error) {
@@ -78,15 +99,14 @@ export default function DirectMapView() {
         isLoading={isLoading}
         viewMode={viewMode}
         selectedSpot={selectedSpot}
-        setSelectedSpot={setSelectedSpot}
-        setSelectedRawSpot={setSelectedRawSpot}
+        onSpotSelection={handleSpotSelection}
       />
 
-      {/* Information Panel - Enhanced Debug */}
+      {/* Information Panel - Simplified */}
       {selectedSpot ? (
         <div className="bg-white border-t max-h-96 overflow-y-auto">
           <div className="p-2 bg-blue-100 text-sm font-medium">
-            📍 {selectedSpot.full_name} (ID: {selectedSpot.id})
+            📍 SELECTED: {selectedSpot.full_name} (ID: {selectedSpot.id})
           </div>
           <SurfSpotInfoPanel 
             selectedSpot={selectedSpot}
@@ -97,7 +117,7 @@ export default function DirectMapView() {
         <div className="bg-gray-50 border-t p-4 text-center text-gray-500">
           <div>Click on a surf spot marker to view details</div>
           <div className="text-xs mt-2 text-gray-400">
-            Debug: {surfSpots.length} spots loaded, selectedSpot = {selectedSpot ? 'SET' : 'NULL'}
+            Debug: {surfSpots.length} spots loaded | Selected: {selectedSpot ? 'YES' : 'NO'}
           </div>
         </div>
       )}
