@@ -24,9 +24,13 @@ const TestMapPage: React.FC = () => {
       
       <div className="absolute top-4 right-4 z-20">
         <div className="bg-white/90 backdrop-blur-sm rounded-lg p-3 text-sm shadow-lg">
-          <div className="font-semibold text-blue-600">Surf Mentor Map</div>
-          <div className="text-gray-600">3 mentors available</div>
-          <div className="text-xs text-gray-500 mt-1">Click markers for details</div>
+          <div className="font-semibold text-blue-600 mb-1">🏄 Surf Spots & Mentors</div>
+          <div className="text-gray-600 text-xs mb-1">🌊 4 surf spots available</div>
+          <div className="text-gray-600 text-xs mb-1">👨‍🏫 3 mentors online</div>
+          <div className="text-xs text-gray-500 mt-2">
+            <div>🟢 Green = Good conditions</div>
+            <div>🔴 Red = Poor conditions</div>
+          </div>
         </div>
       </div>
 
