@@ -1,0 +1,31 @@
+
+.leaflet-container {
+  height: 100vh !important;
+  width: 100% !important;
+  background: #f8fafc;
+  z-index: 10;
+}
+
+.leaflet-marker-icon {
+  border: none !important;
+  background: transparent !important;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.leaflet-popup-tip {
+  background: white;
+}
+
+.custom-mentor-marker {
+  background: transparent !important;
+  border: none !important;
+}

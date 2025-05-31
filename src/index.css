@@ -1,5 +1,6 @@
 
 @import './components/leaflet-fix.css';
+@import './components/DirectMapView.css';
 
 @tailwind base;
 @tailwind components;
