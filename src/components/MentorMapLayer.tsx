@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useMap, useMapEvents } from 'react-leaflet';
+import { useMap } from 'react-leaflet';
 import { useMentorMapData } from '@/hooks/useMentorMapData';
 import MentorMarker from '@/components/mentor/MentorMarker';
 import { validateLeafletContext } from '@/lib/leafletUtils';
@@ -30,12 +30,7 @@ const MentorMapLayer: React.FC<MentorMapLayerProps> = ({
     return null;
   }
 
-  // Use map events to ensure proper context
-  useMapEvents({
-    ready: () => {
-      console.log('🗺️ Map is ready for mentor markers');
-    }
-  });
+  console.log('🗺️ Map is ready for mentor markers');
 
   return (
     <>
