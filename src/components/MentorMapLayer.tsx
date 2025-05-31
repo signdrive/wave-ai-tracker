@@ -1,6 +1,6 @@
+
 import React from 'react';
 import { Marker, Popup } from 'react-leaflet';
-import L from 'leaflet';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
@@ -10,6 +10,8 @@ import { Calendar, Star, MapPin, Clock, Shield, Award } from 'lucide-react';
 import { useMentorClick } from '@/hooks/useMentorClick';
 import { useMonitoring } from '@/lib/monitoring';
 import { validateMentorId } from '@/utils/mentorValidation';
+import { createSafeMentorIcon, createSafeAvatarUrl } from '@/utils/iconUtils';
+import { validateMentors, validateMentorData } from '@/lib/validateMentors';
 
 interface Instructor {
   id: string;
@@ -27,31 +29,6 @@ interface Instructor {
   distance_km: number;
 }
 
-// Custom mentor marker icons based on certifications
-const createMentorIcon = (isAvailable: boolean, certifications: string[]) => {
-  const color = isAvailable ? '#10B981' : '#EF4444';
-  const hasISA = certifications.some(cert => cert.includes('ISA'));
-  const hasVDWS = certifications.some(cert => cert.includes('VDWS'));
-  
-  let badge = '👨‍🏫';
-  if (hasISA) badge = '🏆';
-  else if (hasVDWS) badge = '⭐';
-  
-  const iconSvg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="10" fill="${color}" stroke="white" stroke-width="2"/>
-      <text x="12" y="16" text-anchor="middle" font-size="10" fill="white">${badge}</text>
-    </svg>
-  `;
-
-  return new L.Icon({
-    iconUrl: 'data:image/svg+xml;base64,' + btoa(iconSvg),
-    iconSize: [36, 36],
-    iconAnchor: [18, 36],
-    popupAnchor: [0, -36],
-  });
-};
-
 interface InstructorCardProps {
   instructor: Instructor;
   onBookSession: (instructorId: string) => void;
@@ -63,6 +40,7 @@ const InstructorCard: React.FC<InstructorCardProps> = ({ instructor, onBookSessi
   
   const topCertification = instructor.certifications[0] || 'Certified';
   const rating = 4.2 + Math.random() * 0.8; // Mock rating for now
+  const safeAvatarUrl = createSafeAvatarUrl(instructor.profile_image_url || '');
 
   const handleCardClick = () => {
     try {
@@ -105,9 +83,9 @@ const InstructorCard: React.FC<InstructorCardProps> = ({ instructor, onBookSessi
       <CardHeader className="pb-3">
         <CardTitle className="text-lg flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            {instructor.profile_image_url ? (
+            {safeAvatarUrl !== '/default-mentor.png' ? (
               <img 
-                src={instructor.profile_image_url} 
+                src={safeAvatarUrl} 
                 alt={instructor.name}
                 className="w-8 h-8 rounded-full"
                 onError={(e) => {
@@ -244,7 +222,8 @@ const MentorMapLayer: React.FC<MentorMapLayerProps> = ({
         return true;
       }
       return false;
-    }
+    },
+    select: validateMentors // Add validation to query
   });
 
   if (!visible) return null;
@@ -259,17 +238,25 @@ const MentorMapLayer: React.FC<MentorMapLayerProps> = ({
 
   return (
     <>
-      {instructors.map((instructor) => (
-        <Marker
-          key={instructor.id}
-          position={[instructor.lat, instructor.lng]}
-          icon={createMentorIcon(instructor.is_available, instructor.certifications)}
-        >
-          <Popup maxWidth={300} minWidth={280} closeButton={true}>
-            <InstructorCard instructor={instructor} onBookSession={onBookSession} />
-          </Popup>
-        </Marker>
-      ))}
+      {instructors.map((instructor) => {
+        // Additional validation before rendering
+        if (!validateMentorData(instructor)) {
+          console.warn('Skipping invalid instructor:', instructor);
+          return null;
+        }
+
+        return (
+          <Marker
+            key={instructor.id}
+            position={[instructor.lat, instructor.lng]}
+            icon={createSafeMentorIcon(instructor.is_available, instructor.certifications, instructor.profile_image_url)}
+          >
+            <Popup maxWidth={300} minWidth={280} closeButton={true}>
+              <InstructorCard instructor={instructor} onBookSession={onBookSession} />
+            </Popup>
+          </Marker>
+        );
+      })}
     </>
   );
 };
@@ -313,7 +300,7 @@ const generateMockInstructors = (center: [number, number], count: number, maxRad
 
   return Array.from({ length: count }, (_, i) => {
     // Spread instructors around the center point
-    const latOffset = (Math.random() - 0.5) * 0.2; // ~11km radius spread
+    const latOffset = (Math.random() - 0.5) * 0.2; // ~11km spread
     const lngOffset = (Math.random() - 0.5) * 0.2;
     
     return {
