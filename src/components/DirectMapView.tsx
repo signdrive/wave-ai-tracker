@@ -44,11 +44,13 @@ export default function DirectMapView() {
 
   console.log('🗺️ DirectMapView render state:', {
     viewMode,
-    selectedSpot: selectedSpot ? selectedSpot.full_name : 'none',
-    selectedRawSpot: selectedRawSpot ? selectedRawSpot.name : 'none',
+    selectedSpot: selectedSpot ? `${selectedSpot.full_name} (${selectedSpot.id})` : 'none',
+    selectedRawSpot: selectedRawSpot ? `${selectedRawSpot.name} (${selectedRawSpot.id})` : 'none',
     surfSpotsCount: surfSpots.length,
     rawSpotsCount: rawSpots.length,
-    isLoading
+    isLoading,
+    setSelectedSpotType: typeof setSelectedSpot,
+    setSelectedRawSpotType: typeof setSelectedRawSpot
   });
 
   if (error) {
@@ -80,11 +82,11 @@ export default function DirectMapView() {
         setSelectedRawSpot={setSelectedRawSpot}
       />
 
-      {/* Information Panel */}
+      {/* Information Panel - Enhanced Debug */}
       {selectedSpot ? (
         <div className="bg-white border-t max-h-96 overflow-y-auto">
           <div className="p-2 bg-blue-100 text-sm font-medium">
-            📍 {selectedSpot.full_name} 
+            📍 {selectedSpot.full_name} (ID: {selectedSpot.id})
           </div>
           <SurfSpotInfoPanel 
             selectedSpot={selectedSpot}
@@ -93,7 +95,10 @@ export default function DirectMapView() {
         </div>
       ) : (
         <div className="bg-gray-50 border-t p-4 text-center text-gray-500">
-          Click on a surf spot marker to view details
+          <div>Click on a surf spot marker to view details</div>
+          <div className="text-xs mt-2 text-gray-400">
+            Debug: {surfSpots.length} spots loaded, selectedSpot = {selectedSpot ? 'SET' : 'NULL'}
+          </div>
         </div>
       )}
     </div>

@@ -22,10 +22,13 @@ export const useSurfSpotMarkers = ({
 
     console.log('🏄 Adding surf spot markers', surfSpots.length);
     console.log('🏄 First 3 spots:', surfSpots.slice(0, 3).map(s => ({ id: s.id, name: s.full_name, type: typeof s.id })));
+    console.log('🏄 handleSpotSelection function:', typeof handleSpotSelection);
 
     const spotLayer = L.layerGroup().addTo(mapRef.current);
 
-    surfSpots.forEach(spot => {
+    surfSpots.forEach((spot, index) => {
+      console.log(`🔍 Processing spot ${index + 1}:`, { id: spot.id, name: spot.full_name });
+      
       // Mock swell data for now
       const mockSwell = Math.random() * 6 + 1;
       const color = mockSwell > 3 ? '#10B981' : '#EF4444';
@@ -60,10 +63,20 @@ export const useSurfSpotMarkers = ({
 
       // Add click event to marker for direct selection
       spotMarker.on('click', (e) => {
-        console.log('🖱️ Marker clicked for spot:', spot.full_name, 'ID:', spot.id, 'Type:', typeof spot.id);
+        console.log('🖱️ MARKER CLICK EVENT FIRED!');
+        console.log('🖱️ Clicked spot:', spot.full_name, 'ID:', spot.id, 'Type:', typeof spot.id);
+        console.log('🖱️ Event object:', e);
+        
         L.DomEvent.stopPropagation(e);
-        // Ensure ID is passed as string
-        handleSpotSelection(String(spot.id));
+        
+        // Test if handleSpotSelection is a function
+        if (typeof handleSpotSelection === 'function') {
+          console.log('✅ handleSpotSelection is a function, calling it...');
+          handleSpotSelection(String(spot.id));
+          console.log('✅ handleSpotSelection called successfully');
+        } else {
+          console.error('❌ handleSpotSelection is not a function!', typeof handleSpotSelection);
+        }
       });
 
       const spotPopupContent = `
@@ -84,7 +97,7 @@ export const useSurfSpotMarkers = ({
             </div>
           </div>
           <button 
-            onclick="window.selectSurfSpot('${String(spot.id)}')"
+            onclick="console.log('🔘 Popup button clicked for spot:', '${String(spot.id)}'); if(window.selectSurfSpot) { console.log('🔘 Calling window.selectSurfSpot...'); window.selectSurfSpot('${String(spot.id)}'); } else { console.error('❌ window.selectSurfSpot not found!'); }"
             style="
               margin-top: 8px;
               width: 100%;
@@ -109,9 +122,13 @@ export const useSurfSpotMarkers = ({
       });
 
       spotMarker.addTo(spotLayer);
+      console.log(`✅ Added marker for ${spot.full_name} to layer`);
     });
 
+    console.log('🎯 All markers added to map');
+
     return () => {
+      console.log('🧹 Cleaning up markers');
       spotLayer.remove();
     };
   }, [surfSpots, isLoading, viewMode, handleSpotSelection, mapRef]);
