@@ -1,14 +1,11 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { format, addDays, isAfter, isBefore, startOfDay } from 'date-fns';
-import { MapPin, Star, DollarSign, Clock, User } from 'lucide-react';
 import { toast } from 'sonner';
+import MentorSelection from './MentorSelection';
+import SessionScheduling from './SessionScheduling';
 
 interface BookingFlowProps {
   spotId?: string;
@@ -122,147 +119,50 @@ const BookingFlow: React.FC<BookingFlowProps> = ({
     return timeSlots;
   };
 
-  // Generate next 30 days for date selection
-  const getAvailableDates = () => {
-    const dates = [];
-    for (let i = 1; i <= 30; i++) {
-      dates.push(addDays(new Date(), i));
-    }
-    return dates;
+  const handleSelectMentor = (mentor: any) => {
+    setSelectedMentor(mentor);
+    setStep(2);
   };
+
+  const handleDateSelect = (date: string) => {
+    setSelectedDate(date);
+    setSelectedTime('');
+  };
+
+  const handleTimeSelect = (time: string) => {
+    setSelectedTime(time);
+  };
+
+  const handleBack = () => {
+    setStep(1);
+  };
+
+  const timeSlots = getAvailableTimeSlots();
 
   if (step === 1) {
     return (
-      <Card className="max-w-4xl mx-auto">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <User className="w-5 h-5" />
-            Choose Your Surf Mentor
-          </CardTitle>
-          {spotName && (
-            <p className="text-gray-600">
-              Book a session at {spotName}
-            </p>
-          )}
-        </CardHeader>
-        <CardContent>
-          {mentorsLoading ? (
-            <div className="text-center py-8">Loading mentors...</div>
-          ) : mentors.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-600">No mentors available at the moment.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {mentors.map((mentor) => (
-                <Card key={mentor.id} className="cursor-pointer hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="space-y-3">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="font-semibold text-lg">{mentor.full_name}</h3>
-                          <Badge variant="outline">{mentor.certification_level}</Badge>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-semibold">${mentor.hourly_rate}/hr</p>
-                          <p className="text-sm text-gray-600">{mentor.years_experience} years</p>
-                        </div>
-                      </div>
-                      
-                      <p className="text-sm text-gray-700 line-clamp-3">{mentor.bio}</p>
-                      
-                      <Button 
-                        className="w-full"
-                        onClick={() => {
-                          setSelectedMentor(mentor);
-                          setStep(2);
-                        }}
-                      >
-                        Select Mentor
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <MentorSelection
+        mentors={mentors}
+        mentorsLoading={mentorsLoading}
+        spotName={spotName}
+        onSelectMentor={handleSelectMentor}
+      />
     );
   }
 
   if (step === 2) {
-    const availableDates = getAvailableDates();
-    const timeSlots = getAvailableTimeSlots();
-
     return (
-      <Card className="max-w-2xl mx-auto">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="w-5 h-5" />
-            Schedule Your Session
-          </CardTitle>
-          <p className="text-gray-600">
-            Booking with {selectedMentor.full_name} • ${selectedMentor.hourly_rate}/hour
-          </p>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div>
-            <h4 className="font-medium mb-3">Choose a Date</h4>
-            <div className="grid grid-cols-7 gap-2">
-              {availableDates.slice(0, 14).map((date) => (
-                <Button
-                  key={date.toISOString()}
-                  variant={selectedDate === format(date, 'yyyy-MM-dd') ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => {
-                    setSelectedDate(format(date, 'yyyy-MM-dd'));
-                    setSelectedTime('');
-                  }}
-                  className="text-xs"
-                >
-                  {format(date, 'dd')}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          {selectedDate && (
-            <div>
-              <h4 className="font-medium mb-3">Choose a Time</h4>
-              {timeSlots.length === 0 ? (
-                <p className="text-gray-600">No available times for this date</p>
-              ) : (
-                <div className="grid grid-cols-4 gap-2">
-                  {timeSlots.map((time) => (
-                    <Button
-                      key={time}
-                      variant={selectedTime === time ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setSelectedTime(time)}
-                    >
-                      {time}
-                    </Button>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setStep(1)}>
-              Back
-            </Button>
-            <Button 
-              className="flex-1"
-              disabled={!selectedDate || !selectedTime || loading}
-              onClick={handleBookSession}
-            >
-              {loading ? 'Booking...' : 'Book Session'}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+      <SessionScheduling
+        selectedMentor={selectedMentor}
+        selectedDate={selectedDate}
+        selectedTime={selectedTime}
+        timeSlots={timeSlots}
+        loading={loading}
+        onDateSelect={handleDateSelect}
+        onTimeSelect={handleTimeSelect}
+        onBack={handleBack}
+        onBookSession={handleBookSession}
+      />
     );
   }
 
