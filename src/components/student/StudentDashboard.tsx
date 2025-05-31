@@ -1,33 +1,45 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
-import { BookOpen } from 'lucide-react';
-import BookingFlow from '../booking/BookingFlow';
 import StudentStats from './StudentStats';
 import UpcomingSessions from './UpcomingSessions';
 import PendingSessions from './PendingSessions';
 import RecentSessions from './RecentSessions';
 import EmptyState from './EmptyState';
 
-const StudentDashboard: React.FC = () => {
-  const { user } = useAuth();
-  const [showBooking, setShowBooking] = React.useState(false);
+interface Session {
+  id: string;
+  scheduled_at: string;
+  duration_minutes: number;
+  status: string;
+  rating?: number;
+  mentor_feedback?: string;
+  video_call_url?: string;
+  mentor?: {
+    full_name: string;
+  };
+}
 
+interface StudentDashboardProps {
+  onBookSession: () => void;
+}
+
+const StudentDashboard: React.FC<StudentDashboardProps> = ({ onBookSession }) => {
+  const { user } = useAuth();
+
+  // Fetch student sessions
   const { data: sessions = [], isLoading } = useQuery({
     queryKey: ['student-sessions', user?.id],
     queryFn: async () => {
-      if (!user) return [];
-      
       const { data, error } = await supabase
         .from('mentorship_sessions')
         .select(`
           *,
-          mentor:profiles(full_name, email)
+          mentor:profiles!mentorship_sessions_mentor_id_fkey(full_name, email)
         `)
-        .eq('student_id', user.id)
+        .eq('student_id', user?.id)
         .order('scheduled_at', { ascending: false });
 
       if (error) throw error;
@@ -36,62 +48,56 @@ const StudentDashboard: React.FC = () => {
     enabled: !!user
   });
 
-  const upcomingSessions = sessions.filter(s => 
-    s.status === 'confirmed' && new Date(s.scheduled_at) > new Date()
-  );
-
-  const pendingSessions = sessions.filter(s => s.status === 'pending');
-  const completedSessions = sessions.filter(s => s.status === 'completed');
-
-  if (showBooking) {
+  if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold">Book a Session</h2>
-          <Button variant="outline" onClick={() => setShowBooking(false)}>
-            Back to Dashboard
-          </Button>
+      <div className="min-h-screen bg-gray-50 p-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center py-8">Loading...</div>
         </div>
-        <BookingFlow onBookingComplete={() => setShowBooking(false)} />
       </div>
     );
   }
 
-  if (isLoading) {
-    return <div className="flex items-center justify-center h-64">Loading dashboard...</div>;
-  }
+  // Process sessions with proper typing
+  const processedSessions: Session[] = sessions.map(session => ({
+    ...session,
+    mentor: session.mentor && typeof session.mentor === 'object' && 'full_name' in session.mentor 
+      ? { full_name: session.mentor.full_name }
+      : undefined
+  }));
+
+  const totalSessions = processedSessions.length;
+  const upcomingSessions = processedSessions.filter(s => 
+    new Date(s.scheduled_at) > new Date() && s.status === 'confirmed'
+  );
+  const pendingSessions = processedSessions.filter(s => s.status === 'pending');
+  const completedSessions = processedSessions.filter(s => s.status === 'completed');
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Student Dashboard</h2>
-        <Button onClick={() => setShowBooking(true)}>
-          <BookOpen className="w-4 h-4 mr-2" />
-          Book a Session
-        </Button>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-6xl mx-auto space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Student Dashboard</h1>
+            <p className="text-gray-600">Track your surf mentorship progress</p>
+          </div>
+        </div>
+
+        <StudentStats
+          totalSessions={totalSessions}
+          upcomingSessions={upcomingSessions.length}
+          completedSessions={completedSessions.length}
+          pendingSessions={pendingSessions.length}
+        />
+
+        <PendingSessions sessions={pendingSessions} />
+        <UpcomingSessions sessions={upcomingSessions} />
+        <RecentSessions sessions={completedSessions} />
+
+        {totalSessions === 0 && (
+          <EmptyState onBookSession={onBookSession} />
+        )}
       </div>
-
-      {/* Stats Overview */}
-      <StudentStats
-        totalSessions={sessions.length}
-        upcomingSessions={upcomingSessions.length}
-        completedSessions={completedSessions.length}
-        pendingSessions={pendingSessions.length}
-      />
-
-      {/* Upcoming Sessions */}
-      <UpcomingSessions sessions={upcomingSessions} />
-
-      {/* Pending Sessions */}
-      <PendingSessions sessions={pendingSessions} />
-
-      {/* Recent Sessions */}
-      <RecentSessions sessions={completedSessions} />
-
-      {/* Empty State */}
-      {sessions.length === 0 && (
-        <EmptyState onBookSession={() => setShowBooking(true)} />
-      )}
     </div>
   );
 };
