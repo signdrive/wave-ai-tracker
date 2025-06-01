@@ -51,29 +51,193 @@ export type Database = {
         }
         Relationships: []
       }
+      app_settings: {
+        Row: {
+          created_at: string | null
+          feature_name: string
+          id: number
+          is_active: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          feature_name: string
+          id?: number
+          is_active?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          feature_name?: string
+          id?: number
+          is_active?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      mentor_availability: {
+        Row: {
+          created_at: string | null
+          day_of_week: number | null
+          end_time: string
+          id: string
+          is_available: boolean | null
+          mentor_id: string | null
+          start_time: string
+        }
+        Insert: {
+          created_at?: string | null
+          day_of_week?: number | null
+          end_time: string
+          id?: string
+          is_available?: boolean | null
+          mentor_id?: string | null
+          start_time: string
+        }
+        Update: {
+          created_at?: string | null
+          day_of_week?: number | null
+          end_time?: string
+          id?: string
+          is_available?: boolean | null
+          mentor_id?: string | null
+          start_time?: string
+        }
+        Relationships: []
+      }
+      mentorship_sessions: {
+        Row: {
+          created_at: string | null
+          duration_minutes: number | null
+          id: string
+          mentor_feedback: string | null
+          mentor_id: string | null
+          rating: number | null
+          scheduled_at: string
+          session_notes: string | null
+          spot_id: string
+          status: string | null
+          student_feedback: string | null
+          student_id: string | null
+          updated_at: string | null
+          video_call_url: string | null
+          wave_conditions: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          mentor_feedback?: string | null
+          mentor_id?: string | null
+          rating?: number | null
+          scheduled_at: string
+          session_notes?: string | null
+          spot_id: string
+          status?: string | null
+          student_feedback?: string | null
+          student_id?: string | null
+          updated_at?: string | null
+          video_call_url?: string | null
+          wave_conditions?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: string
+          mentor_feedback?: string | null
+          mentor_id?: string | null
+          rating?: number | null
+          scheduled_at?: string
+          session_notes?: string | null
+          spot_id?: string
+          status?: string | null
+          student_feedback?: string | null
+          student_id?: string | null
+          updated_at?: string | null
+          video_call_url?: string | null
+          wave_conditions?: Json | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
+          bio: string | null
+          certification_level: string | null
           created_at: string
           email: string | null
           full_name: string | null
+          hourly_rate: number | null
           id: string
+          skill_level: number | null
+          timezone: string | null
           updated_at: string
+          user_type: string | null
+          years_experience: number | null
         }
         Insert: {
+          bio?: string | null
+          certification_level?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
+          hourly_rate?: number | null
           id: string
+          skill_level?: number | null
+          timezone?: string | null
           updated_at?: string
+          user_type?: string | null
+          years_experience?: number | null
         }
         Update: {
+          bio?: string | null
+          certification_level?: string | null
           created_at?: string
           email?: string | null
           full_name?: string | null
+          hourly_rate?: number | null
           id?: string
+          skill_level?: number | null
+          timezone?: string | null
           updated_at?: string
+          user_type?: string | null
+          years_experience?: number | null
         }
         Relationships: []
+      }
+      session_recordings: {
+        Row: {
+          ai_analysis: Json | null
+          created_at: string | null
+          duration_seconds: number | null
+          id: string
+          recording_url: string
+          session_id: string | null
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          recording_url: string
+          session_id?: string | null
+        }
+        Update: {
+          ai_analysis?: Json | null
+          created_at?: string | null
+          duration_seconds?: number | null
+          id?: string
+          recording_url?: string
+          session_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_recordings_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "mentorship_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       surf_spots: {
         Row: {
@@ -204,15 +368,46 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["app_role"]
+      }
+      has_role: {
+        Args: {
+          _user_id: string
+          _role: Database["public"]["Enums"]["app_role"]
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "mentor" | "student"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -327,6 +522,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "mentor", "student"],
+    },
   },
 } as const
