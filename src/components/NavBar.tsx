@@ -7,7 +7,7 @@ import { Menu, X, Waves, Map, Users, Crown, User, LogOut } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
 import { useMentorship } from '@/hooks/useMentorship';
-import AuthDialog from '@/components/AuthDialog';
+import EnhancedAuthDialog from '@/components/EnhancedAuthDialog';
 
 const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -27,6 +27,15 @@ const NavBar = () => {
     { path: '/mentorship', label: 'Mentorship', icon: Users },
     { path: '/premium', label: 'Premium', icon: Crown },
   ];
+
+  const getRoleBadgeColor = (role: string) => {
+    switch (role) {
+      case 'admin': return 'bg-purple-500';
+      case 'mentor': return 'bg-green-500';
+      case 'student': return 'bg-blue-500';
+      default: return 'bg-gray-500';
+    }
+  };
 
   return (
     <>
@@ -68,10 +77,7 @@ const NavBar = () => {
               {user ? (
                 <div className="flex items-center space-x-3">
                   {userRole && (
-                    <Badge className={
-                      userRole === 'mentor' ? 'bg-green-500' :
-                      userRole === 'admin' ? 'bg-purple-500' : 'bg-blue-500'
-                    }>
+                    <Badge className={getRoleBadgeColor(userRole)}>
                       {userRole}
                     </Badge>
                   )}
@@ -141,10 +147,7 @@ const NavBar = () => {
                     <div className="flex flex-col items-end space-y-2">
                       <div className="flex items-center space-x-2">
                         {userRole && (
-                          <Badge className={
-                            userRole === 'mentor' ? 'bg-green-500' :
-                            userRole === 'admin' ? 'bg-purple-500' : 'bg-blue-500'
-                          }>
+                          <Badge className={getRoleBadgeColor(userRole)}>
                             {userRole}
                           </Badge>
                         )}
@@ -181,7 +184,7 @@ const NavBar = () => {
         )}
       </nav>
 
-      <AuthDialog 
+      <EnhancedAuthDialog 
         open={showAuthDialog} 
         onOpenChange={setShowAuthDialog}
       />

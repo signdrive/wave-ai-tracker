@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +17,7 @@ const MapPage = lazy(() => import("./pages/MapPage"));
 const PremiumPage = lazy(() => import("./pages/PremiumPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const MentorshipPage = lazy(() => import("./pages/MentorshipPage"));
+const AuthCallback = lazy(() => import("./pages/AuthCallback"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -69,6 +71,14 @@ const App = () => {
                     element={
                       <LazyLoader skeletonType="card">
                         <MentorshipPage />
+                      </LazyLoader>
+                    } 
+                  />
+                  <Route 
+                    path="/auth/callback" 
+                    element={
+                      <LazyLoader skeletonType="card">
+                        <AuthCallback />
                       </LazyLoader>
                     } 
                   />

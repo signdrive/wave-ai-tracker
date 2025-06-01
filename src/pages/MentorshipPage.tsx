@@ -4,7 +4,7 @@ import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
 import MentorshipRouter from '@/components/mentorship/MentorshipRouter';
 import { useAuth } from '@/hooks/useAuth';
-import AuthDialog from '@/components/AuthDialog';
+import EnhancedAuthDialog from '@/components/EnhancedAuthDialog';
 
 const MentorshipPage: React.FC = () => {
   const { user } = useAuth();
@@ -39,7 +39,7 @@ const MentorshipPage: React.FC = () => {
       </main>
       <Footer />
       
-      <AuthDialog 
+      <EnhancedAuthDialog 
         open={showAuthDialog} 
         onOpenChange={setShowAuthDialog}
       />

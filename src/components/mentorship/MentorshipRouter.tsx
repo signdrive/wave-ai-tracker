@@ -7,6 +7,7 @@ import { useMentorship } from '@/hooks/useMentorship';
 import { useAuth } from '@/hooks/useAuth';
 import MentorDashboard from './MentorDashboard';
 import StudentPortal from './StudentPortal';
+import AdminDashboard from '../AdminDashboard';
 
 const MentorshipRouter: React.FC = () => {
   const { user } = useAuth();
@@ -26,13 +27,12 @@ const MentorshipRouter: React.FC = () => {
 
   // Route based on user role
   switch (userRole) {
+    case 'admin':
+      return <AdminDashboard />;
     case 'mentor':
       return <MentorDashboard />;
     case 'student':
       return <StudentPortal />;
-    case 'admin':
-      // Admin could see both or a special admin panel
-      return <MentorDashboard />;
     default:
       // Default to student portal for new users
       return <StudentPortal />;
