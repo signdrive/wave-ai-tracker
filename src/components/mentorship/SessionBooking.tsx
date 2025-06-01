@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Calendar, Clock, MapPin, User } from 'lucide-react';
 import { useMentorship } from '@/hooks/useMentorship';
 import { useSupabaseSurfSpots } from '@/hooks/useSupabaseSurfSpots';
+import { SessionValidation, validateSessionBooking } from './SessionBookingValidation';
 
 const SessionBooking: React.FC = () => {
   const { mentors, createSession, isCreatingSession, userRole } = useMentorship();
@@ -22,10 +23,16 @@ const SessionBooking: React.FC = () => {
     session_notes: '',
   });
 
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.mentor_id || !formData.spot_id || !formData.scheduled_at) {
+    // Validate form data
+    const errors = validateSessionBooking(formData);
+    setValidationErrors(errors);
+    
+    if (errors.length > 0) {
       return;
     }
 
@@ -40,12 +47,32 @@ const SessionBooking: React.FC = () => {
 
   const handleChange = (field: string, value: string | number) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear validation errors when user makes changes
+    if (validationErrors.length > 0) {
+      setValidationErrors([]);
+    }
   };
 
   // Get tomorrow's date as minimum for scheduling
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   const minDate = tomorrow.toISOString().slice(0, 16);
+  
+  // Get max date (6 months from now)
+  const maxDate = new Date();
+  maxDate.setMonth(maxDate.getMonth() + 6);
+  const maxDateString = maxDate.toISOString().slice(0, 16);
+
+  // Only allow students to book sessions
+  if (userRole && userRole !== 'student') {
+    return (
+      <Card>
+        <CardContent className="p-6 text-center">
+          <p className="text-gray-600">Only students can book mentorship sessions.</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -57,10 +84,12 @@ const SessionBooking: React.FC = () => {
       </CardHeader>
       
       <CardContent>
+        <SessionValidation errors={validationErrors} />
+        
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Mentor Selection */}
           <div className="space-y-2">
-            <Label htmlFor="mentor">Select Mentor</Label>
+            <Label htmlFor="mentor">Select Mentor *</Label>
             <Select value={formData.mentor_id} onValueChange={(value) => handleChange('mentor_id', value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Choose a mentor">
@@ -89,7 +118,7 @@ const SessionBooking: React.FC = () => {
 
           {/* Surf Spot Selection */}
           <div className="space-y-2">
-            <Label htmlFor="spot">Surf Spot</Label>
+            <Label htmlFor="spot">Surf Spot *</Label>
             <Select value={formData.spot_id} onValueChange={(value) => handleChange('spot_id', value)}>
               <SelectTrigger>
                 <SelectValue placeholder="Choose a surf spot">
@@ -117,19 +146,23 @@ const SessionBooking: React.FC = () => {
           {/* Date and Time */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="datetime">Date & Time</Label>
+              <Label htmlFor="datetime">Date & Time *</Label>
               <Input
                 id="datetime"
                 type="datetime-local"
                 min={minDate}
+                max={maxDateString}
                 value={formData.scheduled_at}
                 onChange={(e) => handleChange('scheduled_at', e.target.value)}
                 required
               />
+              <p className="text-xs text-gray-500">
+                Sessions available 6:00 AM - 10:00 PM, up to 6 months in advance
+              </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="duration">Duration (minutes)</Label>
+              <Label htmlFor="duration">Duration (minutes) *</Label>
               <Select 
                 value={formData.duration_minutes.toString()} 
                 onValueChange={(value) => handleChange('duration_minutes', parseInt(value))}
@@ -148,6 +181,7 @@ const SessionBooking: React.FC = () => {
                   <SelectItem value="90">1.5 hours</SelectItem>
                   <SelectItem value="120">2 hours</SelectItem>
                   <SelectItem value="180">3 hours</SelectItem>
+                  <SelectItem value="240">4 hours</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -162,7 +196,11 @@ const SessionBooking: React.FC = () => {
               value={formData.session_notes}
               onChange={(e) => handleChange('session_notes', e.target.value)}
               rows={3}
+              maxLength={500}
             />
+            <p className="text-xs text-gray-500">
+              {formData.session_notes.length}/500 characters
+            </p>
           </div>
 
           {/* Booking Summary */}
@@ -188,6 +226,12 @@ const SessionBooking: React.FC = () => {
                   <p>
                     <strong>Duration:</strong> {formData.duration_minutes} minutes
                   </p>
+                  {mentors.find(m => m.id === formData.mentor_id)?.hourly_rate && (
+                    <p>
+                      <strong>Estimated Cost:</strong> $
+                      {Math.round((mentors.find(m => m.id === formData.mentor_id)?.hourly_rate || 0) * (formData.duration_minutes / 60))}
+                    </p>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -197,7 +241,7 @@ const SessionBooking: React.FC = () => {
           <Button 
             type="submit" 
             className="w-full bg-ocean hover:bg-ocean-dark"
-            disabled={isCreatingSession || !formData.mentor_id || !formData.spot_id || !formData.scheduled_at}
+            disabled={isCreatingSession || validationErrors.length > 0}
           >
             {isCreatingSession ? 'Booking Session...' : 'Book Session'}
           </Button>
