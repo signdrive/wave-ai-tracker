@@ -1,8 +1,9 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Menu, X, Waves, Map, Users, Crown, User, LogOut } from 'lucide-react';
+import { Menu, X, Waves, BarChart3, Calendar, Map, User, LogOut } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
 import { useMentorship } from '@/hooks/useMentorship';
@@ -21,10 +22,11 @@ const NavBar = () => {
   };
 
   const navItems = [
-    { path: '/', label: 'Surf Tracker', icon: Waves },
-    { path: '/map', label: 'Map View', icon: Map },
-    { path: '/mentorship', label: 'Mentorship', icon: Users },
-    { path: '/premium', label: 'Premium', icon: Crown },
+    { path: '/', label: 'Dashboard', icon: BarChart3, description: 'Surf conditions summary' },
+    { path: '/live-spots', label: 'Live Spots', icon: Waves, description: 'AI camera feeds' },
+    { path: '/book-sessions', label: 'Book Sessions', icon: Calendar, description: 'Wave pools & natural spots' },
+    { path: '/map', label: 'Heat Map', icon: Map, description: 'Crowd density visualization' },
+    { path: '/surf-log', label: 'My Surf Log', icon: User, description: 'Session history' },
   ];
 
   const getRoleBadgeColor = (role: string) => {
@@ -61,6 +63,7 @@ const NavBar = () => {
                         ? 'bg-ocean text-white'
                         : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                     }`}
+                    title={item.description}
                   >
                     <Icon className="w-4 h-4" />
                     <span>{item.label}</span>
@@ -133,7 +136,10 @@ const NavBar = () => {
                     }`}
                   >
                     <Icon className="w-4 h-4" />
-                    <span>{item.label}</span>
+                    <div>
+                      <span>{item.label}</span>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{item.description}</p>
+                    </div>
                   </Link>
                 );
               })}
