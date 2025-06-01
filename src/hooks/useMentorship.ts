@@ -48,7 +48,21 @@ export const useMentorship = () => {
         return null;
       }
       
-      return data;
+      // Transform the database result to match our interface
+      return {
+        id: data.id,
+        email: data.email,
+        full_name: data.full_name,
+        user_type: data.user_type as UserRole,
+        certification_level: data.certification_level,
+        skill_level: data.skill_level,
+        years_experience: data.years_experience,
+        hourly_rate: data.hourly_rate,
+        bio: data.bio,
+        timezone: data.timezone,
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+      };
     },
     enabled: !!user?.id,
   });
@@ -67,7 +81,21 @@ export const useMentorship = () => {
         return [];
       }
       
-      return data || [];
+      // Transform the database results to match our interface
+      return (data || []).map(item => ({
+        id: item.id,
+        email: item.email,
+        full_name: item.full_name,
+        user_type: item.user_type as UserRole,
+        certification_level: item.certification_level,
+        skill_level: item.skill_level,
+        years_experience: item.years_experience,
+        hourly_rate: item.hourly_rate,
+        bio: item.bio,
+        timezone: item.timezone,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+      }));
     },
   });
 
@@ -88,7 +116,24 @@ export const useMentorship = () => {
         return [];
       }
       
-      return data || [];
+      // Transform the database results to match our interface
+      return (data || []).map(item => ({
+        id: item.id,
+        mentor_id: item.mentor_id,
+        student_id: item.student_id,
+        spot_id: item.spot_id,
+        scheduled_at: item.scheduled_at,
+        duration_minutes: item.duration_minutes,
+        status: item.status as 'pending' | 'confirmed' | 'completed' | 'cancelled',
+        session_notes: item.session_notes,
+        mentor_feedback: item.mentor_feedback,
+        student_feedback: item.student_feedback,
+        rating: item.rating,
+        wave_conditions: item.wave_conditions,
+        video_call_url: item.video_call_url,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+      }));
     },
     enabled: !!user?.id,
   });
@@ -96,9 +141,22 @@ export const useMentorship = () => {
   // Create session mutation
   const createSessionMutation = useMutation({
     mutationFn: async (sessionData: Partial<MentorshipSession>) => {
+      // Transform our interface to database format
+      const dbData = {
+        mentor_id: sessionData.mentor_id,
+        student_id: sessionData.student_id,
+        spot_id: sessionData.spot_id!,
+        scheduled_at: sessionData.scheduled_at!,
+        duration_minutes: sessionData.duration_minutes,
+        status: sessionData.status,
+        session_notes: sessionData.session_notes,
+        wave_conditions: sessionData.wave_conditions,
+        video_call_url: sessionData.video_call_url,
+      };
+
       const { data, error } = await supabase
         .from('mentorship_sessions')
-        .insert([sessionData])
+        .insert([dbData])
         .select()
         .single();
       
@@ -125,9 +183,20 @@ export const useMentorship = () => {
   // Update session mutation
   const updateSessionMutation = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<MentorshipSession> }) => {
+      // Transform our interface to database format
+      const dbUpdates = {
+        status: updates.status,
+        session_notes: updates.session_notes,
+        mentor_feedback: updates.mentor_feedback,
+        student_feedback: updates.student_feedback,
+        rating: updates.rating,
+        wave_conditions: updates.wave_conditions,
+        video_call_url: updates.video_call_url,
+      };
+
       const { data, error } = await supabase
         .from('mentorship_sessions')
-        .update(updates)
+        .update(dbUpdates)
         .eq('id', id)
         .select()
         .single();
@@ -157,9 +226,21 @@ export const useMentorship = () => {
     mutationFn: async (updates: Partial<UserProfile>) => {
       if (!user?.id) throw new Error('No user ID');
       
+      // Transform our interface to database format
+      const dbUpdates = {
+        full_name: updates.full_name,
+        user_type: updates.user_type,
+        certification_level: updates.certification_level,
+        skill_level: updates.skill_level,
+        years_experience: updates.years_experience,
+        hourly_rate: updates.hourly_rate,
+        bio: updates.bio,
+        timezone: updates.timezone,
+      };
+      
       const { data, error } = await supabase
         .from('profiles')
-        .update(updates)
+        .update(dbUpdates)
         .eq('id', user.id)
         .select()
         .single();
