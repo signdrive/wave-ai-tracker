@@ -11,6 +11,9 @@ import SurfLogPage from "./pages/SurfLogPage";
 import MentorshipPage from "./pages/MentorshipPage";
 import PremiumPage from "./pages/PremiumPage";
 import AuthCallback from "./pages/AuthCallback";
+import AdminPage from "./pages/AdminPage";
+import AdminApiConfigPage from "./pages/AdminApiConfigPage";
+import AdminSettingsPage from "./pages/AdminSettingsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +34,9 @@ const App = () => {
               <Route path="/mentorship" element={<MentorshipPage />} />
               <Route path="/premium" element={<PremiumPage />} />
               <Route path="/auth/callback" element={<AuthCallback />} />
+              <Route path="/admin" element={<AdminPage />} />
+              <Route path="/admin/api-config" element={<AdminApiConfigPage />} />
+              <Route path="/admin/settings" element={<AdminSettingsPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
