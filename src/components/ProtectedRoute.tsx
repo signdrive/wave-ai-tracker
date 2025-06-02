@@ -16,40 +16,57 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
   children, 
   requiredRole,
-  fallbackPath = '/mentorship'
+  fallbackPath = '/'
 }) => {
   const { user, loading: authLoading } = useAuth();
   const { userRole, roleLoading } = useMentorship();
   const location = useLocation();
 
-  console.log('ProtectedRoute - Auth State:', { 
+  console.log('ProtectedRoute - Current state:', { 
     user: !!user, 
     userEmail: user?.email, 
     authLoading, 
     userRole, 
     roleLoading, 
     requiredRole,
-    currentPath: location.pathname 
+    currentPath: location.pathname,
+    fallbackPath
   });
 
   // Show loading while auth is being determined
-  if (authLoading || roleLoading) {
+  if (authLoading) {
+    console.log('ProtectedRoute - Auth loading, showing spinner');
     return (
       <div className="min-h-screen bg-gradient-to-br from-ocean/5 to-sand/20 flex items-center justify-center">
         <Card className="max-w-md mx-auto">
           <CardContent className="flex items-center justify-center p-8">
             <Loader2 className="w-6 h-6 animate-spin mr-2" />
-            <span>Verifying access...</span>
+            <span>Verifying authentication...</span>
           </CardContent>
         </Card>
       </div>
     );
   }
 
-  // Redirect to login if not authenticated
+  // Redirect to fallback if not authenticated
   if (!user) {
-    console.log('ProtectedRoute - No user, redirecting to:', fallbackPath);
+    console.log('ProtectedRoute - No authenticated user, redirecting to:', fallbackPath);
     return <Navigate to={fallbackPath} state={{ from: location }} replace />;
+  }
+
+  // Show loading while role is being determined (only if we have a user and require a role)
+  if (requiredRole && roleLoading) {
+    console.log('ProtectedRoute - Role loading, showing spinner');
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-ocean/5 to-sand/20 flex items-center justify-center">
+        <Card className="max-w-md mx-auto">
+          <CardContent className="flex items-center justify-center p-8">
+            <Loader2 className="w-6 h-6 animate-spin mr-2" />
+            <span>Checking permissions...</span>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
   // Check role-based access
