@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Settings, Key, CheckCircle, AlertTriangle, Eye, EyeOff, ExternalLink, Save, X } from 'lucide-react';
+import { Settings, Key, CheckCircle, AlertTriangle, Eye, EyeOff, ExternalLink, Save, X, Shield } from 'lucide-react';
 
 interface ApiKeys {
   surflineApiKey: string;
@@ -23,7 +23,6 @@ const SecureApiConfigPanel: React.FC = () => {
     weatherApiKey: ''
   });
 
-  const [originalKeys, setOriginalKeys] = useState<ApiKeys>({ ...apiKeys });
   const [showKeys, setShowKeys] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 
@@ -59,34 +58,29 @@ const SecureApiConfigPanel: React.FC = () => {
   ];
 
   const handleInputChange = (key: keyof ApiKeys, value: string) => {
-    const newKeys = { ...apiKeys, [key]: value };
-    setApiKeys(newKeys);
-    setHasChanges(JSON.stringify(newKeys) !== JSON.stringify(originalKeys));
+    setApiKeys(prev => ({ ...prev, [key]: value }));
+    setHasChanges(true);
   };
 
   const handleSave = () => {
-    // In a real implementation, this would send to a secure backend
-    localStorage.setItem('admin-api-keys', JSON.stringify(apiKeys));
-    setOriginalKeys({ ...apiKeys });
+    // In a production environment, this should send to a secure backend
+    // For now, we'll just simulate saving and warn the user
+    alert('⚠️ SECURITY WARNING: API keys should be stored securely on the backend, not in the browser!');
     setHasChanges(false);
   };
 
   const handleCancel = () => {
-    setApiKeys({ ...originalKeys });
+    setApiKeys({
+      surflineApiKey: '',
+      magicSeaweedApiKey: '',
+      stormglassApiKey: '',
+      weatherApiKey: ''
+    });
     setHasChanges(false);
   };
 
   const isConnected = Object.values(apiKeys).some(key => key.length > 0);
   const connectedCount = Object.values(apiKeys).filter(key => key.length > 0).length;
-
-  React.useEffect(() => {
-    const stored = localStorage.getItem('admin-api-keys');
-    if (stored) {
-      const parsedKeys = JSON.parse(stored);
-      setApiKeys(parsedKeys);
-      setOriginalKeys(parsedKeys);
-    }
-  }, []);
 
   return (
     <div className="space-y-6">
@@ -115,17 +109,27 @@ const SecureApiConfigPanel: React.FC = () => {
         </Badge>
       </div>
 
-      {/* Security Warning */}
-      <Alert variant="destructive" className="border-red-300 bg-red-50 dark:bg-red-950">
-        <AlertTriangle className="h-4 w-4 text-red-600" />
+      {/* Critical Security Warning */}
+      <Alert variant="destructive" className="border-red-500 bg-red-50 dark:bg-red-950">
+        <Shield className="h-5 w-5 text-red-600" />
         <AlertDescription className="text-red-800 dark:text-red-200">
-          <div className="space-y-2">
-            <p className="font-semibold">🔒 Security Notice</p>
-            <p className="text-sm">
-              API keys are currently stored locally in your browser for development purposes only. 
-              For production deployments, these credentials should be securely managed through 
-              environment variables or a dedicated secrets management service.
-            </p>
+          <div className="space-y-3">
+            <p className="font-bold text-lg">🚨 CRITICAL SECURITY WARNING</p>
+            <div className="space-y-2 text-sm">
+              <p>
+                <strong>DO NOT USE THIS IN PRODUCTION!</strong> This interface is for development/demonstration purposes only.
+              </p>
+              <p>
+                API keys entered here are stored in browser memory and will be lost on page refresh.
+                In a production environment, API keys must be:
+              </p>
+              <ul className="list-disc list-inside ml-4 space-y-1">
+                <li>Stored securely on the backend server</li>
+                <li>Encrypted at rest and in transit</li>
+                <li>Never exposed to client-side JavaScript</li>
+                <li>Managed through environment variables or secret management services</li>
+              </ul>
+            </div>
           </div>
         </AlertDescription>
       </Alert>
@@ -212,21 +216,19 @@ const SecureApiConfigPanel: React.FC = () => {
         </div>
       )}
 
-      {/* Additional Info */}
-      <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+      {/* Development Notice */}
+      <Card className="bg-yellow-50 dark:bg-yellow-950 border-yellow-200 dark:border-yellow-800">
         <CardContent className="p-6">
-          <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
-            📡 Integration Status
+          <h3 className="font-semibold text-yellow-900 dark:text-yellow-100 mb-2">
+            🚧 Development Environment Only
           </h3>
-          <div className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
+          <div className="space-y-2 text-sm text-yellow-800 dark:text-yellow-200">
             <p>
-              • <strong>Connected APIs:</strong> {connectedCount} out of 4 services
+              This API configuration panel is designed for development and testing purposes.
             </p>
             <p>
-              • <strong>Security:</strong> Keys are encrypted locally and never transmitted in plain text
-            </p>
-            <p>
-              • <strong>Rate Limits:</strong> Each API has different rate limiting policies - check their documentation
+              <strong>For production deployment:</strong> Implement proper backend API key management with encryption,
+              secure storage, and environment variable configuration.
             </p>
           </div>
         </CardContent>

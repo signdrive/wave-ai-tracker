@@ -70,9 +70,9 @@ class RealApiService {
   setApiKeys(config: RealSurfApiConfig) {
     this.config = { ...this.config, ...config };
     
-    // Store keys in localStorage for persistence
+    // Note: In production, keys should be stored securely on the backend
     Object.entries(config).forEach(([key, value]) => {
-      if (value) localStorage.setItem(`api-key-${key}`, value);
+      if (value) sessionStorage.setItem(`api-key-${key}`, value);
     });
   }
 
@@ -85,7 +85,7 @@ class RealApiService {
     ];
     
     keys.forEach(key => {
-      const stored = localStorage.getItem(`api-key-${key}`);
+      const stored = sessionStorage.getItem(`api-key-${key}`);
       if (stored) {
         this.config[key as keyof RealSurfApiConfig] = stored;
       }
@@ -94,7 +94,6 @@ class RealApiService {
 
   async getSurflineForecast(spotId: string): Promise<any> {
     if (!this.config.surflineApiKey) {
-      console.warn('Surfline API key not configured, using mock data');
       return this.getMockForecast(spotId);
     }
 
@@ -113,17 +112,14 @@ class RealApiService {
       }
 
       const data = await response.json();
-      console.log('Surfline forecast data:', data);
       return this.transformSurflineData(data);
     } catch (error) {
-      console.error('Surfline API error:', error);
       return this.getMockForecast(spotId);
     }
   }
 
   async getMagicSeaweedForecast(spotId: string): Promise<any> {
     if (!this.config.magicSeaweedApiKey) {
-      console.warn('Magic Seaweed API key not configured, using mock data');
       return this.getMockForecast(spotId);
     }
 
@@ -137,17 +133,14 @@ class RealApiService {
       }
 
       const data: MagicSeaweedForecast[] = await response.json();
-      console.log('Magic Seaweed forecast data:', data);
       return this.transformMagicSeaweedData(data);
     } catch (error) {
-      console.error('Magic Seaweed API error:', error);
       return this.getMockForecast(spotId);
     }
   }
 
   async getStormGlassForecast(lat: number, lng: number): Promise<any> {
     if (!this.config.stormglassApiKey) {
-      console.warn('StormGlass API key not configured, using mock data');
       return this.getMockForecast(`${lat}-${lng}`);
     }
 
@@ -167,10 +160,8 @@ class RealApiService {
       }
 
       const data = await response.json();
-      console.log('StormGlass forecast data:', data);
       return this.transformStormGlassData(data);
     } catch (error) {
-      console.error('StormGlass API error:', error);
       return this.getMockForecast(`${lat}-${lng}`);
     }
   }

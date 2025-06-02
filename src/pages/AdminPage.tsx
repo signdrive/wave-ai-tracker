@@ -2,12 +2,15 @@
 import React from 'react';
 import AdminLayout from '@/components/AdminLayout';
 import AdminDashboard from '@/components/AdminDashboard';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 const AdminPage: React.FC = () => {
   return (
-    <AdminLayout>
-      <AdminDashboard />
-    </AdminLayout>
+    <ProtectedRoute requiredRole="admin" fallbackPath="/">
+      <AdminLayout>
+        <AdminDashboard />
+      </AdminLayout>
+    </ProtectedRoute>
   );
 };
 
