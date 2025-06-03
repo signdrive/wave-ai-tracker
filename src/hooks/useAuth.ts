@@ -25,24 +25,32 @@ export const useAuth = () => {
   useEffect(() => {
     let mounted = true;
 
-    // Set up auth state listener FIRST
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!mounted) return;
 
-        console.log('Auth state change:', event, session?.user?.email);
+        console.log('Auth state change:', event);
         
-        // Update state synchronously
-        setAuthState({
-          user: session?.user ?? null,
-          session,
-          loading: false,
-          error: null
-        });
+        if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+          setAuthState({
+            user: session?.user ?? null,
+            session,
+            loading: false,
+            error: null
+          });
+        } else if (event === 'SIGNED_IN') {
+          setAuthState({
+            user: session?.user ?? null,
+            session,
+            loading: false,
+            error: null
+          });
+        }
       }
     );
 
-    // THEN check for existing session
+    // Get initial session
     const getInitialSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -50,7 +58,6 @@ export const useAuth = () => {
         if (!mounted) return;
 
         if (error) {
-          console.error('Initial session error:', error);
           setAuthState({
             user: null,
             session: null,
@@ -68,7 +75,6 @@ export const useAuth = () => {
       } catch (error) {
         if (!mounted) return;
         
-        console.error('Unexpected session error:', error);
         setAuthState({
           user: null,
           session: null,
@@ -90,6 +96,7 @@ export const useAuth = () => {
     try {
       clearError();
       
+      // Validate inputs
       if (!email || !password || !fullName) {
         throw new Error('All fields are required');
       }
@@ -105,7 +112,6 @@ export const useAuth = () => {
           data: {
             full_name: fullName.trim(),
           },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
@@ -184,7 +190,7 @@ export const useAuth = () => {
       const { data, error } = await supabase.auth.resetPasswordForEmail(
         email.trim().toLowerCase(),
         {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/auth/reset-password`,
         }
       );
 

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Menu, X, Waves, BarChart3, Calendar, Map, User, LogOut, Shield } from 'lucide-react';
+import { Menu, X, Waves, BarChart3, Calendar, Map, User, LogOut } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
 import { useMentorship } from '@/hooks/useMentorship';
@@ -29,13 +29,6 @@ const NavBar = () => {
     { path: '/surf-log', label: 'My Surf Log', icon: User, description: 'Session history' },
   ];
 
-  // Add admin link only for admin users
-  const adminNavItems = userRole === 'admin' ? [
-    { path: '/admin', label: 'Admin Panel', icon: Shield, description: 'System administration' }
-  ] : [];
-
-  const allNavItems = [...navItems, ...adminNavItems];
-
   const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case 'admin': return 'bg-purple-500';
@@ -58,7 +51,7 @@ const NavBar = () => {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6">
-              {allNavItems.map((item) => {
+              {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
                 return (
@@ -128,7 +121,7 @@ const NavBar = () => {
         {isMenuOpen && (
           <div className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
             <div className="px-4 py-2 space-y-1">
-              {allNavItems.map((item) => {
+              {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.path;
                 return (
