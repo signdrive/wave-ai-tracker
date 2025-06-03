@@ -1,6 +1,4 @@
-import { secureApiService } from './secureApiService';
-
-// Legacy API service updated to use secure service
+// API service for handling all external data sources
 interface SurfCondition {
   location: string;
   waveHeight: number;
@@ -55,11 +53,11 @@ interface ForecastDay {
     avg: number;
   };
   period: number;
-  swellDirection: number;
+  swellDirection: number; // degrees (0-360)
   swellDirectionText: string;
   windSpeed: number;
   windDirection: string;
-  rating: number;
+  rating: number; // 1-5 stars
   conditions: string;
   bestTimes: string[];
 }
@@ -72,105 +70,104 @@ interface SurfForecast {
 }
 
 class ApiService {
+  private surflineApiKey: string = '';
+  private tidesApiKey: string = '';
+  private weatherApiKey: string = '1ccbc1f726134bf499f222242252805';
+  private baseUrls = {
+    surfline: 'https://services.surfline.com/kbyg',
+    noaa: 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter',
+    stormglass: 'https://api.stormglass.io/v2',
+    openweather: 'https://api.openweathermap.org/data/2.5',
+    weatherapi: 'https://api.weatherapi.com/v1'
+  };
+
+  setApiKeys(keys: { surfline?: string; tides?: string; weather?: string }) {
+    if (keys.surfline) this.surflineApiKey = keys.surfline;
+    if (keys.tides) this.tidesApiKey = keys.tides;
+    if (keys.weather) this.weatherApiKey = keys.weather;
+  }
+
   async getSurfConditions(spotId: string): Promise<SurfCondition> {
     try {
-      const coordinates = this.getSpotCoordinates(spotId);
-      if (!coordinates) {
-        return this.generateMockSurfCondition(spotId);
-      }
-
-      const [surfData, weatherData] = await Promise.all([
-        secureApiService.getStormglassData(coordinates.lat, coordinates.lon),
-        secureApiService.getWeatherApiData(coordinates.lat, coordinates.lon)
-      ]);
-
-      if (surfData && weatherData) {
-        return {
-          location: `Spot ${spotId}`,
-          waveHeight: surfData.waveHeight,
-          period: surfData.period,
-          windSpeed: weatherData.windSpeed,
-          windDirection: weatherData.windDirection,
-          crowdLevel: Math.random() * 100,
-          setsPerHour: Math.floor(Math.random() * 15) + 5,
-          temperature: weatherData.temperature,
-          lastUpdated: new Date().toISOString()
-        };
-      }
-
-      return this.generateMockSurfCondition(spotId);
+      // Mock data for now - replace with actual API calls once keys are provided
+      const mockData: SurfCondition = {
+        location: `Spot ${spotId}`,
+        waveHeight: Math.random() * 8 + 1,
+        period: Math.random() * 10 + 8,
+        windSpeed: Math.random() * 15 + 5,
+        windDirection: ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.floor(Math.random() * 8)],
+        crowdLevel: Math.random() * 100,
+        setsPerHour: Math.floor(Math.random() * 15) + 5,
+        temperature: Math.random() * 15 + 60,
+        lastUpdated: new Date().toISOString()
+      };
+      
+      return mockData;
     } catch (error) {
       console.error('Error fetching surf conditions:', error);
-      return this.generateMockSurfCondition(spotId);
+      throw error;
     }
   }
 
   async getWeatherData(spotId: string): Promise<WeatherData> {
     try {
-      const coordinates = this.getSpotCoordinates(spotId);
-      if (!coordinates) {
-        return this.generateMockWeatherData();
-      }
-
-      const weatherData = await secureApiService.getWeatherApiData(coordinates.lat, coordinates.lon);
+      // First try to get real weather data if we have coordinates
+      const spotCoordinates = this.getSpotCoordinates(spotId);
       
-      if (weatherData) {
-        return {
-          temperature: weatherData.temperature,
-          feelsLike: weatherData.temperature + (Math.random() * 6 - 3),
-          humidity: Math.floor(Math.random() * 40) + 40,
-          pressure: Math.floor(Math.random() * 50) + 1000,
-          visibility: Math.floor(Math.random() * 10) + 5,
-          windSpeed: weatherData.windSpeed,
-          windDirection: weatherData.windDirection,
-          windGust: weatherData.windSpeed * 1.2,
-          weatherCondition: weatherData.conditions,
-          weatherIcon: 'sunny',
-          uvIndex: Math.floor(Math.random() * 11)
-        };
+      if (spotCoordinates && this.weatherApiKey) {
+        const response = await fetch(
+          `${this.baseUrls.weatherapi}/current.json?key=${this.weatherApiKey}&q=${spotCoordinates.lat},${spotCoordinates.lon}&aqi=no`
+        );
+        
+        if (response.ok) {
+          const data = await response.json();
+          const weatherData: WeatherData = {
+            temperature: Math.round(data.current.temp_f),
+            feelsLike: Math.round(data.current.feelslike_f),
+            humidity: data.current.humidity,
+            pressure: Math.round(data.current.pressure_mb),
+            visibility: Math.round(data.current.vis_miles),
+            windSpeed: Math.round(data.current.wind_mph),
+            windDirection: data.current.wind_dir,
+            windGust: Math.round(data.current.gust_mph || data.current.wind_mph * 1.2),
+            weatherCondition: data.current.condition.text,
+            weatherIcon: data.current.condition.icon,
+            uvIndex: data.current.uv
+          };
+          
+          console.log('Fetched real weather data for spot:', spotId, weatherData);
+          return weatherData;
+        }
       }
-
-      return this.generateMockWeatherData();
+      
+      // Fallback to mock data
+      const windDirections = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+      const conditions = ['Sunny', 'Partly Cloudy', 'Cloudy', 'Rainy', 'Foggy'];
+      
+      const mockWeather: WeatherData = {
+        temperature: Math.floor(Math.random() * 20) + 65,
+        feelsLike: Math.floor(Math.random() * 20) + 65,
+        humidity: Math.floor(Math.random() * 40) + 40,
+        pressure: Math.floor(Math.random() * 50) + 1000,
+        visibility: Math.floor(Math.random() * 10) + 5,
+        windSpeed: Math.floor(Math.random() * 15) + 5,
+        windDirection: windDirections[Math.floor(Math.random() * windDirections.length)],
+        windGust: Math.floor(Math.random() * 20) + 10,
+        weatherCondition: conditions[Math.floor(Math.random() * conditions.length)],
+        weatherIcon: 'sunny',
+        uvIndex: Math.floor(Math.random() * 11)
+      };
+      
+      console.log('Generated mock weather data for spot:', spotId, mockWeather);
+      return mockWeather;
     } catch (error) {
       console.error('Error fetching weather data:', error);
-      return this.generateMockWeatherData();
+      throw error;
     }
   }
 
-  private generateMockSurfCondition(spotId: string): SurfCondition {
-    return {
-      location: `Spot ${spotId}`,
-      waveHeight: Math.random() * 8 + 1,
-      period: Math.random() * 10 + 8,
-      windSpeed: Math.random() * 15 + 5,
-      windDirection: ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.floor(Math.random() * 8)],
-      crowdLevel: Math.random() * 100,
-      setsPerHour: Math.floor(Math.random() * 15) + 5,
-      temperature: Math.random() * 15 + 60,
-      lastUpdated: new Date().toISOString()
-    };
-  }
-
-  private generateMockWeatherData(): WeatherData {
-    const windDirections = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-    const conditions = ['Sunny', 'Partly Cloudy', 'Cloudy', 'Rainy', 'Foggy'];
-    
-    return {
-      temperature: Math.floor(Math.random() * 20) + 65,
-      feelsLike: Math.floor(Math.random() * 20) + 65,
-      humidity: Math.floor(Math.random() * 40) + 40,
-      pressure: Math.floor(Math.random() * 50) + 1000,
-      visibility: Math.floor(Math.random() * 10) + 5,
-      windSpeed: Math.floor(Math.random() * 15) + 5,
-      windDirection: windDirections[Math.floor(Math.random() * windDirections.length)],
-      windGust: Math.floor(Math.random() * 20) + 10,
-      weatherCondition: conditions[Math.floor(Math.random() * conditions.length)],
-      weatherIcon: 'sunny',
-      uvIndex: Math.floor(Math.random() * 11)
-    };
-  }
-
   private getSpotCoordinates(spotId: string): { lat: number; lon: number } | null {
+    // Basic coordinate mapping for popular surf spots
     const spotCoordinates: Record<string, { lat: number; lon: number }> = {
       'pipeline': { lat: 21.6597, lon: -158.0575 },
       'mavericks': { lat: 37.4912, lon: -122.5008 },
@@ -189,6 +186,7 @@ class ApiService {
 
   async getTideData(stationId: string, days: number = 3): Promise<TideData[]> {
     try {
+      // Mock data for now - replace with actual API calls once keys are provided
       const mockTides: TideData[] = [];
       const now = new Date();
       
@@ -216,6 +214,7 @@ class ApiService {
 
   async getWavePoolAvailability(poolId: string, date: Date): Promise<WavePoolSlot[]> {
     try {
+      // Mock data for now - replace with actual API calls once keys are provided
       const slots: WavePoolSlot[] = [];
       const baseTime = new Date(date);
       baseTime.setHours(8, 0, 0, 0);
@@ -306,6 +305,7 @@ class ApiService {
         });
       }
 
+      console.log('Generated surf forecast for:', spotId, mockForecast);
       return mockForecast;
     } catch (error) {
       console.error('Error fetching surf forecast:', error);
@@ -345,6 +345,7 @@ class ApiService {
       mockData.maxWaveHeight = maxHeight;
       mockData.minWaveHeight = minHeight;
 
+      console.log('Generated historical wave data for:', spotId, mockData);
       return mockData;
     } catch (error) {
       console.error('Error fetching historical wave data:', error);
@@ -391,6 +392,7 @@ class ApiService {
         directionCounts[a] > directionCounts[b] ? a : b
       );
 
+      console.log('Generated historical wind data for:', spotId, mockData);
       return mockData;
     } catch (error) {
       console.error('Error fetching historical wind data:', error);
@@ -434,6 +436,7 @@ class ApiService {
         slotCounts[a] > slotCounts[b] ? a : b
       );
 
+      console.log('Generated historical crowd data for:', spotId, mockData);
       return mockData;
     } catch (error) {
       console.error('Error fetching historical crowd data:', error);
@@ -478,6 +481,7 @@ class ApiService {
       mockData.avgWaterTemp = totalWaterTemp / days;
       mockData.tempRange = maxTemp - minTemp;
 
+      console.log('Generated historical temperature data for:', spotId, mockData);
       return mockData;
     } catch (error) {
       console.error('Error fetching historical temperature data:', error);
