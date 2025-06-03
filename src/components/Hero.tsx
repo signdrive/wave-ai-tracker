@@ -12,7 +12,7 @@ const Hero: React.FC = () => {
           loop
           muted
           playsInline
-          className="absolute min-w-full min-h-full object-cover"
+          className="w-full h-full object-cover"
           poster="https://images.unsplash.com/photo-1502680390469-be75c86b636f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1950&q=80"
         >
           <source src="https://player.vimeo.com/external/372357424.hd.mp4?s=ea6aec3f7f71f2c139ec57f568fb943d42584cc9&profile_id=175&oauth2_token_id=57447761" type="video/mp4" />
