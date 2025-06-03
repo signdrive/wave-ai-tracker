@@ -1,4 +1,3 @@
-
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { apiService, SurfCondition, WeatherData, TideData, WavePoolSlot, SurfForecast } from '@/services/apiService';
@@ -72,4 +71,30 @@ export const useRealTimeUpdates = () => {
 
     return setupWebSocket();
   }, [queryClient]);
+};
+
+// Hook for API key management
+export const useApiKeys = () => {
+  const setApiKeys = (keys: { surfline?: string; tides?: string; weather?: string }) => {
+    apiService.setApiKeys(keys);
+    if (keys.surfline) localStorage.setItem('surfline-api-key', keys.surfline);
+    if (keys.tides) localStorage.setItem('tides-api-key', keys.tides);
+    if (keys.weather) localStorage.setItem('weather-api-key', keys.weather);
+  };
+
+  const loadStoredKeys = () => {
+    const surflineKey = localStorage.getItem('surfline-api-key');
+    const tidesKey = localStorage.getItem('tides-api-key');
+    const weatherKey = localStorage.getItem('weather-api-key');
+    
+    if (surflineKey || tidesKey || weatherKey) {
+      apiService.setApiKeys({
+        surfline: surflineKey || undefined,
+        tides: tidesKey || undefined,
+        weather: weatherKey || undefined
+      });
+    }
+  };
+
+  return { setApiKeys, loadStoredKeys };
 };
