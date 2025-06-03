@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 
 const Hero: React.FC = () => {
   return (
-    <div className="relative h-screen w-full overflow-hidden">
+    <div className="relative w-full min-h-screen overflow-hidden">
       {/* Video Background */}
       <div className="absolute inset-0 z-0">
         <video
@@ -22,19 +22,19 @@ const Hero: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-20 flex flex-col items-center justify-center h-full text-center text-white px-4">
-        <div className="animate-fade-in">
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">
+      <div className="relative z-20 flex flex-col items-center justify-center min-h-screen text-center text-white px-4 py-16">
+        <div className="animate-fade-in max-w-4xl mx-auto">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 leading-tight">
             Discover Your Perfect Wave
           </h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl lg:text-2xl mb-8 max-w-3xl mx-auto leading-relaxed">
             Book surf sessions at premium wave pools or find the best natural waves with our AI-powered surf cameras.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-ocean hover:bg-ocean-dark text-lg">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Button size="lg" className="bg-ocean hover:bg-ocean-dark text-lg px-8 py-3">
               Book Wave Pool
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/20 text-lg">
+            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/20 text-lg px-8 py-3">
               Check Live Surf Cams
             </Button>
           </div>
