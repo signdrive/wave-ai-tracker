@@ -21,7 +21,7 @@ class SecureApiService {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('No session');
 
-      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/get-api-keys?service=${serviceName}`, {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/get-api-keys?service=${serviceName}`, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json'
