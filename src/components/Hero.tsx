@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -50,4 +51,3 @@ const Hero: React.FC = () => {
 };
 
 export default Hero;
-
