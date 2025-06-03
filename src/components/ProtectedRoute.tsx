@@ -4,7 +4,7 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useMentorship } from '@/hooks/useMentorship';
 import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, Shield } from 'lucide-react';
+import { Loader2, Shield, LogIn } from 'lucide-react';
 import { UserRole } from '@/types/mentorship';
 
 interface ProtectedRouteProps {
@@ -22,6 +22,16 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const { userRole, roleLoading } = useMentorship();
   const location = useLocation();
 
+  console.log('ProtectedRoute - Auth State:', { 
+    user: !!user, 
+    userEmail: user?.email, 
+    authLoading, 
+    userRole, 
+    roleLoading, 
+    requiredRole,
+    currentPath: location.pathname 
+  });
+
   // Show loading while auth is being determined
   if (authLoading || roleLoading) {
     return (
@@ -38,11 +48,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Redirect to login if not authenticated
   if (!user) {
-    return <Navigate to="/mentorship" state={{ from: location }} replace />;
+    console.log('ProtectedRoute - No user, redirecting to:', fallbackPath);
+    return <Navigate to={fallbackPath} state={{ from: location }} replace />;
   }
 
   // Check role-based access
   if (requiredRole && userRole !== requiredRole) {
+    console.log('ProtectedRoute - Role mismatch. Required:', requiredRole, 'User role:', userRole);
     return (
       <div className="min-h-screen bg-gradient-to-br from-ocean/5 to-sand/20 flex items-center justify-center">
         <Card className="max-w-md mx-auto">
@@ -53,18 +65,28 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
               You don't have permission to access this area. 
               Required role: {requiredRole}, your role: {userRole || 'none'}
             </p>
-            <button 
-              onClick={() => window.history.back()}
-              className="text-ocean hover:underline"
-            >
-              Go back
-            </button>
+            <div className="flex space-x-2">
+              <button 
+                onClick={() => window.history.back()}
+                className="text-ocean hover:underline"
+              >
+                Go back
+              </button>
+              <span className="text-gray-400">|</span>
+              <button 
+                onClick={() => window.location.href = '/'}
+                className="text-ocean hover:underline"
+              >
+                Go to Home
+              </button>
+            </div>
           </CardContent>
         </Card>
       </div>
     );
   }
 
+  console.log('ProtectedRoute - Access granted');
   return <>{children}</>;
 };
 
