@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 
 const Hero: React.FC = () => {
   return (
-    <div className="relative w-full min-h-screen overflow-hidden">
+    <div className="relative w-full overflow-hidden">
       {/* Video Background */}
       <div className="absolute inset-0 z-0">
         <video
@@ -22,7 +22,7 @@ const Hero: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="relative z-20 flex flex-col items-center justify-center min-h-screen text-center text-white px-4 py-16">
+      <div className="relative z-20 flex flex-col items-center justify-center text-center text-white px-4 py-16">
         <div className="animate-fade-in max-w-4xl mx-auto">
           <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 leading-tight">
             Discover Your Perfect Wave
