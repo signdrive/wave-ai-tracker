@@ -2,9 +2,6 @@
 import React from 'react';
 import NavBar from '@/components/NavBar';
 import Hero from '@/components/Hero';
-import WavePoolBooking from '@/components/WavePoolBooking';
-import SurfCamDisplay from '@/components/SurfCamDisplay';
-import TideChart from '@/components/TideChart';
 import Footer from '@/components/Footer';
 import EnhancedSurfInterface from '@/components/EnhancedSurfInterface';
 
