@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,6 +19,19 @@ export const useAuth = () => {
 
   const clearError = useCallback(() => {
     setAuthState(prev => ({ ...prev, error: null }));
+  }, []);
+
+  // Function to check subscription status after authentication
+  const checkSubscriptionStatus = useCallback(async (session: Session) => {
+    try {
+      await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
+    } catch (error) {
+      console.error('Failed to check subscription status:', error);
+    }
   }, []);
 
   useEffect(() => {
@@ -57,6 +69,13 @@ export const useAuth = () => {
           loading: false,
           error: null
         });
+
+        // Check subscription status after successful authentication
+        if (session && event === 'SIGNED_IN') {
+          setTimeout(() => {
+            checkSubscriptionStatus(session);
+          }, 0);
+        }
       }
     );
 
@@ -85,6 +104,13 @@ export const useAuth = () => {
             loading: false,
             error: null
           });
+
+          // Check subscription status for existing session
+          if (session) {
+            setTimeout(() => {
+              checkSubscriptionStatus(session);
+            }, 0);
+          }
         }
       } catch (error) {
         if (!mounted) return;
@@ -105,7 +131,7 @@ export const useAuth = () => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [checkSubscriptionStatus]);
 
   const signUp = async (email: string, password: string, fullName: string) => {
     try {

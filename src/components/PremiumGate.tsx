@@ -9,37 +9,33 @@ interface PremiumGateProps {
 }
 
 const PremiumGate: React.FC<PremiumGateProps> = ({ children }) => {
-  const { user, loading: authLoading } = useAuth();
+  const { user, session, loading: authLoading } = useAuth();
   const [hasActiveSubscription, setHasActiveSubscription] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     checkSubscriptionStatus();
-  }, [user]);
+  }, [user, session]);
 
   const checkSubscriptionStatus = async () => {
-    if (!user) {
+    if (!user || !session) {
       setLoading(false);
       return;
     }
 
     try {
-      // Use the existing subscriptions table
-      const { data: subscription } = await supabase
-        .from('subscriptions')
-        .select('status, expires_at')
-        .eq('user_id', user.id)
-        .eq('status', 'active')
-        .single();
+      // Use the check-subscription edge function instead of direct database query
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
 
-      if (subscription) {
-        // Check if subscription hasn't expired
-        const isValid = !subscription.expires_at || 
-          new Date(subscription.expires_at) > new Date();
-        
-        setHasActiveSubscription(isValid);
-      } else {
+      if (error) {
+        console.error('Subscription check failed:', error);
         setHasActiveSubscription(false);
+      } else {
+        setHasActiveSubscription(data?.subscribed || false);
       }
     } catch (error) {
       console.error('Subscription check failed:', error);
