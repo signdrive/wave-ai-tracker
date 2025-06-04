@@ -4,16 +4,15 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import * as THREE from 'three';
 import { Camera, Scan, AlertTriangle } from 'lucide-react';
 
 interface RealARData {
   detectedWaves: Array<{
     height: number;
-    position: THREE.Vector3;
+    position: { x: number; y: number; z: number };
     confidence: number;
   }>;
-  windVisualization: THREE.Vector3;
+  windVisualization: { x: number; y: number; z: number };
   tideIndicator: number;
   complianceVerified: boolean;
 }
@@ -23,15 +22,28 @@ const RealAROverlaySystem: React.FC = () => {
   const [hasWebXR, setHasWebXR] = useState(false);
   const [arData, setARData] = useState<RealARData | null>(null);
   const [complianceViolation, setComplianceViolation] = useState(false);
+  const [THREE, setTHREE] = useState<any>(null);
   
-  const sceneRef = useRef<THREE.Scene>();
-  const rendererRef = useRef<THREE.WebGLRenderer>();
-  const cameraRef = useRef<THREE.PerspectiveCamera>();
+  const sceneRef = useRef<any>();
+  const rendererRef = useRef<any>();
+  const cameraRef = useRef<any>();
 
   useEffect(() => {
+    initializeThreeJS();
     checkWebXRSupport();
-    initializeRealAR();
   }, []);
+
+  const initializeThreeJS = async () => {
+    try {
+      // Dynamically import Three.js to avoid build issues
+      const threeModule = await import('three');
+      setTHREE(threeModule);
+      console.log('✅ Three.js loaded successfully');
+    } catch (error) {
+      console.error('❌ Failed to load Three.js:', error);
+      setComplianceViolation(true);
+    }
+  };
 
   const checkWebXRSupport = async () => {
     if ('xr' in navigator) {
@@ -54,7 +66,7 @@ const RealAROverlaySystem: React.FC = () => {
   };
 
   const initializeRealAR = async () => {
-    if (!hasWebXR) return;
+    if (!hasWebXR || !THREE) return;
 
     try {
       // Initialize Three.js with WebXR
@@ -85,7 +97,7 @@ const RealAROverlaySystem: React.FC = () => {
   };
 
   const startRealAR = async () => {
-    if (!hasWebXR || !rendererRef.current) {
+    if (!hasWebXR || !rendererRef.current || !THREE) {
       alert('❌ COMPLIANCE VIOLATION: Real AR not available despite marketing claims');
       return;
     }
@@ -119,6 +131,8 @@ const RealAROverlaySystem: React.FC = () => {
   };
 
   const startWaveDetection = async () => {
+    if (!THREE) return;
+
     try {
       // Real computer vision for wave detection
       const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -134,11 +148,11 @@ const RealAROverlaySystem: React.FC = () => {
         const mockDetectedWaves = [
           {
             height: Math.random() * 3 + 1,
-            position: new THREE.Vector3(
-              (Math.random() - 0.5) * 10,
-              0,
-              (Math.random() - 0.5) * 10
-            ),
+            position: {
+              x: (Math.random() - 0.5) * 10,
+              y: 0,
+              z: (Math.random() - 0.5) * 10
+            },
             confidence: Math.random() * 0.3 + 0.7
           }
         ];
@@ -153,7 +167,7 @@ const RealAROverlaySystem: React.FC = () => {
           });
           const waveMesh = new THREE.Mesh(waveGeometry, waveMaterial);
           
-          waveMesh.position.copy(wave.position);
+          waveMesh.position.set(wave.position.x, wave.position.y, wave.position.z);
           sceneRef.current?.add(waveMesh);
 
           // Remove after 5 seconds
@@ -164,7 +178,7 @@ const RealAROverlaySystem: React.FC = () => {
 
         setARData({
           detectedWaves: mockDetectedWaves,
-          windVisualization: new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5),
+          windVisualization: { x: Math.random() - 0.5, y: 0, z: Math.random() - 0.5 },
           tideIndicator: Math.random(),
           complianceVerified: true
         });
@@ -186,6 +200,13 @@ const RealAROverlaySystem: React.FC = () => {
     setIsARActive(false);
     setARData(null);
   };
+
+  // Initialize AR when THREE.js is loaded
+  useEffect(() => {
+    if (THREE && hasWebXR) {
+      initializeRealAR();
+    }
+  }, [THREE, hasWebXR]);
 
   if (complianceViolation) {
     return (
@@ -241,7 +262,7 @@ const RealAROverlaySystem: React.FC = () => {
               <Button 
                 onClick={startRealAR} 
                 className="w-full bg-green-600 hover:bg-green-700"
-                disabled={!hasWebXR}
+                disabled={!hasWebXR || !THREE}
               >
                 <Camera className="w-4 h-4 mr-2" />
                 Start Real AR Session

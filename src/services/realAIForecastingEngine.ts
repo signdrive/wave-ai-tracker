@@ -1,7 +1,5 @@
 
 // COMPLIANCE ENFORCEMENT: Real ML-based wave forecasting
-import * as tf from '@tensorflow/tfjs';
-
 interface RealWaveData {
   buoyReadings: number[];
   windVectors: number[];
@@ -19,13 +17,17 @@ interface AIForecastResult {
 }
 
 class RealAIForecastingEngine {
-  private model: tf.LayersModel | null = null;
+  private model: any | null = null;
   private isValidated = false;
+  private tf: any = null;
 
   async initialize() {
     try {
+      // Dynamically import TensorFlow.js to avoid build issues
+      this.tf = await import('@tensorflow/tfjs');
+      
       // Load actual trained model (compliance requirement)
-      this.model = await tf.loadLayersModel('/models/wave_prediction_v3.json');
+      this.model = await this.tf.loadLayersModel('/models/wave_prediction_v3.json');
       this.isValidated = true;
       console.log('✅ REAL AI MODEL LOADED - Compliance achieved');
     } catch {
@@ -35,7 +37,7 @@ class RealAIForecastingEngine {
   }
 
   async generateRealForecast(spotData: any): Promise<AIForecastResult> {
-    if (!this.model || !this.isValidated) {
+    if (!this.model || !this.isValidated || !this.tf) {
       throw new Error('COMPLIANCE VIOLATION: No real AI model available');
     }
 
@@ -44,7 +46,7 @@ class RealAIForecastingEngine {
     const windData = await this.fetchGFSWindData(spotData.lat, spotData.lon);
     
     // Prepare features for ML model
-    const features = tf.tensor2d([[
+    const features = this.tf.tensor2d([[
       ...realBuoyData.waveHeight,
       ...windData.speed,
       ...windData.direction,
@@ -53,7 +55,7 @@ class RealAIForecastingEngine {
     ]]);
 
     // ACTUAL AI PREDICTION
-    const prediction = this.model.predict(features) as tf.Tensor;
+    const prediction = this.model.predict(features);
     const result = await prediction.data();
 
     // Validate against NOAA ground truth
