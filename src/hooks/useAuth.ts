@@ -25,6 +25,24 @@ export const useAuth = () => {
   useEffect(() => {
     let mounted = true;
 
+    // Handle OAuth tokens in URL hash (for Google OAuth)
+    const handleOAuthTokens = async () => {
+      if (window.location.hash) {
+        try {
+          const { data, error } = await supabase.auth.getSession();
+          if (error) {
+            console.error('Error handling OAuth tokens:', error);
+          } else if (data.session) {
+            console.log('OAuth session established:', data.session.user.email);
+            // Clear the hash from URL
+            window.history.replaceState(null, '', window.location.pathname);
+          }
+        } catch (error) {
+          console.error('Unexpected OAuth error:', error);
+        }
+      }
+    };
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -41,6 +59,9 @@ export const useAuth = () => {
         });
       }
     );
+
+    // Handle OAuth tokens if present
+    handleOAuthTokens();
 
     // THEN check for existing session
     const getInitialSession = async () => {
@@ -145,7 +166,7 @@ export const useAuth = () => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
+          redirectTo: `${window.location.origin}/`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
