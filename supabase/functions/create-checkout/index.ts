@@ -55,10 +55,10 @@ serve(async (req) => {
       logStep("Creating new customer");
     }
 
-    // Define price IDs for your plans (you'll need to get these from your Stripe dashboard)
+    // Define price IDs for your plans (using your actual Stripe Price IDs)
     const priceIds = {
-      pro: "price_1RQ2CNEI0WeG2rlC1234567890", // Replace with your actual Wave AI Pro price ID
-      elite: "price_1RQ2CNEI0WeG2rlC0987654321" // Replace with your actual Wave AI Elite price ID
+      pro: "price_1RWGAQEI0WeG2rlCqyEoE3So", // Wave AI Pro - $9.99 USD
+      elite: "price_1RWGBPEI0WeG2rlC1Gc6lN8c" // Wave AI Elite - €24.99 EUR
     };
 
     const priceId = priceIds[planType as keyof typeof priceIds];
