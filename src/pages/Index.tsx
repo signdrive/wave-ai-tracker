@@ -5,6 +5,7 @@ import Hero from '@/components/Hero';
 import Footer from '@/components/Footer';
 import { useApiKeys } from '@/hooks/useRealTimeData';
 import EnhancedSurfInterface from '@/components/EnhancedSurfInterface';
+import PremiumGate from '@/components/PremiumGate';
 
 const Index = () => {
   const { loadStoredKeys } = useApiKeys();
@@ -18,13 +19,15 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-ocean/5 to-sand/20">
       <NavBar />
       <main>
-        {/* Hero Section - Full Screen */}
+        {/* Hero Section - Always Visible */}
         <Hero />
         
-        {/* Enhanced Surf Interface - The Core Platform */}
-        <section id="surf-platform" className="py-16">
-          <EnhancedSurfInterface />
-        </section>
+        {/* Enhanced Surf Interface - Protected by Premium */}
+        <PremiumGate>
+          <section id="surf-platform" className="py-16">
+            <EnhancedSurfInterface />
+          </section>
+        </PremiumGate>
       </main>
       <Footer />
     </div>
