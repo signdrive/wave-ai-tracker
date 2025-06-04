@@ -1,275 +1,72 @@
+
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Waves, Camera, BookOpen, Users, Brain, Mic, Watch, Scan, BarChart3, Settings, Key, Bell, Share2 } from 'lucide-react';
-import { AnimatedTabs, AnimatedTabsList, AnimatedTabsTrigger, AnimatedTabsContent } from './AnimatedTabs';
-import { LoadingSkeleton } from './LoadingSkeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import SurfCamDisplay from './SurfCamDisplay';
+import SurfSpotMap from './SurfSpotMap';
+import MLWavePredictions from './MLWavePredictions';
+import RealAROverlaySystem from './RealAROverlaySystem';
+import PersonalSurfCoach from './PersonalSurfCoach';
+import ComplianceAuditDashboard from './ComplianceAuditDashboard';
 
-// Import all our new components
-import AIForecastEngine from './AIForecastEngine';
-import BookingMarketplace from './BookingMarketplace';
-import SocialCommunityHub from './SocialCommunityHub';
-import VoiceCommandSystem from './VoiceCommandSystem';
-import SessionLogger from './SessionLogger';
-import WearableIntegration from './WearableIntegration';
-import AROverlaySystem from './AROverlaySystem';
-import AdvancedAnalyticsDashboard from './AdvancedAnalyticsDashboard';
-import RealTimeSurfCam from './RealTimeSurfCam';
-import ApiConfigPanel from './ApiConfigPanel';
-import NotificationSettings from './NotificationSettings';
-import SocialShareButton from './SocialShareButton';
-
-interface EnhancedSurfInterfaceProps {
-  spotId?: string;
-  spotName?: string;
-}
-
-const EnhancedSurfInterface: React.FC<EnhancedSurfInterfaceProps> = ({ 
-  spotId = 'malibu-ca', 
-  spotName = 'Malibu' 
-}) => {
-  const [activeTab, setActiveTab] = useState('forecast');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const handleSpotQuery = (spotName: string) => {
-    console.log('Voice query for spot:', spotName);
-    setActiveTab('forecast');
-  };
-
-  const handleConditionCheck = (location: string) => {
-    console.log('Checking conditions for:', location);
-    setActiveTab('forecast');
-  };
-
-  const handleBookingRequest = (service: string) => {
-    console.log('Booking request for:', service);
-    setActiveTab('booking');
-  };
-
-  const handleSessionSaved = (session: any) => {
-    console.log('Session saved:', session);
-  };
-
-  const handleTabChange = (value: string) => {
-    setIsLoading(true);
-    setActiveTab(value);
-    // Simulate loading delay for better UX
-    setTimeout(() => setIsLoading(false), 300);
-  };
+const EnhancedSurfInterface: React.FC = () => {
+  const [activeTab, setActiveTab] = useState('surf-cams');
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ocean/5 to-sand/20 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-6 animate-in fade-in-50 slide-in-from-top-4 duration-500">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-4xl font-bold text-ocean-dark dark:text-white transition-colors duration-300">
-                Wave AI Tracker
-              </h1>
-              <p className="text-gray-600 dark:text-gray-300 mt-1 transition-colors duration-300">
-                The Ultimate Surf Intelligence Platform • Powered by AI
-              </p>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Badge className="bg-green-500 animate-pulse">
-                🤖 AI Active
-              </Badge>
-              <Badge className="bg-blue-500 animate-pulse">
-                🌊 Live Data
-              </Badge>
-              <Badge className="bg-purple-500 animate-pulse">
-                🎯 Premium
-              </Badge>
-              <SocialShareButton
-                spot={spotName}
-                conditions="Epic"
-                rating={5}
-                className="ml-2"
-              />
-            </div>
+    <div className="container mx-auto px-4 py-8">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-6">
+          <TabsTrigger value="surf-cams">Live Cams</TabsTrigger>
+          <TabsTrigger value="forecasts">AI Forecasts</TabsTrigger>
+          <TabsTrigger value="map">Spot Map</TabsTrigger>
+          <TabsTrigger value="ar-overlay">AR Vision</TabsTrigger>
+          <TabsTrigger value="surf-coach">AI Coach</TabsTrigger>
+          <TabsTrigger value="compliance">Audit</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="surf-cams">
+          <SurfCamDisplay />
+        </TabsContent>
+
+        <TabsContent value="forecasts">
+          <div className="space-y-6">
+            <MLWavePredictions
+              spotId="pipeline"
+              spotName="Pipeline, Hawaii"
+              currentConditions={{
+                waveHeight: 6.5,
+                period: 14,
+                windSpeed: 8,
+                windDirection: 225,
+                tideLevel: 0.3,
+                swellDirection: 315,
+                temperature: 26
+              }}
+              spotPreferences={{
+                idealWaveHeight: [6, 12],
+                idealPeriod: [12, 16],
+                idealWindSpeed: 10,
+                bestTide: 'mid'
+              }}
+            />
           </div>
-        </div>
+        </TabsContent>
 
-        {/* Main Interface */}
-        <div className="animate-in fade-in-50 slide-in-from-bottom-4 duration-700">
-          <AnimatedTabs value={activeTab} onValueChange={handleTabChange}>
-            <AnimatedTabsList className="grid w-full grid-cols-4 lg:grid-cols-10 gap-2">
-              <AnimatedTabsTrigger value="forecast">
-                <Brain className="w-4 h-4 mr-1" />
-                <span className="hidden sm:inline">AI Forecast</span>
-              </AnimatedTabsTrigger>
-              <AnimatedTabsTrigger value="cams">
-                <Camera className="w-4 h-4 mr-1" />
-                <span className="hidden sm:inline">Surf Cams</span>
-              </AnimatedTabsTrigger>
-              <AnimatedTabsTrigger value="booking">
-                <BookOpen className="w-4 h-4 mr-1" />
-                <span className="hidden sm:inline">Booking</span>
-              </AnimatedTabsTrigger>
-              <AnimatedTabsTrigger value="community">
-                <Users className="w-4 h-4 mr-1" />
-                <span className="hidden sm:inline">Community</span>
-              </AnimatedTabsTrigger>
-              <AnimatedTabsTrigger value="voice">
-                <Mic className="w-4 h-4 mr-1" />
-                <span className="hidden sm:inline">Voice AI</span>
-              </AnimatedTabsTrigger>
-              <AnimatedTabsTrigger value="session">
-                <Watch className="w-4 h-4 mr-1" />
-                <span className="hidden sm:inline">Sessions</span>
-              </AnimatedTabsTrigger>
-              <AnimatedTabsTrigger value="ar">
-                <Scan className="w-4 h-4 mr-1" />
-                <span className="hidden sm:inline">AR View</span>
-              </AnimatedTabsTrigger>
-              <AnimatedTabsTrigger value="analytics">
-                <BarChart3 className="w-4 h-4 mr-1" />
-                <span className="hidden sm:inline">Analytics</span>
-              </AnimatedTabsTrigger>
-              <AnimatedTabsTrigger value="api-config">
-                <Key className="w-4 h-4 mr-1" />
-                <span className="hidden sm:inline">APIs</span>
-              </AnimatedTabsTrigger>
-              <AnimatedTabsTrigger value="notifications">
-                <Bell className="w-4 h-4 mr-1" />
-                <span className="hidden sm:inline">Alerts</span>
-              </AnimatedTabsTrigger>
-            </AnimatedTabsList>
+        <TabsContent value="map">
+          <SurfSpotMap />
+        </TabsContent>
 
-            {/* AI Forecast Engine */}
-            <AnimatedTabsContent value="forecast">
-              {isLoading ? (
-                <LoadingSkeleton type="forecast" />
-              ) : (
-                <AIForecastEngine spotId={spotId} spotName={spotName} />
-              )}
-            </AnimatedTabsContent>
+        <TabsContent value="ar-overlay">
+          <RealAROverlaySystem />
+        </TabsContent>
 
-            {/* Enhanced Surf Cams */}
-            <AnimatedTabsContent value="cams">
-              <Card className="transition-all duration-300 hover:shadow-lg dark:bg-gray-800 dark:border-gray-700">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Camera className="w-5 h-5 mr-2 text-ocean dark:text-ocean-light" />
-                    Live Surf Cams with AI Analysis
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {isLoading ? (
-                    <LoadingSkeleton type="cam" />
-                  ) : (
-                    <RealTimeSurfCam
-                      spotId={spotId}
-                      spotName={spotName}
-                      imageSrc="/placeholder.svg"
-                      cameraStatus={{ 
-                        spotId: spotId,
-                        status: 'LIVE', 
-                        lastChecked: new Date().toISOString(),
-                        isValid: true
-                      }}
-                      metadata={{
-                        lat: 34.0259,
-                        lon: -118.7798,
-                        country: 'USA',
-                        state: 'California',
-                        waveType: 'Point Break',
-                        difficulty: 'Intermediate',
-                        bestSwellDirection: 'W-SW',
-                        bestWind: 'Offshore',
-                        bestTide: 'Mid',
-                        crowdFactor: 'Moderate',
-                        liveCam: 'https://example.com/cam',
-                        cameraStatus: 'LIVE'
-                      }}
-                    />
-                  )}
-                </CardContent>
-              </Card>
-            </AnimatedTabsContent>
+        <TabsContent value="surf-coach">
+          <PersonalSurfCoach />
+        </TabsContent>
 
-            {/* Other tab contents with loading states */}
-            <AnimatedTabsContent value="booking">
-              {isLoading ? (
-                <LoadingSkeleton type="card" count={3} />
-              ) : (
-                <BookingMarketplace spotId={spotId} spotName={spotName} />
-              )}
-            </AnimatedTabsContent>
-
-            <AnimatedTabsContent value="community">
-              {isLoading ? (
-                <LoadingSkeleton type="list" />
-              ) : (
-                <SocialCommunityHub spotId={spotId} spotName={spotName} />
-              )}
-            </AnimatedTabsContent>
-
-            <AnimatedTabsContent value="voice">
-              {isLoading ? (
-                <LoadingSkeleton type="card" />
-              ) : (
-                <VoiceCommandSystem
-                  onSpotQuery={handleSpotQuery}
-                  onConditionCheck={handleConditionCheck}
-                  onBookingRequest={handleBookingRequest}
-                />
-              )}
-            </AnimatedTabsContent>
-
-            <AnimatedTabsContent value="session">
-              {isLoading ? (
-                <LoadingSkeleton type="card" count={2} />
-              ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <SessionLogger
-                    currentSpot={spotName}
-                    onSessionSaved={handleSessionSaved}
-                  />
-                  <WearableIntegration />
-                </div>
-              )}
-            </AnimatedTabsContent>
-
-            <AnimatedTabsContent value="ar">
-              {isLoading ? (
-                <LoadingSkeleton type="card" />
-              ) : (
-                <AROverlaySystem />
-              )}
-            </AnimatedTabsContent>
-
-            <AnimatedTabsContent value="analytics">
-              {isLoading ? (
-                <LoadingSkeleton type="chart" count={4} />
-              ) : (
-                <AdvancedAnalyticsDashboard />
-              )}
-            </AnimatedTabsContent>
-
-            {/* New API Configuration Tab */}
-            <AnimatedTabsContent value="api-config">
-              {isLoading ? (
-                <LoadingSkeleton type="card" />
-              ) : (
-                <ApiConfigPanel />
-              )}
-            </AnimatedTabsContent>
-
-            {/* New Notifications Tab */}
-            <AnimatedTabsContent value="notifications">
-              {isLoading ? (
-                <LoadingSkeleton type="card" />
-              ) : (
-                <NotificationSettings />
-              )}
-            </AnimatedTabsContent>
-          </AnimatedTabs>
-        </div>
-      </div>
+        <TabsContent value="compliance">
+          <ComplianceAuditDashboard />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
