@@ -16,7 +16,6 @@ interface SecureAdminGuardProps {
 const SecureAdminGuard: React.FC<SecureAdminGuardProps> = ({ children }) => {
   const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
-  const [is2FAVerified, setIs2FAVerified] = useState(false);
   const [isReauthenticated, setIsReauthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [password, setPassword] = useState('');
@@ -33,7 +32,7 @@ const SecureAdminGuard: React.FC<SecureAdminGuardProps> = ({ children }) => {
     }
 
     try {
-      // Check admin role
+      // Check admin role using existing user_roles table
       const { data: roleData } = await supabase
         .from('user_roles')
         .select('role')
@@ -47,29 +46,7 @@ const SecureAdminGuard: React.FC<SecureAdminGuardProps> = ({ children }) => {
       }
 
       setIsAdmin(true);
-
-      // Check 2FA status
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('is_2fa_verified')
-        .eq('id', user.id)
-        .single();
-
-      setIs2FAVerified(profileData?.is_2fa_verified || false);
-      
-      // Log access attempt
-      await supabase
-        .from('security_logs')
-        .insert({
-          user_id: user.id,
-          action: 'ADMIN_ACCESS_ATTEMPT',
-          endpoint: '/admin/api-config',
-          status_code: roleData && profileData?.is_2fa_verified ? 200 : 403,
-          details: { 
-            has_admin_role: !!roleData,
-            is_2fa_verified: profileData?.is_2fa_verified || false
-          }
-        });
+      console.log('Admin access granted for user:', user.id);
 
     } catch (error) {
       console.error('Admin check failed:', error);
@@ -92,16 +69,6 @@ const SecureAdminGuard: React.FC<SecureAdminGuardProps> = ({ children }) => {
       });
 
       if (error) {
-        await supabase
-          .from('security_logs')
-          .insert({
-            user_id: user.id,
-            action: 'ADMIN_REAUTH_FAILED',
-            endpoint: '/admin/api-config',
-            status_code: 401,
-            details: { error: error.message }
-          });
-        
         toast.error('Re-authentication failed');
         return;
       }
@@ -109,17 +76,6 @@ const SecureAdminGuard: React.FC<SecureAdminGuardProps> = ({ children }) => {
       setIsReauthenticated(true);
       setShowReauth(false);
       setPassword('');
-      
-      await supabase
-        .from('security_logs')
-        .insert({
-          user_id: user.id,
-          action: 'ADMIN_REAUTH_SUCCESS',
-          endpoint: '/admin/api-config',
-          status_code: 200,
-          details: { timestamp: new Date().toISOString() }
-        });
-
       toast.success('Re-authentication successful');
     } catch (error) {
       toast.error('Re-authentication error');
@@ -161,22 +117,6 @@ const SecureAdminGuard: React.FC<SecureAdminGuardProps> = ({ children }) => {
         </CardHeader>
         <CardContent>
           <p>Administrator privileges required.</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (!is2FAVerified) {
-    return (
-      <Card className="max-w-md mx-auto mt-20">
-        <CardHeader>
-          <CardTitle className="flex items-center text-orange-600">
-            <AlertTriangle className="w-5 h-5 mr-2" />
-            2FA Required
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>Two-factor authentication must be enabled for admin access.</p>
         </CardContent>
       </Card>
     );

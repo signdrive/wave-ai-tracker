@@ -24,8 +24,9 @@ const PremiumGate: React.FC<PremiumGateProps> = ({ children }) => {
     }
 
     try {
+      // Use the existing subscriptions table
       const { data: subscription } = await supabase
-        .from('user_subscriptions')
+        .from('subscriptions')
         .select('status, expires_at')
         .eq('user_id', user.id)
         .eq('status', 'active')
