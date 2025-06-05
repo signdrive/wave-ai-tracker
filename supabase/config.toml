@@ -41,3 +41,9 @@ verify_jwt = true
 
 [functions.customer-portal]
 verify_jwt = true
+
+[functions.get-api-keys]
+verify_jwt = true
+
+[functions.validate-cam-feed]
+verify_jwt = false

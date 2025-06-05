@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -37,52 +38,93 @@ export const useAuth = () => {
   useEffect(() => {
     let mounted = true;
 
-    // Handle OAuth tokens in URL hash (for Google OAuth)
+    // Enhanced OAuth token handling for better cross-device persistence
     const handleOAuthTokens = async () => {
-      if (window.location.hash) {
+      const hash = window.location.hash;
+      const search = window.location.search;
+      
+      if (hash || search) {
         try {
           const { data, error } = await supabase.auth.getSession();
           if (error) {
-            console.error('Error handling OAuth tokens:', error);
+            console.error('OAuth token handling error:', error);
+            setAuthState(prev => ({ ...prev, error, loading: false }));
           } else if (data.session) {
             console.log('OAuth session established:', data.session.user.email);
-            // Clear the hash from URL
+            // Store session persistence flag
+            localStorage.setItem('supabase.auth.token', 'true');
+            // Clear URL fragments for cleaner navigation
             window.history.replaceState(null, '', window.location.pathname);
           }
         } catch (error) {
           console.error('Unexpected OAuth error:', error);
+          setAuthState(prev => ({ 
+            ...prev, 
+            error: error as AuthError, 
+            loading: false 
+          }));
         }
       }
     };
 
-    // Set up auth state listener FIRST
+    // Enhanced auth state listener with better error handling
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!mounted) return;
 
         console.log('Auth state change:', event, session?.user?.email);
         
-        // Update state synchronously
-        setAuthState({
-          user: session?.user ?? null,
-          session,
-          loading: false,
-          error: null
-        });
-
-        // Check subscription status after successful authentication
-        if (session && event === 'SIGNED_IN') {
-          setTimeout(() => {
-            checkSubscriptionStatus(session);
-          }, 0);
+        // Handle different auth events
+        switch (event) {
+          case 'SIGNED_IN':
+            setAuthState({
+              user: session?.user ?? null,
+              session,
+              loading: false,
+              error: null
+            });
+            
+            // Set session persistence
+            if (session) {
+              localStorage.setItem('supabase.auth.token', 'true');
+              setTimeout(() => checkSubscriptionStatus(session), 0);
+            }
+            break;
+            
+          case 'SIGNED_OUT':
+            setAuthState({
+              user: null,
+              session: null,
+              loading: false,
+              error: null
+            });
+            localStorage.removeItem('supabase.auth.token');
+            break;
+            
+          case 'TOKEN_REFRESHED':
+            setAuthState({
+              user: session?.user ?? null,
+              session,
+              loading: false,
+              error: null
+            });
+            break;
+            
+          default:
+            setAuthState({
+              user: session?.user ?? null,
+              session,
+              loading: false,
+              error: null
+            });
         }
       }
     );
 
-    // Handle OAuth tokens if present
+    // Handle OAuth tokens first
     handleOAuthTokens();
 
-    // THEN check for existing session
+    // Then check for existing session with enhanced error handling
     const getInitialSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
@@ -91,6 +133,8 @@ export const useAuth = () => {
 
         if (error) {
           console.error('Initial session error:', error);
+          // Clear potentially corrupted session data
+          localStorage.removeItem('supabase.auth.token');
           setAuthState({
             user: null,
             session: null,
@@ -105,17 +149,16 @@ export const useAuth = () => {
             error: null
           });
 
-          // Check subscription status for existing session
           if (session) {
-            setTimeout(() => {
-              checkSubscriptionStatus(session);
-            }, 0);
+            localStorage.setItem('supabase.auth.token', 'true');
+            setTimeout(() => checkSubscriptionStatus(session), 0);
           }
         }
       } catch (error) {
         if (!mounted) return;
         
         console.error('Unexpected session error:', error);
+        localStorage.removeItem('supabase.auth.token');
         setAuthState({
           user: null,
           session: null,
@@ -192,7 +235,7 @@ export const useAuth = () => {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/`,
+          redirectTo: `${window.location.origin}/auth/callback`,
           queryParams: {
             access_type: 'offline',
             prompt: 'consent',
@@ -211,6 +254,7 @@ export const useAuth = () => {
   const signOut = async () => {
     try {
       clearError();
+      localStorage.removeItem('supabase.auth.token');
       const { error } = await supabase.auth.signOut();
       return { error };
     } catch (error) {
