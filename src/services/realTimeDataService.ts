@@ -1,3 +1,4 @@
+import { supabase } from '@/integrations/supabase/client';
 
 // Real-time data service for eliminating mock data
 interface RealWaveData {
