@@ -13,28 +13,23 @@ const AuthCallback: React.FC = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Handle OAuth callback with URL parameters
+        // Handle the OAuth callback properly
         const { data, error } = await supabase.auth.getSession();
         
         if (error) {
           console.error('Auth callback error:', error);
-          
-          // Check for specific error messages
-          if (error.message.includes('invalid_request') || error.message.includes('access_denied')) {
-            navigate('/mentorship?error=access_denied', { replace: true });
-          } else {
-            navigate('/mentorship?error=auth_failed', { replace: true });
-          }
+          navigate('/mentorship?error=auth_failed', { replace: true });
           return;
         }
 
         if (data.session) {
           console.log('Successfully authenticated user:', data.session.user.email);
+          // Store session persistence flag
+          localStorage.setItem('supabase.auth.token', 'true');
           // Successfully authenticated, redirect to dashboard
           navigate('/', { replace: true });
         } else {
           console.log('No session found, redirecting to mentorship');
-          // No session found, redirect to login
           navigate('/mentorship', { replace: true });
         }
       } catch (error) {
@@ -43,13 +38,11 @@ const AuthCallback: React.FC = () => {
       }
     };
 
-    // Add a small delay to ensure the URL parameters are processed
-    const timer = setTimeout(handleAuthCallback, 100);
-    
-    return () => clearTimeout(timer);
-  }, [navigate, searchParams]);
+    // Handle OAuth callback immediately
+    handleAuthCallback();
+  }, [navigate]);
 
-  // Check for error parameters
+  // Check for error parameters from OAuth flow
   const errorParam = searchParams.get('error');
   const errorDescription = searchParams.get('error_description');
 

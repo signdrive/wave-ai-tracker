@@ -38,35 +38,6 @@ export const useAuth = () => {
   useEffect(() => {
     let mounted = true;
 
-    // Enhanced OAuth token handling for better cross-device persistence
-    const handleOAuthTokens = async () => {
-      const hash = window.location.hash;
-      const search = window.location.search;
-      
-      if (hash || search) {
-        try {
-          const { data, error } = await supabase.auth.getSession();
-          if (error) {
-            console.error('OAuth token handling error:', error);
-            setAuthState(prev => ({ ...prev, error, loading: false }));
-          } else if (data.session) {
-            console.log('OAuth session established:', data.session.user.email);
-            // Store session persistence flag
-            localStorage.setItem('supabase.auth.token', 'true');
-            // Clear URL fragments for cleaner navigation
-            window.history.replaceState(null, '', window.location.pathname);
-          }
-        } catch (error) {
-          console.error('Unexpected OAuth error:', error);
-          setAuthState(prev => ({ 
-            ...prev, 
-            error: error as AuthError, 
-            loading: false 
-          }));
-        }
-      }
-    };
-
     // Enhanced auth state listener with better error handling
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
@@ -121,10 +92,7 @@ export const useAuth = () => {
       }
     );
 
-    // Handle OAuth tokens first
-    handleOAuthTokens();
-
-    // Then check for existing session with enhanced error handling
+    // Check for existing session with enhanced error handling
     const getInitialSession = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
