@@ -53,7 +53,7 @@ const NavBar = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2 font-bold text-xl text-ocean dark:text-ocean-light">
               <Waves className="w-8 h-8" />
-              <span>WaveFinder</span>
+              <span>WaveMentor</span>
             </Link>
 
             {/* Desktop Navigation */}

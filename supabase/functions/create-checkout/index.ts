@@ -57,8 +57,8 @@ serve(async (req) => {
 
     // Define price IDs for your plans (using your actual Stripe Price IDs)
     const priceIds = {
-      pro: "price_1RWGAQEI0WeG2rlCqyEoE3So", // Wave AI Pro - $9.99 USD
-      elite: "price_1RWGBPEI0WeG2rlC1Gc6lN8c" // Wave AI Elite - €24.99 EUR
+      pro: "price_1RWGAQEI0WeG2rlCqyEoE3So", // WaveMentor Pro - $9.99 USD
+      elite: "price_1RWGBPEI0WeG2rlC1Gc6lN8c" // WaveMentor Elite - €24.99 EUR
     };
 
     const priceId = priceIds[planType as keyof typeof priceIds];

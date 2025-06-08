@@ -51,7 +51,7 @@ serve(async (req) => {
       logStep("No customer found, updating unsubscribed state");
       await supabaseClient.from("subscriptions").upsert({
         user_id: user.id,
-        plan_name: 'free',
+        plan_name: 'Wave Tracker',
         status: 'inactive',
         expires_at: null,
         updated_at: new Date().toISOString(),
@@ -71,7 +71,7 @@ serve(async (req) => {
       limit: 1,
     });
     const hasActiveSub = subscriptions.data.length > 0;
-    let subscriptionTier = 'free';
+    let subscriptionTier = 'Wave Tracker';
     let subscriptionEnd = null;
 
     if (hasActiveSub) {
@@ -85,9 +85,9 @@ serve(async (req) => {
       const amount = price.unit_amount || 0;
       
       if (amount >= 2400) { // €24.99 or equivalent
-        subscriptionTier = "Wave AI Elite";
+        subscriptionTier = "WaveMentor Elite";
       } else if (amount >= 900) { // $9.99 or equivalent
-        subscriptionTier = "Wave AI Pro";
+        subscriptionTier = "WaveMentor Pro";
       } else {
         subscriptionTier = "Wave Tracker";
       }

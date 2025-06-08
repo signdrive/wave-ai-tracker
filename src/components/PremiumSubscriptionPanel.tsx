@@ -128,7 +128,7 @@ const PremiumSubscriptionPanel = () => {
       planType: null,
     },
     {
-      name: 'Wave AI Pro',
+      name: 'WaveMentor Pro',
       price: '$9.99',
       period: '/month',
       description: 'For serious wave hunters',
@@ -144,12 +144,12 @@ const PremiumSubscriptionPanel = () => {
         { name: 'Advanced weather models', included: true },
         { name: 'Crowd level predictions', included: true },
       ],
-      buttonText: currentPlan === 'Wave AI Pro' ? 'Current Plan' : 'Upgrade to Pro',
+      buttonText: currentPlan === 'WaveMentor Pro' ? 'Current Plan' : 'Upgrade to Pro',
       buttonVariant: 'default' as const,
       planType: 'pro' as const,
     },
     {
-      name: 'Wave AI Elite',
+      name: 'WaveMentor Elite',
       price: '€24.99',
       period: '/month',
       description: 'Ultimate surf intelligence',
@@ -168,7 +168,7 @@ const PremiumSubscriptionPanel = () => {
         { name: 'API access for developers', included: true },
         { name: 'Priority booking slots', included: true },
       ],
-      buttonText: currentPlan === 'Wave AI Elite' ? 'Current Plan' : 'Upgrade to Elite',
+      buttonText: currentPlan === 'WaveMentor Elite' ? 'Current Plan' : 'Upgrade to Elite',
       buttonVariant: 'default' as const,
       planType: 'elite' as const,
     },
@@ -178,7 +178,7 @@ const PremiumSubscriptionPanel = () => {
     <div className="py-12">
       <div className="text-center mb-12">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-          Choose Your Wave AI Plan
+          Choose Your WaveMentor Plan
         </h2>
         <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
           Get AI-powered surf forecasts, premium features, and exclusive access to the best waves.
