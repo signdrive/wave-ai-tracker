@@ -54,9 +54,17 @@ class SecureApiKeyManager {
         throw new Error('Invalid API key input');
       }
 
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        console.error('User not authenticated:', userError);
+        return false;
+      }
+
       const { error } = await supabase
         .from('api_keys')
         .insert({
+          user_id: user.id,
           service_name: serviceName,
           key_name: keyName,
           key_value: keyValue, // Will be encrypted by trigger
@@ -79,10 +87,18 @@ class SecureApiKeyManager {
 
   async deactivateApiKey(serviceName: string): Promise<boolean> {
     try {
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        console.error('User not authenticated:', userError);
+        return false;
+      }
+
       const { error } = await supabase
         .from('api_keys')
         .update({ is_active: false })
-        .eq('service_name', serviceName);
+        .eq('service_name', serviceName)
+        .eq('user_id', user.id);
 
       if (error) {
         console.error('Failed to deactivate API key:', error);
