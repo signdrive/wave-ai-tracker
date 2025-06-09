@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -127,7 +126,7 @@ const SecureInputField: React.FC<SecureInputFieldProps> = ({
         <span>{label}</span>
         {required && <span className="text-red-500">*</span>}
         {isSafe && !error && value && (
-          <Shield className="w-3 h-3 text-green-500" title="Input is secure" />
+          <Shield className="w-3 h-3 text-green-500" />
         )}
       </Label>
       

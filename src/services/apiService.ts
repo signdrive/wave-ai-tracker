@@ -1,4 +1,6 @@
 // API service for handling all external data sources
+import { secureApiKeyManager } from './secureApiKeyManager';
+
 interface SurfCondition {
   location: string;
   waveHeight: number;

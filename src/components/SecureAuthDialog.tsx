@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -137,7 +136,7 @@ const SecureAuthDialog: React.FC<SecureAuthDialogProps> = ({ open, onOpenChange 
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <span>Welcome to WaveMentor</span>
-            <Shield className="w-4 h-4 text-green-500" title="Secure Authentication" />
+            <Shield className="w-4 h-4 text-green-500" />
           </DialogTitle>
         </DialogHeader>
 
