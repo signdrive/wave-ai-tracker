@@ -72,7 +72,7 @@ interface SurfForecast {
 class ApiService {
   private surflineApiKey: string = '';
   private tidesApiKey: string = '';
-  private weatherApiKey: string = '1ccbc1f726134bf499f222242252805';
+  private weatherApiKey: string = ''; // Removed hardcoded key
   private baseUrls = {
     surfline: 'https://services.surfline.com/kbyg',
     noaa: 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter',
@@ -80,6 +80,13 @@ class ApiService {
     openweather: 'https://api.openweathermap.org/data/2.5',
     weatherapi: 'https://api.weatherapi.com/v1'
   };
+
+  async initializeApiKeys() {
+    // Load API keys securely from the key manager
+    this.weatherApiKey = await secureApiKeyManager.getApiKey('weatherapi') || '';
+    this.surflineApiKey = await secureApiKeyManager.getApiKey('surfline') || '';
+    this.tidesApiKey = await secureApiKeyManager.getApiKey('tides') || '';
+  }
 
   setApiKeys(keys: { surfline?: string; tides?: string; weather?: string }) {
     if (keys.surfline) this.surflineApiKey = keys.surfline;
@@ -89,6 +96,11 @@ class ApiService {
 
   async getSurfConditions(spotId: string): Promise<SurfCondition> {
     try {
+      // Ensure API keys are loaded
+      if (!this.weatherApiKey) {
+        await this.initializeApiKeys();
+      }
+
       // Mock data for now - replace with actual API calls once keys are provided
       const mockData: SurfCondition = {
         location: `Spot ${spotId}`,
@@ -491,4 +503,4 @@ class ApiService {
 }
 
 export const apiService = new ApiService();
-export type { SurfCondition, WeatherData, TideData, WavePoolSlot, SurfForecast, ForecastDay };
+export type { SurfCondition, WeatherData, TideData, WavePoolSlot, ForecastDay, SurfForecast };
