@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -92,11 +91,7 @@ const SecureApiKeyManagement: React.FC = () => {
     setLoading(prev => ({ ...prev, [service]: true }));
 
     try {
-      const success = await secureApiKeyManager.storeApiKey(
-        service,
-        `${service}_api_key`,
-        keyValue.trim()
-      );
+      const success = await secureApiKeyManager.setApiKey(service, keyValue.trim());
 
       if (success) {
         toast.success(`${service} API key saved securely`);

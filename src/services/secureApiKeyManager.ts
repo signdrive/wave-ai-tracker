@@ -34,12 +34,12 @@ class SecureApiKeyManager {
         return null;
       }
 
-      // Fetch from database
+      // Fetch from database using correct column names
       const { data, error } = await supabase
         .from('api_keys')
-        .select('key')
-        .eq('service', service)
-        .eq('active', true)
+        .select('key_value')
+        .eq('service_name', service)
+        .eq('is_active', true)
         .single();
 
       if (error || !data) {
@@ -48,12 +48,12 @@ class SecureApiKeyManager {
       }
 
       // Cache the key
-      this.setCachedKey(service, data.key);
+      this.setCachedKey(service, data.key_value);
       
       // Update last used timestamp
       await this.updateLastUsed(service);
 
-      return data.key;
+      return data.key_value;
     } catch (error) {
       console.error('Error fetching API key:', error);
       await securityService.logSecurityEvent({
@@ -83,16 +83,23 @@ class SecureApiKeyManager {
         throw new Error('Invalid API key format');
       }
 
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('No authenticated user');
+      }
+
       // Sanitize service name
       const sanitizedService = service.replace(/[^a-zA-Z0-9_-]/g, '');
 
       const { error } = await supabase
         .from('api_keys')
         .upsert({
-          service: sanitizedService,
-          key: key,
-          encrypted: false, // In production, this should be encrypted
-          active: true,
+          service_name: sanitizedService,
+          key_name: `${sanitizedService}_api_key`,
+          key_value: key,
+          user_id: user.id,
+          is_active: true,
           updated_at: new Date().toISOString()
         });
 
@@ -114,6 +121,53 @@ class SecureApiKeyManager {
       console.error('Error setting API key:', error);
       await securityService.logSecurityEvent({
         event_type: 'api_key_update_error',
+        severity: 'high',
+        details: { service, error: error instanceof Error ? error.message : 'Unknown error' }
+      });
+      return false;
+    }
+  }
+
+  async storeApiKey(service: string, keyName: string, keyValue: string): Promise<boolean> {
+    return this.setApiKey(service, keyValue);
+  }
+
+  async deactivateApiKey(service: string): Promise<boolean> {
+    try {
+      // Validate admin role
+      const isAdmin = await securityService.checkUserRole('admin');
+      if (!isAdmin) {
+        await securityService.logSecurityEvent({
+          event_type: 'unauthorized_api_key_modification',
+          severity: 'critical',
+          details: { service }
+        });
+        return false;
+      }
+
+      const { error } = await supabase
+        .from('api_keys')
+        .update({ is_active: false, updated_at: new Date().toISOString() })
+        .eq('service_name', service);
+
+      if (error) {
+        throw error;
+      }
+
+      // Clear cache for this service
+      this.clearCachedKey(service);
+
+      await securityService.logSecurityEvent({
+        event_type: 'api_key_deactivated',
+        severity: 'medium',
+        details: { service }
+      });
+
+      return true;
+    } catch (error) {
+      console.error('Error deactivating API key:', error);
+      await securityService.logSecurityEvent({
+        event_type: 'api_key_deactivation_error',
         severity: 'high',
         details: { service, error: error instanceof Error ? error.message : 'Unknown error' }
       });
@@ -144,8 +198,8 @@ class SecureApiKeyManager {
     try {
       await supabase
         .from('api_keys')
-        .update({ last_used: new Date().toISOString() })
-        .eq('service', service);
+        .update({ updated_at: new Date().toISOString() })
+        .eq('service_name', service);
     } catch (error) {
       // Non-critical error, just log it
       console.warn('Failed to update last_used timestamp:', error);
