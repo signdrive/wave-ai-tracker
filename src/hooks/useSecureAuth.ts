@@ -4,6 +4,7 @@ import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { securityService } from '@/services/securityService';
 import { InputValidator } from '@/utils/inputValidator';
+import { secureSessionManager } from '@/utils/secureSessionManager';
 
 interface SecureAuthState {
   user: User | null;
@@ -28,7 +29,10 @@ export const useSecureAuth = () => {
       return;
     }
 
-    const isValid = await securityService.validateSession();
+    const isValidSupabase = await securityService.validateSession();
+    const isValidSecure = await secureSessionManager.validateSession();
+    const isValid = isValidSupabase && isValidSecure;
+    
     setAuthState(prev => ({ 
       ...prev, 
       session, 
@@ -43,6 +47,12 @@ export const useSecureAuth = () => {
         severity: 'high',
         details: { session_id: session.access_token.substring(0, 10) + '...' }
       });
+      
+      // Invalidate the session
+      await secureSessionManager.invalidateSession('Security validation failed');
+    } else if (isValid && !isValidSecure) {
+      // Initialize secure session if Supabase session is valid but secure session isn't
+      await secureSessionManager.initializeSession(session.user.id);
     }
   }, []);
 
@@ -57,11 +67,15 @@ export const useSecureAuth = () => {
         
         switch (event) {
           case 'SIGNED_IN':
+            if (session) {
+              await secureSessionManager.initializeSession(session.user.id);
+            }
             await validateAndSetSession(session);
             setAuthState(prev => ({ ...prev, loading: false, error: null }));
             break;
             
           case 'SIGNED_OUT':
+            await secureSessionManager.invalidateSession('User signed out');
             setAuthState({
               user: null,
               session: null,
@@ -156,6 +170,7 @@ export const useSecureAuth = () => {
           details: { email: sanitizedEmail, error: error.message }
         });
       } else if (data.session) {
+        await secureSessionManager.initializeSession(data.session.user.id);
         await securityService.logSecurityEvent({
           user_id: data.session.user.id,
           event_type: 'successful_login',
@@ -227,8 +242,6 @@ export const useSecureAuth = () => {
 
   const secureSignOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      
       if (authState.user) {
         await securityService.logSecurityEvent({
           user_id: authState.user.id,
@@ -237,6 +250,9 @@ export const useSecureAuth = () => {
           details: {}
         });
       }
+      
+      await secureSessionManager.invalidateSession('User logged out');
+      const { error } = await supabase.auth.signOut();
 
       return { error };
     } catch (error) {

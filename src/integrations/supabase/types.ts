@@ -301,54 +301,54 @@ export type Database = {
       }
       parking_spots: {
         Row: {
-          address: string
+          address: string | null
           confidence_score: number | null
           created_at: string | null
           expires_at: string | null
-          id: number
+          id: string
           is_available: boolean | null
           latitude: number
-          location: unknown
+          location: unknown | null
           longitude: number
           max_duration_hours: number | null
           price_per_hour: number | null
           reported_by: string | null
           restrictions: string[] | null
-          spot_type: string
+          spot_type: string | null
           updated_at: string | null
         }
         Insert: {
-          address: string
+          address?: string | null
           confidence_score?: number | null
           created_at?: string | null
           expires_at?: string | null
-          id?: number
+          id?: string
           is_available?: boolean | null
           latitude: number
-          location: unknown
+          location?: unknown | null
           longitude: number
           max_duration_hours?: number | null
           price_per_hour?: number | null
           reported_by?: string | null
           restrictions?: string[] | null
-          spot_type: string
+          spot_type?: string | null
           updated_at?: string | null
         }
         Update: {
-          address?: string
+          address?: string | null
           confidence_score?: number | null
           created_at?: string | null
           expires_at?: string | null
-          id?: number
+          id?: string
           is_available?: boolean | null
           latitude?: number
-          location?: unknown
+          location?: unknown | null
           longitude?: number
           max_duration_hours?: number | null
           price_per_hour?: number | null
           reported_by?: string | null
           restrictions?: string[] | null
-          spot_type?: string
+          spot_type?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -536,24 +536,96 @@ export type Database = {
       }
       spot_reports: {
         Row: {
-          description: string | null
-          id: number
-          location: string | null
-          report_date: string
+          created_at: string | null
+          id: string
+          notes: string | null
+          photo_url: string | null
+          report_type: string
+          reporter_id: string | null
+          spot_id: string | null
+          verified: boolean | null
         }
         Insert: {
-          description?: string | null
-          id?: number
-          location?: string | null
-          report_date: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          photo_url?: string | null
+          report_type: string
+          reporter_id?: string | null
+          spot_id?: string | null
+          verified?: boolean | null
         }
         Update: {
-          description?: string | null
-          id?: number
-          location?: string | null
-          report_date?: string
+          created_at?: string | null
+          id?: string
+          notes?: string | null
+          photo_url?: string | null
+          report_type?: string
+          reporter_id?: string | null
+          spot_id?: string | null
+          verified?: boolean | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "spot_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "spot_reports_spot_id_fkey"
+            columns: ["spot_id"]
+            isOneToOne: false
+            referencedRelation: "parking_spots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      spot_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string | null
+          helpful_votes: number | null
+          id: string
+          rating: number
+          reviewer_id: string | null
+          spot_id: string | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string | null
+          helpful_votes?: number | null
+          id?: string
+          rating: number
+          reviewer_id?: string | null
+          spot_id?: string | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string | null
+          helpful_votes?: number | null
+          id?: string
+          rating?: number
+          reviewer_id?: string | null
+          spot_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spot_reviews_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "spot_reviews_spot_id_fkey"
+            columns: ["spot_id"]
+            isOneToOne: false
+            referencedRelation: "parking_spots"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       subscriptions: {
         Row: {

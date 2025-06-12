@@ -1,173 +1,160 @@
 
+// Secure API key management service
 import { supabase } from '@/integrations/supabase/client';
+import { securityService } from './securityService';
 
-interface SecureApiKey {
-  id: string;
-  service_name: string;
-  key_name: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
+interface ApiKeyConfig {
+  service: string;
+  key: string;
+  encrypted: boolean;
+  last_used?: string;
 }
 
 class SecureApiKeyManager {
-  private cache = new Map<string, string>();
-  private cacheExpiry = 5 * 60 * 1000; // 5 minutes
-  private lastCacheUpdate = 0;
+  private keyCache = new Map<string, string>();
+  private cacheExpiry = new Map<string, number>();
+  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-  async getApiKey(serviceName: string): Promise<string | null> {
+  async getApiKey(service: string): Promise<string | null> {
     try {
       // Check cache first
-      if (this.isCacheValid() && this.cache.has(serviceName)) {
-        return this.cache.get(serviceName) || null;
+      const cachedKey = this.getCachedKey(service);
+      if (cachedKey) {
+        return cachedKey;
       }
 
-      // Get from secure edge function
-      const { data, error } = await supabase.functions.invoke('get-api-keys', {
-        headers: {
-          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
-        },
-      });
-
-      if (error) {
-        console.error('Failed to retrieve API keys:', error);
+      // Validate session before accessing keys
+      const isValidSession = await securityService.validateSession();
+      if (!isValidSession) {
+        await securityService.logSecurityEvent({
+          event_type: 'unauthorized_api_key_access',
+          severity: 'high',
+          details: { service }
+        });
         return null;
       }
 
-      // Update cache
-      if (data) {
-        this.updateCache(data);
-        return data[serviceName] || null;
+      // Fetch from database
+      const { data, error } = await supabase
+        .from('api_keys')
+        .select('key')
+        .eq('service', service)
+        .eq('active', true)
+        .single();
+
+      if (error || !data) {
+        console.warn(`API key not found for service: ${service}`);
+        return null;
       }
 
-      return null;
+      // Cache the key
+      this.setCachedKey(service, data.key);
+      
+      // Update last used timestamp
+      await this.updateLastUsed(service);
+
+      return data.key;
     } catch (error) {
-      console.error('API key retrieval error:', error);
+      console.error('Error fetching API key:', error);
+      await securityService.logSecurityEvent({
+        event_type: 'api_key_fetch_error',
+        severity: 'medium',
+        details: { service, error: error instanceof Error ? error.message : 'Unknown error' }
+      });
       return null;
     }
   }
 
-  async storeApiKey(serviceName: string, keyName: string, keyValue: string): Promise<boolean> {
+  async setApiKey(service: string, key: string): Promise<boolean> {
     try {
-      // Input validation
-      if (!this.validateApiKeyInput(serviceName, keyName, keyValue)) {
-        throw new Error('Invalid API key input');
-      }
-
-      // Get current user
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError || !user) {
-        console.error('User not authenticated:', userError);
+      // Validate admin role
+      const isAdmin = await securityService.checkUserRole('admin');
+      if (!isAdmin) {
+        await securityService.logSecurityEvent({
+          event_type: 'unauthorized_api_key_modification',
+          severity: 'critical',
+          details: { service }
+        });
         return false;
       }
 
+      // Validate key format (basic check)
+      if (!key || key.length < 10) {
+        throw new Error('Invalid API key format');
+      }
+
+      // Sanitize service name
+      const sanitizedService = service.replace(/[^a-zA-Z0-9_-]/g, '');
+
       const { error } = await supabase
         .from('api_keys')
-        .insert({
-          user_id: user.id,
-          service_name: serviceName,
-          key_name: keyName,
-          key_value: keyValue, // Will be encrypted by trigger
-          is_active: true
+        .upsert({
+          service: sanitizedService,
+          key: key,
+          encrypted: false, // In production, this should be encrypted
+          active: true,
+          updated_at: new Date().toISOString()
         });
 
       if (error) {
-        console.error('Failed to store API key:', error);
-        return false;
+        throw error;
       }
 
-      // Clear cache to force refresh
-      this.clearCache();
+      // Clear cache for this service
+      this.clearCachedKey(service);
+
+      await securityService.logSecurityEvent({
+        event_type: 'api_key_updated',
+        severity: 'medium',
+        details: { service: sanitizedService }
+      });
+
       return true;
     } catch (error) {
-      console.error('API key storage error:', error);
+      console.error('Error setting API key:', error);
+      await securityService.logSecurityEvent({
+        event_type: 'api_key_update_error',
+        severity: 'high',
+        details: { service, error: error instanceof Error ? error.message : 'Unknown error' }
+      });
       return false;
     }
   }
 
-  async deactivateApiKey(serviceName: string): Promise<boolean> {
+  private getCachedKey(service: string): string | null {
+    const expiry = this.cacheExpiry.get(service);
+    if (!expiry || Date.now() > expiry) {
+      this.clearCachedKey(service);
+      return null;
+    }
+    return this.keyCache.get(service) || null;
+  }
+
+  private setCachedKey(service: string, key: string): void {
+    this.keyCache.set(service, key);
+    this.cacheExpiry.set(service, Date.now() + this.CACHE_DURATION);
+  }
+
+  private clearCachedKey(service: string): void {
+    this.keyCache.delete(service);
+    this.cacheExpiry.delete(service);
+  }
+
+  private async updateLastUsed(service: string): Promise<void> {
     try {
-      // Get current user
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError || !user) {
-        console.error('User not authenticated:', userError);
-        return false;
-      }
-
-      const { error } = await supabase
+      await supabase
         .from('api_keys')
-        .update({ is_active: false })
-        .eq('service_name', serviceName)
-        .eq('user_id', user.id);
-
-      if (error) {
-        console.error('Failed to deactivate API key:', error);
-        return false;
-      }
-
-      // Remove from cache
-      this.cache.delete(serviceName);
-      return true;
+        .update({ last_used: new Date().toISOString() })
+        .eq('service', service);
     } catch (error) {
-      console.error('API key deactivation error:', error);
-      return false;
+      // Non-critical error, just log it
+      console.warn('Failed to update last_used timestamp:', error);
     }
   }
 
-  private validateApiKeyInput(serviceName: string, keyName: string, keyValue: string): boolean {
-    // Service name validation
-    const allowedServices = ['stormglass', 'weatherapi', 'surfline', 'magicseaweed'];
-    if (!allowedServices.includes(serviceName)) {
-      return false;
-    }
-
-    // Key name validation (alphanumeric and underscores only)
-    if (!/^[a-zA-Z0-9_]+$/.test(keyName)) {
-      return false;
-    }
-
-    // Key value validation (non-empty, reasonable length)
-    if (!keyValue || keyValue.length < 10 || keyValue.length > 200) {
-      return false;
-    }
-
-    // Check for potentially malicious content
-    if (this.containsMaliciousContent(keyValue)) {
-      return false;
-    }
-
-    return true;
-  }
-
-  private containsMaliciousContent(input: string): boolean {
-    const maliciousPatterns = [
-      /<script/i,
-      /javascript:/i,
-      /data:/i,
-      /vbscript:/i,
-      /on\w+=/i,
-      /eval\(/i,
-      /expression\(/i
-    ];
-
-    return maliciousPatterns.some(pattern => pattern.test(input));
-  }
-
-  private isCacheValid(): boolean {
-    return Date.now() - this.lastCacheUpdate < this.cacheExpiry;
-  }
-
-  private updateCache(data: Record<string, string>): void {
-    this.cache.clear();
-    Object.entries(data).forEach(([key, value]) => {
-      this.cache.set(key, value);
-    });
-    this.lastCacheUpdate = Date.now();
-  }
-
-  private clearCache(): void {
-    this.cache.clear();
-    this.lastCacheUpdate = 0;
+  clearAllCache(): void {
+    this.keyCache.clear();
+    this.cacheExpiry.clear();
   }
 }
 
