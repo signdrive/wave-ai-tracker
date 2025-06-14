@@ -13,6 +13,7 @@ import AdminApiConfigPage from '@/pages/AdminApiConfigPage';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import PrivacySettingsPage from '@/pages/PrivacySettingsPage';
 import PrivacyPolicyPage from '@/pages/PrivacyPolicyPage';
+import Footer from '@/components/Footer';
 
 const queryClient = new QueryClient();
 
@@ -21,9 +22,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
         <BrowserRouter>
-          <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+          <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
             <NavBar />
-            <main className="pt-16">
+            <main className="pt-16 flex-grow">
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/live-spots" element={<LiveSpotsPage />} />
@@ -36,6 +37,7 @@ function App() {
                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
               </Routes>
             </main>
+            <Footer />
           </div>
         </BrowserRouter>
       </ThemeProvider>
