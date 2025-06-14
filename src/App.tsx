@@ -10,28 +10,31 @@ import MapPage from '@/pages/MapPage';
 import NavBar from '@/components/NavBar';
 import AdminPage from '@/pages/AdminPage';
 import AdminApiConfigPage from '@/pages/AdminApiConfigPage';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 const queryClient = new QueryClient();
 
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-          <NavBar />
-          <main className="pt-16">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/live-spots" element={<LiveSpotsPage />} />
-              <Route path="/book-sessions" element={<BookSessionsPage />} />
-              <Route path="/surf-log" element={<SurfLogPage />} />
-              <Route path="/map" element={<MapPage />} />
-              <Route path="/admin" element={<AdminPage />} />
-              <Route path="/admin/api-config" element={<AdminApiConfigPage />} />
-            </Routes>
-          </main>
-        </div>
-      </BrowserRouter>
+      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+        <BrowserRouter>
+          <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+            <NavBar />
+            <main className="pt-16">
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/live-spots" element={<LiveSpotsPage />} />
+                <Route path="/book-sessions" element={<BookSessionsPage />} />
+                <Route path="/surf-log" element={<SurfLogPage />} />
+                <Route path="/map" element={<MapPage />} />
+                <Route path="/admin" element={<AdminPage />} />
+                <Route path="/admin/api-config" element={<AdminApiConfigPage />} />
+              </Routes>
+            </main>
+          </div>
+        </BrowserRouter>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
