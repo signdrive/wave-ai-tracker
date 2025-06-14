@@ -11,6 +11,8 @@ import NavBar from '@/components/NavBar';
 import AdminPage from '@/pages/AdminPage';
 import AdminApiConfigPage from '@/pages/AdminApiConfigPage';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import PrivacySettingsPage from '@/pages/PrivacySettingsPage';
+import PrivacyPolicyPage from '@/pages/PrivacyPolicyPage';
 
 const queryClient = new QueryClient();
 
@@ -30,6 +32,8 @@ function App() {
                 <Route path="/map" element={<MapPage />} />
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/admin/api-config" element={<AdminApiConfigPage />} />
+                <Route path="/privacy-settings" element={<PrivacySettingsPage />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
               </Routes>
             </main>
           </div>

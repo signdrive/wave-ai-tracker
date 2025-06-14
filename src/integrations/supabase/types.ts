@@ -144,6 +144,36 @@ export type Database = {
         }
         Relationships: []
       }
+      data_requests: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          request_type: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          request_type: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          request_type?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       fcm_tokens: {
         Row: {
           active: boolean | null
@@ -181,6 +211,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      gdpr_consents: {
+        Row: {
+          consent_type: string
+          created_at: string
+          id: string
+          is_granted: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          consent_type: string
+          created_at?: string
+          id?: string
+          is_granted?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          consent_type?: string
+          created_at?: string
+          id?: string
+          is_granted?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       mentor_availability: {
         Row: {
@@ -1114,6 +1171,10 @@ export type Database = {
           valid_hours?: number
         }
         Returns: string
+      }
+      delete_inactive_user_data: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       disablelongtransactions: {
         Args: Record<PropertyKey, never>

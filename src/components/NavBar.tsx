@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -8,6 +7,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
 import { useMentorship } from '@/hooks/useMentorship';
 import EnhancedAuthDialog from '@/components/EnhancedAuthDialog';
+import { UserNav } from './UserNav';
 
 const NavBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -85,25 +85,7 @@ const NavBar = () => {
               <ThemeToggle />
               
               {user ? (
-                <div className="flex items-center space-x-3">
-                  {userRole && (
-                    <Badge className={getRoleBadgeColor(userRole)}>
-                      {userRole}
-                    </Badge>
-                  )}
-                  <span className="text-sm text-gray-700 dark:text-gray-300">
-                    {user.email}
-                  </span>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={handleSignOut}
-                    className="flex items-center space-x-1"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>Sign Out</span>
-                  </Button>
-                </div>
+                <UserNav />
               ) : (
                 <Button 
                   onClick={() => setShowAuthDialog(true)}
@@ -152,44 +134,41 @@ const NavBar = () => {
                 );
               })}
               
-              <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2">
-                <div className="flex items-center justify-between px-3 py-2">
-                  <ThemeToggle />
-                  
-                  {user ? (
-                    <div className="flex flex-col items-end space-y-2">
-                      <div className="flex items-center space-x-2">
-                        {userRole && (
-                          <Badge className={getRoleBadgeColor(userRole)}>
-                            {userRole}
-                          </Badge>
-                        )}
-                        <span className="text-sm text-gray-700 dark:text-gray-300">
-                          {user.email}
-                        </span>
-                      </div>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={handleSignOut}
-                        className="flex items-center space-x-1"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        <span>Sign Out</span>
-                      </Button>
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-2 mt-2 space-y-2">
+                {user ? (
+                  <>
+                    <div className="px-3 py-2">
+                      <p className="text-sm font-medium leading-none text-gray-900 dark:text-white">{user.user_metadata?.full_name || user.email}</p>
+                      <p className="text-xs leading-none text-gray-500 dark:text-gray-400">
+                        {user.email}
+                      </p>
+                      {userRole && <Badge className={`${getRoleBadgeColor(userRole)} mt-2`}>{userRole}</Badge>}
                     </div>
-                  ) : (
-                    <Button 
-                      onClick={() => {
-                        setShowAuthDialog(true);
-                        setIsMenuOpen(false);
-                      }}
-                      className="bg-ocean hover:bg-ocean-dark"
-                    >
-                      <User className="w-4 h-4 mr-1" />
-                      Sign In
-                    </Button>
-                  )}
+
+                    <Link to="/privacy-settings" onClick={() => setIsMenuOpen(false)} className="flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
+                      <Shield className="w-4 h-4" />
+                      <span>Privacy Settings</span>
+                    </Link>
+
+                    <button onClick={handleSignOut} className="w-full text-left flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
+                      <LogOut className="w-4 h-4" />
+                      <span>Sign Out</span>
+                    </button>
+                  </>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      setShowAuthDialog(true);
+                      setIsMenuOpen(false);
+                    }}
+                    className="w-full bg-ocean hover:bg-ocean-dark"
+                  >
+                    <User className="w-4 h-4 mr-1" />
+                    Sign In
+                  </Button>
+                )}
+                <div className="flex items-center justify-between px-3 py-2 mt-2">
+                  <ThemeToggle />
                 </div>
               </div>
             </div>
