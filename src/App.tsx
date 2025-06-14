@@ -1,49 +1,37 @@
+import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { QueryClient } from 'react-query';
+import { Dashboard } from '@/pages/Dashboard';
+import LiveSpots from '@/pages/LiveSpots';
+import BookSessions from '@/pages/BookSessions';
+import SurfLog from '@/pages/SurfLog';
+import MapPage from '@/pages/MapPage';
+import NavBar from '@/components/NavBar';
+import AdminPage from '@/pages/AdminPage';
+import AuthenticationManager from '@/components/AuthenticationManager';
+import AdminApiConfigPage from '@/pages/AdminApiConfigPage';
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ThemeProvider } from "@/components/ThemeProvider";
-import { Toaster } from "@/components/ui/sonner";
-import Index from "./pages/Index";
-import MapPage from "./pages/MapPage";
-import LiveSpotsPage from "./pages/LiveSpotsPage";
-import BookSessionsPage from "./pages/BookSessionsPage";
-import SurfLogPage from "./pages/SurfLogPage";
-import MentorshipPage from "./pages/MentorshipPage";
-import PremiumPage from "./pages/PremiumPage";
-import AuthCallback from "./pages/AuthCallback";
-import AdminPage from "./pages/AdminPage";
-import AdminApiConfigPage from "./pages/AdminApiConfigPage";
-import AdminSettingsPage from "./pages/AdminSettingsPage";
-import NotFound from "./pages/NotFound";
-
-const queryClient = new QueryClient();
-
-const App = () => {
+function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="light" storageKey="wavefinder-theme">
-        <Toaster />
-        <BrowserRouter>
-          <div className="min-h-screen bg-background">
+    <QueryClient>
+      <BrowserRouter>
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+          <NavBar />
+          <main className="pt-16">
             <Routes>
-              <Route path="/" element={<Index />} />
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/live-spots" element={<LiveSpots />} />
+              <Route path="/book-sessions" element={<BookSessions />} />
+              <Route path="/surf-log" element={<SurfLog />} />
               <Route path="/map" element={<MapPage />} />
-              <Route path="/live-spots" element={<LiveSpotsPage />} />
-              <Route path="/book-sessions" element={<BookSessionsPage />} />
-              <Route path="/surf-log" element={<SurfLogPage />} />
-              <Route path="/mentorship" element={<MentorshipPage />} />
-              <Route path="/premium" element={<PremiumPage />} />
-              <Route path="/auth/callback" element={<AuthCallback />} />
               <Route path="/admin" element={<AdminPage />} />
               <Route path="/admin/api-config" element={<AdminApiConfigPage />} />
-              <Route path="/admin/settings" element={<AdminSettingsPage />} />
-              <Route path="*" element={<NotFound />} />
             </Routes>
-          </div>
-        </BrowserRouter>
-      </ThemeProvider>
-    </QueryClientProvider>
+          </main>
+        </div>
+      </BrowserRouter>
+    </QueryClient>
   );
-};
+}
 
 export default App;

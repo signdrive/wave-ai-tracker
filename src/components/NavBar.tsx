@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Menu, X, Waves, BarChart3, Calendar, Map, User, LogOut, Shield } from 'lucide-react';
+import { Menu, X, Waves, BarChart3, Calendar, Map, User, LogOut, Shield, Settings } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
 import { useMentorship } from '@/hooks/useMentorship';
@@ -29,9 +29,10 @@ const NavBar = () => {
     { path: '/surf-log', label: 'My Surf Log', icon: User, description: 'Session history' },
   ];
 
-  // Add admin link only for admin users
+  // Add admin links for admin users
   const adminNavItems = userRole === 'admin' ? [
-    { path: '/admin', label: 'Admin Panel', icon: Shield, description: 'System administration' }
+    { path: '/admin', label: 'Admin Panel', icon: Shield, description: 'System administration' },
+    { path: '/admin/api-config', label: 'API Config', icon: Settings, description: 'API key management' }
   ] : [];
 
   const allNavItems = [...navItems, ...adminNavItems];

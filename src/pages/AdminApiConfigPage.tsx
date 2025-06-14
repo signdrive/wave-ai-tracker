@@ -1,15 +1,15 @@
 
 import React from 'react';
-import AdminLayout from '@/components/AdminLayout';
+import SecureAdminLayout from '@/components/SecureAdminLayout';
 import SecureApiConfigPanel from '@/components/SecureApiConfigPanel';
 import SecureAdminGuard from '@/components/SecureAdminGuard';
 
 const AdminApiConfigPage: React.FC = () => {
   return (
     <SecureAdminGuard>
-      <AdminLayout>
+      <SecureAdminLayout>
         <SecureApiConfigPanel />
-      </AdminLayout>
+      </SecureAdminLayout>
     </SecureAdminGuard>
   );
 };

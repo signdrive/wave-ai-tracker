@@ -18,6 +18,7 @@ export type Database = {
           longitude: number
           prediction_data: Json
           prediction_type: string
+          user_id: string | null
           valid_until: string
         }
         Insert: {
@@ -28,6 +29,7 @@ export type Database = {
           longitude: number
           prediction_data: Json
           prediction_type: string
+          user_id?: string | null
           valid_until: string
         }
         Update: {
@@ -38,6 +40,7 @@ export type Database = {
           longitude?: number
           prediction_data?: Json
           prediction_type?: string
+          user_id?: string | null
           valid_until?: string
         }
         Relationships: []
@@ -377,6 +380,7 @@ export type Database = {
           total_reports: number | null
           updated_at: string
           user_type: string | null
+          username: string | null
           years_experience: number | null
         }
         Insert: {
@@ -394,6 +398,7 @@ export type Database = {
           total_reports?: number | null
           updated_at?: string
           user_type?: string | null
+          username?: string | null
           years_experience?: number | null
         }
         Update: {
@@ -411,6 +416,7 @@ export type Database = {
           total_reports?: number | null
           updated_at?: string
           user_type?: string | null
+          username?: string | null
           years_experience?: number | null
         }
         Relationships: []
@@ -766,14 +772,17 @@ export type Database = {
         Row: {
           created_at: string | null
           id: number
+          user_id: string
         }
         Insert: {
           created_at?: string | null
           id?: never
+          user_id: string
         }
         Update: {
           created_at?: string | null
           id?: never
+          user_id?: string
         }
         Relationships: []
       }
@@ -798,6 +807,27 @@ export type Database = {
           spot_id?: string
           spot_name?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      user_name: {
+        Row: {
+          created_at: string | null
+          email: string | null
+          id: number
+          username: string
+        }
+        Insert: {
+          created_at?: string | null
+          email?: string | null
+          id?: number
+          username: string
+        }
+        Update: {
+          created_at?: string | null
+          email?: string | null
+          id?: number
+          username?: string
         }
         Relationships: []
       }
