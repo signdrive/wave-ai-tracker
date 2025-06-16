@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -50,26 +49,27 @@ const SimpleSurfSpotMapPage: React.FC = () => {
     return uniqueCountries.sort();
   }, [surfSpots]);
 
-  // Filter spots based on current filters
+  // Filter spots based on current filters with null safety
   const filteredSpots = useMemo(() => {
     return surfSpots.filter(spot => {
-      // Text search
-      if (filters.search !== '') {
+      // Text search with null safety
+      if (filters.search && filters.search.trim() !== '') {
         const searchTerm = filters.search.toLowerCase();
-        const matchesSearch = spot.full_name.toLowerCase().includes(searchTerm) ||
-          spot.country.toLowerCase().includes(searchTerm) ||
-          spot.region.toLowerCase().includes(searchTerm) ||
-          spot.description.toLowerCase().includes(searchTerm);
+        const matchesSearch = 
+          (spot.full_name?.toLowerCase() || '').includes(searchTerm) ||
+          (spot.country?.toLowerCase() || '').includes(searchTerm) ||
+          (spot.region?.toLowerCase() || '').includes(searchTerm) ||
+          (spot.description?.toLowerCase() || '').includes(searchTerm);
         if (!matchesSearch) return false;
       }
 
-      // Country filter
+      // Country filter with null safety
       if (filters.country !== 'all' && spot.country !== filters.country) return false;
 
-      // Difficulty filter
+      // Difficulty filter with null safety
       if (filters.difficulty !== 'all' && spot.difficulty !== filters.difficulty) return false;
 
-      // Break type filter
+      // Break type filter with null safety
       if (filters.break_type !== 'all') {
         const hasBreakType = 
           (filters.break_type === 'point' && spot.point_break) ||
@@ -78,10 +78,10 @@ const SimpleSurfSpotMapPage: React.FC = () => {
         if (!hasBreakType) return false;
       }
 
-      // Crowd level filter
+      // Crowd level filter with null safety
       if (filters.crowd_level !== 'all' && spot.crowd_levels !== filters.crowd_level) return false;
 
-      // Special features
+      // Special features with null safety
       if (filters.big_wave && !spot.big_wave) return false;
       if (filters.longboard_friendly && !spot.longboard_friendly) return false;
       if (filters.kite_surfing && !spot.kite_surfing) return false;
@@ -283,17 +283,17 @@ const SimpleSurfSpotMapPage: React.FC = () => {
                   {filteredSpots.map((spot) => (
                     <div key={spot.id} className="border rounded-lg p-3 hover:bg-gray-50">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-semibold text-ocean-dark">{spot.full_name}</h3>
+                        <h3 className="font-semibold text-ocean-dark">{spot.full_name || 'Unknown Spot'}</h3>
                         <div className="flex space-x-1">
                           {spot.big_wave && <Badge className="bg-red-500 text-xs">Big Wave</Badge>}
                           {spot.longboard_friendly && <Badge className="bg-purple-500 text-xs">Longboard</Badge>}
                           {spot.kite_surfing && <Badge className="bg-green-500 text-xs">Kite</Badge>}
                         </div>
                       </div>
-                      <p className="text-sm text-gray-600 mb-2">{spot.description}</p>
+                      <p className="text-sm text-gray-600 mb-2">{spot.description || 'No description available'}</p>
                       <div className="flex justify-between items-center text-xs text-gray-500">
-                        <span>{spot.region}, {spot.country}</span>
-                        <span>{spot.difficulty} • {spot.crowd_levels} crowd</span>
+                        <span>{spot.region || 'Unknown'}, {spot.country || 'Unknown'}</span>
+                        <span>{spot.difficulty || 'Unknown'} • {spot.crowd_levels || 'Unknown'} crowd</span>
                       </div>
                     </div>
                   ))}
