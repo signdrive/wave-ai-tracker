@@ -1,22 +1,47 @@
 
-import { defineConfig } from "vite";
+import { defineConfig, Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+import process from "process";
+
+// Custom plugin to print server URL and exit
+const printServerUrlAndExitPlugin = (): Plugin => {
+  return {
+    name: 'print-server-url-and-exit',
+    apply: 'serve', // Apply only in serve mode (dev)
+    configureServer(server) {
+      console.log("DEBUG: printServerUrlAndExitPlugin - configureServer hook invoked"); // Test log
+
+      // Temporarily removed the listening event and process.exit(0) for debugging
+      // server.httpServer?.on('listening', () => {
+      //   const address = server.httpServer?.address();
+      //   if (address && typeof address === 'object') {
+      //     const host = address.address === '127.0.0.1' ? 'localhost' : address.address;
+      //     const port = address.port;
+      //     console.log(`  > Local: http://${host}:${port}/`);
+      //     process.exit(0);
+      //   }
+      // });
+    },
+  };
+};
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  server: {
-    host: "::",
-    port: 8080,
-  },
-  plugins: [
-    react(),
-    mode === 'development' &&
-    componentTagger(),
-  ].filter(Boolean),
-  resolve: {
-    alias: {
+export default defineConfig(({ mode }) => {
+  console.log(`DEBUG: vite.config.ts - defineConfig called. Mode: ${mode}`); // Log mode
+  return {
+    server: {
+      host: "127.0.0.1", // Changed from "::" to "127.0.0.1"
+      port: 8080,
+    },
+    plugins: [
+      react(),
+      mode === 'development' && componentTagger(),
+      printServerUrlAndExitPlugin(), // Add the custom plugin unconditionally for this test
+    ].filter(Boolean),
+    resolve: {
+      alias: {
       "@": path.resolve(__dirname, "./src"),
     },
   },

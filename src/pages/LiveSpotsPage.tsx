@@ -2,10 +2,40 @@
 import React from 'react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
+import React from 'react';
+import NavBar from '@/components/NavBar';
+import Footer from '@/components/Footer';
 import PremiumGate from '@/components/PremiumGate';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Waves, Camera, Brain, Users } from 'lucide-react';
+// Import the new components
+import SpotCrowdDisplay from '@/components/crowd-feature/SpotCrowdDisplay';
+import CrowdReportForm from '@/components/crowd-feature/CrowdReportForm';
+
+// Define a type for our spots for better type safety
+interface SurfSpot {
+  id: string;
+  name: string;
+  height?: string;
+  score?: number;
+  crowd?: 'Low' | 'Medium' | 'High' | 'Moderate';
+  skill?: string;
+  isFeatured?: boolean;
+}
+
+const featuredSpotData: SurfSpot = {
+  id: 'spot-pipeline',
+  name: 'Pipeline, Hawaii',
+  isFeatured: true,
+};
+
+const moreSpotsData: SurfSpot[] = [
+  { id: 'spot-mavericks', name: 'Mavericks, CA', height: '12-15 ft', score: 8.7, crowd: 'Low', skill: 'Expert' },
+  { id: 'spot-bondi', name: 'Bondi Beach, AU', height: '3-4 ft', score: 7.2, crowd: 'High', skill: 'Beginner' },
+  { id: 'spot-jeffreys', name: 'Jeffreys Bay, SA', height: '5-6 ft', score: 9.1, crowd: 'Moderate', skill: 'Intermediate' },
+  { id: 'spot-nazare', name: 'Nazaré, PT', height: '20+ ft', score: 9.8, crowd: 'Low', skill: 'Expert' },
+];
 
 const LiveSpotsPage = () => {
   return (
@@ -26,7 +56,7 @@ const LiveSpotsPage = () => {
                   <CardTitle className="flex items-center justify-between">
                     <div className="flex items-center">
                       <Camera className="w-5 h-5 mr-2" />
-                      Pipeline, Hawaii
+                      {featuredSpotData.name} {/* Use dynamic name from new data structure */}
                     </div>
                     <Badge className="bg-green-500">LIVE</Badge>
                   </CardTitle>
@@ -57,13 +87,12 @@ const LiveSpotsPage = () => {
                     </div>
                   </div>
                   
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center">
-                      <Users className="w-4 h-4 mr-1 text-orange-500" />
-                      <span>Crowd: Moderate</span>
-                    </div>
-                    <Badge variant="outline">Advanced</Badge>
+                  <div className="flex items-center justify-between text-sm mb-3"> {/* Added mb-3 for spacing */}
+                    {/* Static crowd text replaced by SpotCrowdDisplay */}
+                    <SpotCrowdDisplay spotId={featuredSpotData.id} />
+                    <Badge variant="outline">Advanced</Badge> {/* Static for now */}
                   </div>
+                  <CrowdReportForm spotId={featuredSpotData.id} />
                 </CardContent>
               </Card>
 
@@ -114,13 +143,8 @@ const LiveSpotsPage = () => {
             <div className="mt-8">
               <h2 className="text-xl font-semibold mb-4">More Live Spots</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {[
-                  { name: 'Mavericks, CA', height: '12-15 ft', score: 8.7, crowd: 'Low', skill: 'Expert' },
-                  { name: 'Bondi Beach, AU', height: '3-4 ft', score: 7.2, crowd: 'High', skill: 'Beginner' },
-                  { name: 'Jeffreys Bay, SA', height: '5-6 ft', score: 9.1, crowd: 'Moderate', skill: 'Intermediate' },
-                  { name: 'Nazaré, PT', height: '20+ ft', score: 9.8, crowd: 'Low', skill: 'Expert' },
-                ].map((spot, index) => (
-                  <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer">
+                {moreSpotsData.map((spot) => ( // Use new moreSpotsData array and spot.id for key
+                  <Card key={spot.id} className="hover:shadow-lg transition-shadow">
                     <CardContent className="p-4">
                       <div className="aspect-video bg-gray-100 rounded mb-3 flex items-center justify-center">
                         <Camera className="w-6 h-6 text-gray-400" />
@@ -135,14 +159,14 @@ const LiveSpotsPage = () => {
                           <span>AI Score:</span>
                           <span className="font-medium">{spot.score}/10</span>
                         </div>
-                        <div className="flex justify-between">
-                          <span>Crowd:</span>
-                          <span className="font-medium">{spot.crowd}</span>
-                        </div>
+                        {/* Static crowd text removed, SpotCrowdDisplay will handle it */}
+                        <SpotCrowdDisplay spotId={spot.id} />
                         <Badge variant="outline" className="w-full justify-center mt-2">
                           {spot.skill}
                         </Badge>
                       </div>
+                      {/* Add CrowdReportForm for each spot in the list */}
+                      <CrowdReportForm spotId={spot.id} />
                     </CardContent>
                   </Card>
                 ))}
