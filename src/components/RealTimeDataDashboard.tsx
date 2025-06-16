@@ -71,10 +71,15 @@ const RealTimeDataDashboard: React.FC<RealTimeDataDashboardProps> = ({
   const getWaveQualityRating = (waveData: RealWaveData): number => {
     if (!waveData) return 0;
     
+    // Safely handle potentially undefined values
+    const waveHeight = waveData.waveHeight || 0;
+    const period = waveData.period || 0;
+    const windSpeed = waveData.windSpeed || 0;
+    
     // Simple quality algorithm based on wave height, period, and wind
-    const heightScore = Math.min(waveData.waveHeight / 8, 1) * 40;
-    const periodScore = Math.min(waveData.period / 15, 1) * 30;
-    const windScore = Math.max(0, (20 - waveData.windSpeed) / 20) * 30;
+    const heightScore = Math.min(waveHeight / 8, 1) * 40;
+    const periodScore = Math.min(period / 15, 1) * 30;
+    const windScore = Math.max(0, (20 - windSpeed) / 20) * 30;
     
     return Math.round(heightScore + periodScore + windScore);
   };
@@ -87,8 +92,14 @@ const RealTimeDataDashboard: React.FC<RealTimeDataDashboardProps> = ({
   };
 
   const formatWindDirection = (degrees: number): string => {
+    if (typeof degrees !== 'number' || isNaN(degrees)) return 'N/A';
     const directions = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
     return directions[Math.round(degrees / 22.5) % 16];
+  };
+
+  const safeToFixed = (value: number | undefined | null, decimals: number = 1): string => {
+    if (typeof value !== 'number' || isNaN(value)) return '0';
+    return value.toFixed(decimals);
   };
 
   if (loading && !waveData) {
@@ -133,7 +144,7 @@ const RealTimeDataDashboard: React.FC<RealTimeDataDashboardProps> = ({
         <div className="flex items-center space-x-2">
           <CheckCircle className="h-4 w-4 text-green-600" />
           <span className="text-sm text-gray-600">
-            Real data from {waveData?.source}
+            Real data from {waveData?.source || 'API'}
           </span>
         </div>
         {lastUpdate && (
@@ -158,20 +169,20 @@ const RealTimeDataDashboard: React.FC<RealTimeDataDashboardProps> = ({
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center">
               <Waves className="h-8 w-8 mx-auto mb-2 text-blue-600" />
-              <div className="text-2xl font-bold">{waveData?.waveHeight.toFixed(1)}ft</div>
+              <div className="text-2xl font-bold">{safeToFixed(waveData?.waveHeight)}ft</div>
               <div className="text-sm text-gray-500">Wave Height</div>
             </div>
             
             <div className="text-center">
               <Activity className="h-8 w-8 mx-auto mb-2 text-purple-600" />
-              <div className="text-2xl font-bold">{waveData?.period.toFixed(0)}s</div>
+              <div className="text-2xl font-bold">{safeToFixed(waveData?.period, 0)}s</div>
               <div className="text-sm text-gray-500">Period</div>
             </div>
             
             <div className="text-center">
               <Wind className="h-8 w-8 mx-auto mb-2 text-gray-600" />
               <div className="text-2xl font-bold">
-                {waveData?.windSpeed.toFixed(0)}mph
+                {safeToFixed(waveData?.windSpeed, 0)}mph
               </div>
               <div className="text-sm text-gray-500">
                 {waveData ? formatWindDirection(waveData.windDirection) : 'N/A'}
@@ -202,7 +213,7 @@ const RealTimeDataDashboard: React.FC<RealTimeDataDashboardProps> = ({
                     <Badge variant={tide.type === 'High' ? 'default' : 'secondary'}>
                       {tide.type}
                     </Badge>
-                    <span className="font-medium">{tide.height.toFixed(1)}ft</span>
+                    <span className="font-medium">{safeToFixed(tide.height)}ft</span>
                   </div>
                   <span className="text-sm text-gray-500">
                     {new Date(tide.time).toLocaleTimeString([], { 

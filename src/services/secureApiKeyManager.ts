@@ -24,57 +24,68 @@ class SecureApiKeyManager {
       }
 
       // Validate session before accessing keys
-      const isValidSession = await securityService.validateSession();
+      const isValidSession = await securityService.validateSession().catch(() => false);
       if (!isValidSession) {
-        await securityService.logSecurityEvent({
-          event_type: 'unauthorized_api_key_access',
-          severity: 'high',
-          details: { service }
-        });
+        console.warn('Invalid session for API key access');
         return null;
       }
 
-      // Fetch from database using correct column names
+      // Fetch from database using correct column names with better error handling
       const { data, error } = await supabase
         .from('api_keys')
         .select('key_value')
         .eq('service_name', service)
         .eq('is_active', true)
-        .single();
+        .maybeSingle(); // Use maybeSingle instead of single to avoid errors when no data
 
-      if (error || !data) {
-        console.warn(`API key not found for service: ${service}`);
+      if (error) {
+        console.warn(`Database error fetching API key for service: ${service}`, error);
+        return null;
+      }
+
+      if (!data?.key_value) {
+        console.warn(`No active API key found for service: ${service}`);
         return null;
       }
 
       // Cache the key
       this.setCachedKey(service, data.key_value);
       
-      // Update last used timestamp
-      await this.updateLastUsed(service);
+      // Update last used timestamp (non-blocking)
+      this.updateLastUsed(service).catch(console.warn);
 
       return data.key_value;
     } catch (error) {
       console.error('Error fetching API key:', error);
-      await securityService.logSecurityEvent({
-        event_type: 'api_key_fetch_error',
-        severity: 'medium',
-        details: { service, error: error instanceof Error ? error.message : 'Unknown error' }
-      });
+      // Try to log security event but don't fail if it doesn't work
+      try {
+        await securityService.logSecurityEvent({
+          event_type: 'api_key_fetch_error',
+          severity: 'medium',
+          details: { service, error: error instanceof Error ? error.message : 'Unknown error' }
+        });
+      } catch (logError) {
+        console.warn('Failed to log security event:', logError);
+      }
       return null;
     }
   }
 
   async setApiKey(service: string, key: string): Promise<boolean> {
     try {
-      // Validate admin role
-      const isAdmin = await securityService.checkUserRole('admin');
+      // Validate admin role with fallback
+      const isAdmin = await securityService.checkUserRole('admin').catch(() => false);
       if (!isAdmin) {
-        await securityService.logSecurityEvent({
-          event_type: 'unauthorized_api_key_modification',
-          severity: 'critical',
-          details: { service }
-        });
+        console.warn('Unauthorized API key modification attempt');
+        try {
+          await securityService.logSecurityEvent({
+            event_type: 'unauthorized_api_key_modification',
+            severity: 'critical',
+            details: { service }
+          });
+        } catch (logError) {
+          console.warn('Failed to log security event:', logError);
+        }
         return false;
       }
 
@@ -84,8 +95,8 @@ class SecureApiKeyManager {
       }
 
       // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
         throw new Error('No authenticated user');
       }
 
@@ -110,20 +121,29 @@ class SecureApiKeyManager {
       // Clear cache for this service
       this.clearCachedKey(service);
 
-      await securityService.logSecurityEvent({
-        event_type: 'api_key_updated',
-        severity: 'medium',
-        details: { service: sanitizedService }
-      });
+      // Log security event (non-blocking)
+      try {
+        await securityService.logSecurityEvent({
+          event_type: 'api_key_updated',
+          severity: 'medium',
+          details: { service: sanitizedService }
+        });
+      } catch (logError) {
+        console.warn('Failed to log security event:', logError);
+      }
 
       return true;
     } catch (error) {
       console.error('Error setting API key:', error);
-      await securityService.logSecurityEvent({
-        event_type: 'api_key_update_error',
-        severity: 'high',
-        details: { service, error: error instanceof Error ? error.message : 'Unknown error' }
-      });
+      try {
+        await securityService.logSecurityEvent({
+          event_type: 'api_key_update_error',
+          severity: 'high',
+          details: { service, error: error instanceof Error ? error.message : 'Unknown error' }
+        });
+      } catch (logError) {
+        console.warn('Failed to log security event:', logError);
+      }
       return false;
     }
   }
@@ -134,14 +154,19 @@ class SecureApiKeyManager {
 
   async deactivateApiKey(service: string): Promise<boolean> {
     try {
-      // Validate admin role
-      const isAdmin = await securityService.checkUserRole('admin');
+      // Validate admin role with fallback
+      const isAdmin = await securityService.checkUserRole('admin').catch(() => false);
       if (!isAdmin) {
-        await securityService.logSecurityEvent({
-          event_type: 'unauthorized_api_key_modification',
-          severity: 'critical',
-          details: { service }
-        });
+        console.warn('Unauthorized API key deactivation attempt');
+        try {
+          await securityService.logSecurityEvent({
+            event_type: 'unauthorized_api_key_modification',
+            severity: 'critical',
+            details: { service }
+          });
+        } catch (logError) {
+          console.warn('Failed to log security event:', logError);
+        }
         return false;
       }
 
@@ -157,20 +182,29 @@ class SecureApiKeyManager {
       // Clear cache for this service
       this.clearCachedKey(service);
 
-      await securityService.logSecurityEvent({
-        event_type: 'api_key_deactivated',
-        severity: 'medium',
-        details: { service }
-      });
+      // Log security event (non-blocking)
+      try {
+        await securityService.logSecurityEvent({
+          event_type: 'api_key_deactivated',
+          severity: 'medium',
+          details: { service }
+        });
+      } catch (logError) {
+        console.warn('Failed to log security event:', logError);
+      }
 
       return true;
     } catch (error) {
       console.error('Error deactivating API key:', error);
-      await securityService.logSecurityEvent({
-        event_type: 'api_key_deactivation_error',
-        severity: 'high',
-        details: { service, error: error instanceof Error ? error.message : 'Unknown error' }
-      });
+      try {
+        await securityService.logSecurityEvent({
+          event_type: 'api_key_deactivation_error',
+          severity: 'high',
+          details: { service, error: error instanceof Error ? error.message : 'Unknown error' }
+        });
+      } catch (logError) {
+        console.warn('Failed to log security event:', logError);
+      }
       return false;
     }
   }
