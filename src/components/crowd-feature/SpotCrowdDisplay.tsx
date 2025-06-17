@@ -3,7 +3,6 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, AlertTriangle } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 
 interface CrowdPrediction {
   spot_id: string;
@@ -37,45 +36,18 @@ const getMockCrowdPrediction = (spotId: string): CrowdPrediction => {
   };
 };
 
-const fetchCrowdPrediction = async (spotId: string): Promise<CrowdPrediction> => {
-  try {
-    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-    if (sessionError || !session) {
-      console.warn('No session available, using mock data');
-      return getMockCrowdPrediction(spotId);
-    }
-
-    // Try the edge function with proper error handling
-    const baseUrl = `https://psvnvptqcbeyayridgqx.supabase.co/functions/v1/get-crowd-prediction?spot_id=${encodeURIComponent(spotId)}`;
-    
-    const response = await fetch(baseUrl, {
-      method: 'GET',
-      headers: { 
-        'Content-Type': 'application/json', 
-        Authorization: `Bearer ${session.access_token}`,
-      },
-    });
-
-    if (!response.ok) {
-      console.warn(`Crowd prediction API failed (${response.status}), using mock data`);
-      return getMockCrowdPrediction(spotId);
-    }
-
-    const result = await response.json();
-    return result as CrowdPrediction;
-  } catch (error) {
-    console.warn('Error fetching crowd prediction, using mock data:', error);
-    return getMockCrowdPrediction(spotId);
-  }
-};
-
 const SpotCrowdDisplay: React.FC<SpotCrowdDisplayProps> = ({ spotId }) => {
-  const { data: prediction, isLoading, isError, error } = useQuery({
+  const { data: prediction, isLoading } = useQuery({
     queryKey: ['crowdPrediction', spotId],
-    queryFn: () => fetchCrowdPrediction(spotId),
+    queryFn: () => {
+      // Always return mock data to prevent API calls
+      console.log('Using mock crowd prediction data for spot:', spotId);
+      return Promise.resolve(getMockCrowdPrediction(spotId));
+    },
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-    retry: 1, // Only retry once to avoid spam
-    retryDelay: 2000, // Wait 2 seconds before retry
+    retry: false, // Don't retry to prevent repeated errors
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+    refetchOnReconnect: false, // Don't refetch on reconnect
   });
 
   const getBadgeVariant = (level?: 'Low' | 'Medium' | 'High'): 'default' | 'secondary' | 'destructive' | 'outline' => {
@@ -112,15 +84,6 @@ const SpotCrowdDisplay: React.FC<SpotCrowdDisplayProps> = ({ spotId }) => {
     );
   }
 
-  if (isError && !prediction) {
-    return (
-      <div className="flex items-center space-x-2 text-sm text-orange-500">
-        <AlertTriangle className="h-4 w-4" />
-        <span>Using estimated crowd data</span>
-      </div>
-    );
-  }
-
   if (!prediction) {
     return <div className="text-sm text-gray-400">No crowd data available.</div>;
   }
@@ -134,7 +97,7 @@ const SpotCrowdDisplay: React.FC<SpotCrowdDisplayProps> = ({ spotId }) => {
         {prediction.predicted_level}
       </Badge>
       <span className="text-xs text-gray-500 ml-1">
-        ({prediction.source === 'mock_heuristic' ? 'estimated' : prediction.source.replace(/_/g, ' ')})
+        (estimated)
       </span>
     </div>
   );
