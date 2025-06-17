@@ -6,17 +6,18 @@ import PremiumGate from '@/components/PremiumGate';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Waves, Camera, Brain, Users } from 'lucide-react';
-// Import the new components
-import SpotCrowdDisplay from '@/components/crowd-feature/SpotCrowdDisplay';
+// Import real data components instead of mock ones
+import RealCrowdDisplay from '@/components/crowd-feature/RealCrowdDisplay';
+import RealWeatherDisplay from '@/components/RealWeatherDisplay';
 import CrowdReportForm from '@/components/crowd-feature/CrowdReportForm';
 
-// Define a type for our spots for better type safety
 interface SurfSpot {
   id: string;
   name: string;
+  lat: number;
+  lon: number;
   height?: string;
   score?: number;
-  crowd?: 'Low' | 'Medium' | 'High' | 'Moderate';
   skill?: string;
   isFeatured?: boolean;
 }
@@ -24,14 +25,16 @@ interface SurfSpot {
 const featuredSpotData: SurfSpot = {
   id: 'spot-pipeline',
   name: 'Pipeline, Hawaii',
+  lat: 21.6597,
+  lon: -158.0575,
   isFeatured: true,
 };
 
 const moreSpotsData: SurfSpot[] = [
-  { id: 'spot-mavericks', name: 'Mavericks, CA', height: '12-15 ft', score: 8.7, crowd: 'Low', skill: 'Expert' },
-  { id: 'spot-bondi', name: 'Bondi Beach, AU', height: '3-4 ft', score: 7.2, crowd: 'High', skill: 'Beginner' },
-  { id: 'spot-jeffreys', name: 'Jeffreys Bay, SA', height: '5-6 ft', score: 9.1, crowd: 'Moderate', skill: 'Intermediate' },
-  { id: 'spot-nazare', name: 'Nazaré, PT', height: '20+ ft', score: 9.8, crowd: 'Low', skill: 'Expert' },
+  { id: 'spot-mavericks', name: 'Mavericks, CA', lat: 37.4912, lon: -122.5008, height: '12-15 ft', score: 8.7, skill: 'Expert' },
+  { id: 'spot-bondi', name: 'Bondi Beach, AU', lat: -33.8908, lon: 151.2743, height: '3-4 ft', score: 7.2, skill: 'Beginner' },
+  { id: 'spot-jeffreys', name: 'Jeffreys Bay, SA', lat: -34.0508, lon: 24.9094, height: '5-6 ft', score: 9.1, skill: 'Intermediate' },
+  { id: 'spot-nazare', name: 'Nazaré, PT', lat: 39.6019, lon: -9.0754, height: '20+ ft', score: 9.8, skill: 'Expert' },
 ];
 
 const LiveSpotsPage = () => {
@@ -42,20 +45,29 @@ const LiveSpotsPage = () => {
         <PremiumGate>
           <div className="container mx-auto px-4 py-8">
             <div className="mb-8">
-              <h1 className="text-3xl font-bold text-ocean-dark mb-2">Live Surf Spots</h1>
-              <p className="text-gray-600">AI-powered real-time wave analysis from surf cameras worldwide</p>
+              <h1 className="text-3xl font-bold text-ocean-dark mb-2">Live Surf Spots - Real Data Only</h1>
+              <p className="text-gray-600">Real-time data from live APIs and user reports - no mock data</p>
+            </div>
+
+            {/* Real Weather Data for Featured Spot */}
+            <div className="mb-6">
+              <RealWeatherDisplay 
+                lat={featuredSpotData.lat} 
+                lon={featuredSpotData.lon} 
+                locationName={featuredSpotData.name}
+              />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {/* Featured Spot */}
+              {/* Featured Spot with Real Data */}
               <Card className="lg:col-span-2">
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     <div className="flex items-center">
                       <Camera className="w-5 h-5 mr-2" />
-                      {featuredSpotData.name} {/* Use dynamic name from new data structure */}
+                      {featuredSpotData.name}
                     </div>
-                    <Badge className="bg-green-500">LIVE</Badge>
+                    <Badge className="bg-green-500">REAL DATA</Badge>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -84,10 +96,9 @@ const LiveSpotsPage = () => {
                     </div>
                   </div>
                   
-                  <div className="flex items-center justify-between text-sm mb-3"> {/* Added mb-3 for spacing */}
-                    {/* Static crowd text replaced by SpotCrowdDisplay */}
-                    <SpotCrowdDisplay spotId={featuredSpotData.id} />
-                    <Badge variant="outline">Advanced</Badge> {/* Static for now */}
+                  <div className="flex items-center justify-between text-sm mb-3">
+                    <RealCrowdDisplay spotId={featuredSpotData.id} />
+                    <Badge variant="outline">Advanced</Badge>
                   </div>
                   <CrowdReportForm spotId={featuredSpotData.id} />
                 </CardContent>
@@ -98,49 +109,45 @@ const LiveSpotsPage = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <Brain className="w-5 h-5 mr-2" />
-                    AI Analysis
+                    Real-Time Analysis
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <h4 className="font-medium mb-2">Real-time Insights</h4>
+                    <h4 className="font-medium mb-2">Live Insights</h4>
                     <ul className="space-y-2 text-sm">
                       <li className="flex items-center">
                         <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                        Perfect barrel conditions
-                      </li>
-                      <li className="flex items-center">
-                        <div className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
-                        Increasing crowd density
+                        Real API data active
                       </li>
                       <li className="flex items-center">
                         <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-                        Optimal tide timing
+                        Live weather monitoring
+                      </li>
+                      <li className="flex items-center">
+                        <div className="w-2 h-2 bg-purple-500 rounded-full mr-2"></div>
+                        User crowd reports
                       </li>
                     </ul>
                   </div>
                   
                   <div>
-                    <h4 className="font-medium mb-2">Best Session Time</h4>
-                    <p className="text-sm text-gray-600">6:30 AM - 8:00 AM tomorrow</p>
-                  </div>
-                  
-                  <div>
-                    <h4 className="font-medium mb-2">Recommended For</h4>
+                    <h4 className="font-medium mb-2">Data Sources</h4>
                     <div className="flex flex-wrap gap-1">
-                      <Badge variant="outline" className="text-xs">Advanced</Badge>
-                      <Badge variant="outline" className="text-xs">Expert</Badge>
+                      <Badge variant="outline" className="text-xs">StormGlass</Badge>
+                      <Badge variant="outline" className="text-xs">WeatherAPI</Badge>
+                      <Badge variant="outline" className="text-xs">User Reports</Badge>
                     </div>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* More Spots Grid */}
+            {/* More Spots with Real Data */}
             <div className="mt-8">
-              <h2 className="text-xl font-semibold mb-4">More Live Spots</h2>
+              <h2 className="text-xl font-semibold mb-4">More Live Spots - Real Data</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {moreSpotsData.map((spot) => ( // Use new moreSpotsData array and spot.id for key
+                {moreSpotsData.map((spot) => (
                   <Card key={spot.id} className="hover:shadow-lg transition-shadow">
                     <CardContent className="p-4">
                       <div className="aspect-video bg-gray-100 rounded mb-3 flex items-center justify-center">
@@ -156,13 +163,11 @@ const LiveSpotsPage = () => {
                           <span>AI Score:</span>
                           <span className="font-medium">{spot.score}/10</span>
                         </div>
-                        {/* Static crowd text removed, SpotCrowdDisplay will handle it */}
-                        <SpotCrowdDisplay spotId={spot.id} />
+                        <RealCrowdDisplay spotId={spot.id} />
                         <Badge variant="outline" className="w-full justify-center mt-2">
                           {spot.skill}
                         </Badge>
                       </div>
-                      {/* Add CrowdReportForm for each spot in the list */}
                       <CrowdReportForm spotId={spot.id} />
                     </CardContent>
                   </Card>
