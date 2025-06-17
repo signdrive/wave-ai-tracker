@@ -21,19 +21,8 @@ const fetchCrowdPrediction = async (spotId: string): Promise<CrowdPrediction> =>
     throw new Error(sessionError?.message || 'User not authenticated');
   }
 
-  // Use query parameters instead of body for GET request
-  const { data, error } = await supabase.functions.invoke('get-crowd-prediction', {
-    method: 'GET',
-    headers: { 
-      'Content-Type': 'application/json', 
-      Authorization: `Bearer ${session.access_token}`,
-    },
-    // Add spot_id as query parameter in the URL
-    body: undefined,
-  });
-
-  // Manually construct URL with query parameter since Supabase client doesn't support query params directly
-  const baseUrl = `${supabase.supabaseUrl}/functions/v1/get-crowd-prediction?spot_id=${encodeURIComponent(spotId)}`;
+  // Use the hardcoded Supabase URL from the client configuration
+  const baseUrl = `https://psvnvptqcbeyayridgqx.supabase.co/functions/v1/get-crowd-prediction?spot_id=${encodeURIComponent(spotId)}`;
   
   const response = await fetch(baseUrl, {
     method: 'GET',
