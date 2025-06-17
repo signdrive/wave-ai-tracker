@@ -74,7 +74,7 @@ interface SurfForecast {
 class ApiService {
   private surflineApiKey: string = '';
   private tidesApiKey: string = '';
-  private weatherApiKey: string = ''; // Removed hardcoded key
+  private weatherApiKey: string = '';
   private baseUrls = {
     surfline: 'https://services.surfline.com/kbyg',
     noaa: 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter',
@@ -84,10 +84,14 @@ class ApiService {
   };
 
   async initializeApiKeys() {
-    // Load API keys securely from the key manager
-    this.weatherApiKey = await secureApiKeyManager.getApiKey('weatherapi') || '';
-    this.surflineApiKey = await secureApiKeyManager.getApiKey('surfline') || '';
-    this.tidesApiKey = await secureApiKeyManager.getApiKey('tides') || '';
+    try {
+      this.weatherApiKey = await secureApiKeyManager.getApiKey('weatherapi') || '';
+      this.surflineApiKey = await secureApiKeyManager.getApiKey('surfline') || '';
+      this.tidesApiKey = await secureApiKeyManager.getApiKey('tides') || '';
+    } catch (error) {
+      console.warn('Could not load API keys from secure storage:', error);
+      // Continue with empty keys - will use mock data
+    }
   }
 
   setApiKeys(keys: { surfline?: string; tides?: string; weather?: string }) {
@@ -98,12 +102,11 @@ class ApiService {
 
   async getSurfConditions(spotId: string): Promise<SurfCondition> {
     try {
-      // Ensure API keys are loaded
       if (!this.weatherApiKey) {
         await this.initializeApiKeys();
       }
 
-      // Mock data for now - replace with actual API calls once keys are provided
+      // Always return mock data for now to avoid API errors
       const mockData: SurfCondition = {
         location: `Spot ${spotId}`,
         waveHeight: Math.random() * 8 + 1,
@@ -125,36 +128,40 @@ class ApiService {
 
   async getWeatherData(spotId: string): Promise<WeatherData> {
     try {
-      // First try to get real weather data if we have coordinates
       const spotCoordinates = this.getSpotCoordinates(spotId);
       
-      if (spotCoordinates && this.weatherApiKey) {
-        const response = await fetch(
-          `${this.baseUrls.weatherapi}/current.json?key=${this.weatherApiKey}&q=${spotCoordinates.lat},${spotCoordinates.lon}&aqi=no`
-        );
-        
-        if (response.ok) {
-          const data = await response.json();
-          const weatherData: WeatherData = {
-            temperature: Math.round(data.current.temp_f),
-            feelsLike: Math.round(data.current.feelslike_f),
-            humidity: data.current.humidity,
-            pressure: Math.round(data.current.pressure_mb),
-            visibility: Math.round(data.current.vis_miles),
-            windSpeed: Math.round(data.current.wind_mph),
-            windDirection: data.current.wind_dir,
-            windGust: Math.round(data.current.gust_mph || data.current.wind_mph * 1.2),
-            weatherCondition: data.current.condition.text,
-            weatherIcon: data.current.condition.icon,
-            uvIndex: data.current.uv
-          };
+      // Only try real API if we have both coordinates and API key
+      if (spotCoordinates && this.weatherApiKey && this.weatherApiKey.length > 10) {
+        try {
+          const response = await fetch(
+            `${this.baseUrls.weatherapi}/current.json?key=${this.weatherApiKey}&q=${spotCoordinates.lat},${spotCoordinates.lon}&aqi=no`
+          );
           
-          console.log('Fetched real weather data for spot:', spotId, weatherData);
-          return weatherData;
+          if (response.ok) {
+            const data = await response.json();
+            const weatherData: WeatherData = {
+              temperature: Math.round(data.current.temp_f),
+              feelsLike: Math.round(data.current.feelslike_f),
+              humidity: data.current.humidity,
+              pressure: Math.round(data.current.pressure_mb),
+              visibility: Math.round(data.current.vis_miles),
+              windSpeed: Math.round(data.current.wind_mph),
+              windDirection: data.current.wind_dir,
+              windGust: Math.round(data.current.gust_mph || data.current.wind_mph * 1.2),
+              weatherCondition: data.current.condition.text,
+              weatherIcon: data.current.condition.icon,
+              uvIndex: data.current.uv
+            };
+            
+            console.log('Fetched real weather data for spot:', spotId, weatherData);
+            return weatherData;
+          }
+        } catch (apiError) {
+          console.warn('Real weather API failed, falling back to mock data:', apiError);
         }
       }
       
-      // Fallback to mock data
+      // Always fallback to mock data
       const windDirections = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
       const conditions = ['Sunny', 'Partly Cloudy', 'Cloudy', 'Rainy', 'Foggy'];
       
@@ -181,7 +188,6 @@ class ApiService {
   }
 
   private getSpotCoordinates(spotId: string): { lat: number; lon: number } | null {
-    // Basic coordinate mapping for popular surf spots
     const spotCoordinates: Record<string, { lat: number; lon: number }> = {
       'pipeline': { lat: 21.6597, lon: -158.0575 },
       'mavericks': { lat: 37.4912, lon: -122.5008 },
@@ -200,7 +206,6 @@ class ApiService {
 
   async getTideData(stationId: string, days: number = 3): Promise<TideData[]> {
     try {
-      // Mock data for now - replace with actual API calls once keys are provided
       const mockTides: TideData[] = [];
       const now = new Date();
       
@@ -228,7 +233,6 @@ class ApiService {
 
   async getWavePoolAvailability(poolId: string, date: Date): Promise<WavePoolSlot[]> {
     try {
-      // Mock data for now - replace with actual API calls once keys are provided
       const slots: WavePoolSlot[] = [];
       const baseTime = new Date(date);
       baseTime.setHours(8, 0, 0, 0);

@@ -1,9 +1,9 @@
 
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Badge } from '@/components/ui/badge'; // Assuming Shadcn UI Badge is available
+import { Badge } from '@/components/ui/badge';
 import { Loader2, AlertTriangle } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client'; // Use the shared Supabase client
+import { supabase } from '@/integrations/supabase/client';
 
 interface CrowdPrediction {
   spot_id: string;
@@ -16,29 +16,40 @@ interface SpotCrowdDisplayProps {
 }
 
 const fetchCrowdPrediction = async (spotId: string): Promise<CrowdPrediction> => {
-  // Ensure user is authenticated to get the token
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();
   if (sessionError || !session) {
     throw new Error(sessionError?.message || 'User not authenticated');
   }
 
+  // Use query parameters instead of body for GET request
   const { data, error } = await supabase.functions.invoke('get-crowd-prediction', {
     method: 'GET',
     headers: { 
       'Content-Type': 'application/json', 
       Authorization: `Bearer ${session.access_token}`,
     },
-    body: JSON.stringify({ spot_id: spotId }),
+    // Add spot_id as query parameter in the URL
+    body: undefined,
   });
 
-  if (error) {
-    console.error('Error invoking get-crowd-prediction:', error);
-    throw new Error(error.message || 'Failed to fetch crowd prediction');
+  // Manually construct URL with query parameter since Supabase client doesn't support query params directly
+  const baseUrl = `${supabase.supabaseUrl}/functions/v1/get-crowd-prediction?spot_id=${encodeURIComponent(spotId)}`;
+  
+  const response = await fetch(baseUrl, {
+    method: 'GET',
+    headers: { 
+      'Content-Type': 'application/json', 
+      Authorization: `Bearer ${session.access_token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
   }
-  // The 'data' from invoke might be the function's response body directly
-  // or nested under another data property depending on Supabase client version / function setup.
-  // Assuming 'data' is the expected CrowdPrediction object.
-  return data as CrowdPrediction;
+
+  const result = await response.json();
+  return result as CrowdPrediction;
 };
 
 const SpotCrowdDisplay: React.FC<SpotCrowdDisplayProps> = ({ spotId }) => {
@@ -53,17 +64,16 @@ const SpotCrowdDisplay: React.FC<SpotCrowdDisplayProps> = ({ spotId }) => {
     if (!level) return 'outline';
     switch (level) {
       case 'Low':
-        return 'default'; // Greenish in default themes often
+        return 'default';
       case 'Medium':
-        return 'secondary'; // Yellowish/Orangish
+        return 'secondary';
       case 'High':
-        return 'destructive'; // Reddish
+        return 'destructive';
       default:
         return 'outline';
     }
   };
 
-  // Tailwind classes for colors (approximate, depends on actual theme config)
   const levelColorClasses = {
     Low: 'bg-green-100 text-green-800 border-green-300',
     Medium: 'bg-yellow-100 text-yellow-800 border-yellow-300',
@@ -102,7 +112,6 @@ const SpotCrowdDisplay: React.FC<SpotCrowdDisplayProps> = ({ spotId }) => {
       Crowd Level: {' '}
       <Badge
         className={`px-2 py-0.5 text-xs font-medium rounded-md ${getCurrentLevelColor(prediction.predicted_level)}`}
-        // variant={getBadgeVariant(prediction.predicted_level)} // Using custom colors via className
       >
         {prediction.predicted_level}
       </Badge>

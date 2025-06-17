@@ -30,34 +30,48 @@ class SecureApiKeyManager {
         return null;
       }
 
-      // Fetch from database using correct column names with better error handling
+      // Try direct database access first (for non-admin users)
       const { data, error } = await supabase
         .from('api_keys')
         .select('key_value')
         .eq('service_name', service)
         .eq('is_active', true)
-        .maybeSingle(); // Use maybeSingle instead of single to avoid errors when no data
+        .maybeSingle();
 
-      if (error) {
-        console.warn(`Database error fetching API key for service: ${service}`, error);
-        return null;
+      if (!error && data?.key_value) {
+        this.setCachedKey(service, data.key_value);
+        this.updateLastUsed(service).catch(console.warn);
+        return data.key_value;
       }
 
-      if (!data?.key_value) {
-        console.warn(`No active API key found for service: ${service}`);
-        return null;
+      // If direct access fails, try the admin function
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          console.warn('No session available for API key function access');
+          return null;
+        }
+
+        const { data: functionData, error: functionError } = await supabase.functions.invoke('get-api-keys', {
+          headers: { Authorization: `Bearer ${session.access_token}` }
+        });
+
+        if (!functionError && functionData && typeof functionData === 'object') {
+          const keyValue = functionData[service];
+          if (keyValue) {
+            this.setCachedKey(service, keyValue);
+            return keyValue;
+          }
+        }
+      } catch (functionError) {
+        console.warn('Admin function access failed (this is normal for non-admin users):', functionError);
       }
 
-      // Cache the key
-      this.setCachedKey(service, data.key_value);
-      
-      // Update last used timestamp (non-blocking)
-      this.updateLastUsed(service).catch(console.warn);
+      console.warn(`No API key found for service: ${service}`);
+      return null;
 
-      return data.key_value;
     } catch (error) {
       console.error('Error fetching API key:', error);
-      // Try to log security event but don't fail if it doesn't work
       try {
         await securityService.logSecurityEvent({
           event_type: 'api_key_fetch_error',
