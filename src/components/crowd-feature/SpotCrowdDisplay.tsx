@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge'; // Assuming Shadcn UI Badge is available
@@ -22,9 +23,12 @@ const fetchCrowdPrediction = async (spotId: string): Promise<CrowdPrediction> =>
   }
 
   const { data, error } = await supabase.functions.invoke('get-crowd-prediction', {
-    method: 'GET', // GET is default, but explicit
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-    params: { spot_id: spotId }, // supabase.functions.invoke uses `params` for GET query string
+    method: 'GET',
+    headers: { 
+      'Content-Type': 'application/json', 
+      Authorization: `Bearer ${session.access_token}`,
+    },
+    body: JSON.stringify({ spot_id: spotId }),
   });
 
   if (error) {
@@ -38,14 +42,12 @@ const fetchCrowdPrediction = async (spotId: string): Promise<CrowdPrediction> =>
 };
 
 const SpotCrowdDisplay: React.FC<SpotCrowdDisplayProps> = ({ spotId }) => {
-  const { data: prediction, isLoading, isError, error } = useQuery<CrowdPrediction, Error>(
-    ['crowdPrediction', spotId], // Query key
-    () => fetchCrowdPrediction(spotId),
-    {
-      staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-      retry: 1, // Retry once on failure
-    }
-  );
+  const { data: prediction, isLoading, isError, error } = useQuery({
+    queryKey: ['crowdPrediction', spotId],
+    queryFn: () => fetchCrowdPrediction(spotId),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+    retry: 1, // Retry once on failure
+  });
 
   const getBadgeVariant = (level?: 'Low' | 'Medium' | 'High'): 'default' | 'secondary' | 'destructive' | 'outline' => {
     if (!level) return 'outline';

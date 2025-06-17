@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,6 @@ import { toast } from 'sonner';
 import { Loader2, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client'; // Use the shared Supabase client
 import type { Session } from '@supabase/supabase-js';
-
 
 type CrowdLevel = 'Low' | 'Medium' | 'High';
 
@@ -59,19 +59,17 @@ const CrowdReportForm: React.FC<CrowdReportFormProps> = ({ spotId }) => {
     };
   }, []);
 
-  const mutation = useMutation<any, Error, CrowdLevel>(
-    (level) => submitCrowdReport({ spot_id: spotId, reported_level: level }),
-    {
-      onSuccess: () => {
-        toast.success('Crowd report submitted! Thanks for contributing.');
-        // Invalidate the query for this spot's crowd prediction to refetch
-        queryClient.invalidateQueries(['crowdPrediction', spotId]);
-      },
-      onError: (error) => {
-        toast.error(`Failed to submit report: ${error.message}`);
-      },
-    }
-  );
+  const mutation = useMutation({
+    mutationFn: (level: CrowdLevel) => submitCrowdReport({ spot_id: spotId, reported_level: level }),
+    onSuccess: () => {
+      toast.success('Crowd report submitted! Thanks for contributing.');
+      // Invalidate the query for this spot's crowd prediction to refetch
+      queryClient.invalidateQueries({ queryKey: ['crowdPrediction', spotId] });
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to submit report: ${error.message}`);
+    },
+  });
 
   const handleSubmit = (level: CrowdLevel) => {
     mutation.mutate(level);
@@ -95,10 +93,10 @@ const CrowdReportForm: React.FC<CrowdReportFormProps> = ({ spotId }) => {
             variant="outline"
             size="sm"
             onClick={() => handleSubmit(level)}
-            disabled={mutation.isLoading}
+            disabled={mutation.isPending}
             className="flex-1 text-xs px-2 py-1 h-auto"
           >
-            {mutation.isLoading && mutation.variables === level ? (
+            {mutation.isPending && mutation.variables === level ? (
               <Loader2 className="h-3 w-3 animate-spin mr-1" />
             ) : (
               <Send className="h-3 w-3 mr-1" />

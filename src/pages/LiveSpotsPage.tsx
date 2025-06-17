@@ -2,9 +2,6 @@
 import React from 'react';
 import NavBar from '@/components/NavBar';
 import Footer from '@/components/Footer';
-import React from 'react';
-import NavBar from '@/components/NavBar';
-import Footer from '@/components/Footer';
 import PremiumGate from '@/components/PremiumGate';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
