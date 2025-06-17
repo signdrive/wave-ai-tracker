@@ -1,3 +1,4 @@
+
 // API service for handling all external data sources
 import { secureApiKeyManager } from './secureApiKeyManager';
 
@@ -75,6 +76,7 @@ class ApiService {
   private surflineApiKey: string = '';
   private tidesApiKey: string = '';
   private weatherApiKey: string = '';
+  private apiKeysInitialized: boolean = false;
   private baseUrls = {
     surfline: 'https://services.surfline.com/kbyg',
     noaa: 'https://api.tidesandcurrents.noaa.gov/api/prod/datagetter',
@@ -85,12 +87,17 @@ class ApiService {
 
   async initializeApiKeys() {
     try {
+      // Only attempt initialization once to prevent repeated errors
+      if (this.apiKeysInitialized) return;
+      
       this.weatherApiKey = await secureApiKeyManager.getApiKey('weatherapi') || '';
       this.surflineApiKey = await secureApiKeyManager.getApiKey('surfline') || '';
       this.tidesApiKey = await secureApiKeyManager.getApiKey('tides') || '';
+      
+      this.apiKeysInitialized = true;
     } catch (error) {
-      console.warn('Could not load API keys from secure storage:', error);
-      // Continue with empty keys - will use mock data
+      console.warn('Could not load API keys from secure storage, using mock data only');
+      this.apiKeysInitialized = true; // Prevent repeated attempts
     }
   }
 
@@ -102,11 +109,7 @@ class ApiService {
 
   async getSurfConditions(spotId: string): Promise<SurfCondition> {
     try {
-      if (!this.weatherApiKey) {
-        await this.initializeApiKeys();
-      }
-
-      // Always return mock data for now to avoid API errors
+      // Always return mock data to avoid API errors for now
       const mockData: SurfCondition = {
         location: `Spot ${spotId}`,
         waveHeight: Math.random() * 8 + 1,
@@ -128,10 +131,12 @@ class ApiService {
 
   async getWeatherData(spotId: string): Promise<WeatherData> {
     try {
+      await this.initializeApiKeys();
+      
       const spotCoordinates = this.getSpotCoordinates(spotId);
       
-      // Only try real API if we have both coordinates and API key
-      if (spotCoordinates && this.weatherApiKey && this.weatherApiKey.length > 10) {
+      // Only try real API if we have both coordinates and a valid API key
+      if (spotCoordinates && this.weatherApiKey && this.weatherApiKey.length > 20) {
         try {
           const response = await fetch(
             `${this.baseUrls.weatherapi}/current.json?key=${this.weatherApiKey}&q=${spotCoordinates.lat},${spotCoordinates.lon}&aqi=no`
@@ -161,7 +166,7 @@ class ApiService {
         }
       }
       
-      // Always fallback to mock data
+      // Always fallback to mock data to avoid console errors
       const windDirections = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
       const conditions = ['Sunny', 'Partly Cloudy', 'Cloudy', 'Rainy', 'Foggy'];
       
@@ -179,7 +184,7 @@ class ApiService {
         uvIndex: Math.floor(Math.random() * 11)
       };
       
-      console.log('Generated mock weather data for spot:', spotId, mockWeather);
+      console.log('Generated mock weather data for spot:', spotId);
       return mockWeather;
     } catch (error) {
       console.error('Error fetching weather data:', error);
