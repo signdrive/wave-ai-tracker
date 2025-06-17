@@ -144,6 +144,33 @@ export type Database = {
         }
         Relationships: []
       }
+      crowd_reports: {
+        Row: {
+          created_at: string | null
+          id: string
+          reported_level: string
+          source: string | null
+          spot_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          reported_level: string
+          source?: string | null
+          spot_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          reported_level?: string
+          source?: string | null
+          spot_id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       data_requests: {
         Row: {
           completed_at: string | null
