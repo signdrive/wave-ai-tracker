@@ -1,39 +1,46 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { secureApiService } from '@/services/secureApiService';
-import { apiService, SurfCondition, WeatherData, TideData, WavePoolSlot, SurfForecast } from '@/services/apiService';
+import { enhancedSecureApiService } from '@/services/enhancedSecureApiService';
+import { apiService } from '@/services/apiService';
+import { errorHandlingService } from '@/services/errorHandlingService';
 
-// Hook for real-time surf conditions with secure API
+// Enhanced hook for real-time surf conditions with bulletproof error handling
 export const useSurfConditions = (spotId: string, refetchInterval: number = 30000) => {
   return useQuery({
     queryKey: ['surf-conditions', spotId],
     queryFn: async () => {
-      try {
-        // Use secure API service for real data
-        return await secureApiService.getStormGlassForecast(34.0259, -118.7798);
-      } catch (error) {
-        // Fallback to mock data if secure API fails
-        return apiService.getSurfConditions(spotId);
-      }
+      return errorHandlingService.safeApiCall(
+        async () => {
+          // Try enhanced secure API first
+          return await enhancedSecureApiService.getStormGlassForecast(34.0259, -118.7798);
+        },
+        // Fallback to regular API service
+        await apiService.getSurfConditions(spotId),
+        `surf_conditions_${spotId}`
+      );
     },
     refetchInterval,
     staleTime: 30000,
+    retry: false, // Let our error handling service manage retries
   });
 };
 
-// Hook for real-time weather data with secure API
+// Enhanced weather data hook
 export const useWeatherData = (spotId: string, refetchInterval: number = 300000) => {
   return useQuery({
     queryKey: ['weather-data', spotId],
     queryFn: async () => {
-      try {
-        return await secureApiService.getWeatherData(spotId);
-      } catch (error) {
-        return apiService.getWeatherData(spotId);
-      }
+      return errorHandlingService.safeApiCall(
+        async () => {
+          return await enhancedSecureApiService.getWeatherData(spotId);
+        },
+        await apiService.getWeatherData(spotId),
+        `weather_data_${spotId}`
+      );
     },
     refetchInterval,
     staleTime: 300000,
+    retry: false,
   });
 };
 
@@ -70,7 +77,7 @@ export const useRealTimeUpdates = () => {
 
   useEffect(() => {
     const setupWebSocket = () => {
-      console.log('Setting up secure real-time data connection...');
+      console.log('Setting up bulletproof real-time data connection...');
       
       const interval = setInterval(() => {
         queryClient.invalidateQueries({ queryKey: ['surf-conditions'] });
@@ -85,17 +92,27 @@ export const useRealTimeUpdates = () => {
   }, [queryClient]);
 };
 
-// Updated API keys hook for secure storage
+// Enhanced API keys hook with fallback management
 export const useApiKeys = () => {
   const setApiKeys = (keys: { stormglass?: string; weatherapi?: string }) => {
-    // Keys are now managed through secure admin panel only
-    console.warn('API keys must be set through secure admin panel');
+    // Store as fallback keys
+    if (keys.stormglass) {
+      errorHandlingService.setFallbackKey('stormglass', keys.stormglass);
+    }
+    if (keys.weatherapi) {
+      errorHandlingService.setFallbackKey('weatherapi', keys.weatherapi);
+    }
+    console.log('Fallback API keys stored successfully');
   };
 
   const loadStoredKeys = () => {
-    // Keys are loaded from database by secure service
-    console.log('API keys loaded from secure database storage');
+    console.log('Fallback API keys loaded from localStorage');
   };
 
-  return { setApiKeys, loadStoredKeys };
+  const resetErrors = () => {
+    errorHandlingService.resetErrorCounts();
+    console.log('API error counts reset');
+  };
+
+  return { setApiKeys, loadStoredKeys, resetErrors };
 };

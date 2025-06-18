@@ -2,6 +2,7 @@
 import React from 'react';
 import { Waves, Wind, Thermometer } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { errorHandlingService } from '@/services/errorHandlingService';
 
 interface SurfConditions {
   waveHeight: number;
@@ -38,33 +39,39 @@ const SurfConditionsDisplay: React.FC<SurfConditionsDisplayProps> = ({
 
   if (!conditions) return null;
 
+  // Safe number formatting with error protection
+  const safeWaveHeight = errorHandlingService.safeToFixed(conditions.waveHeight, 1);
+  const safePeriod = errorHandlingService.safeToFixed(conditions.period, 0);
+  const safeWindSpeed = errorHandlingService.safeToFixed(conditions.windSpeed, 0);
+  const safeTemperature = errorHandlingService.safeToFixed(conditions.temperature, 0);
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div className="flex items-center">
         <Waves className="w-4 h-4 mr-2 text-ocean" />
         <div>
           <p className="text-xs text-gray-500">Wave Height</p>
-          <p className="font-semibold text-lg">{conditions.waveHeight.toFixed(1)}ft</p>
+          <p className="font-semibold text-lg">{safeWaveHeight}ft</p>
         </div>
       </div>
       <div className="flex items-center">
         <div>
           <p className="text-xs text-gray-500">Period</p>
-          <p className="font-semibold text-lg">{conditions.period.toFixed(0)}s</p>
+          <p className="font-semibold text-lg">{safePeriod}s</p>
         </div>
       </div>
       <div className="flex items-center">
         <Wind className="w-4 h-4 mr-2 text-ocean" />
         <div>
           <p className="text-xs text-gray-500">Wind</p>
-          <p className="font-semibold text-lg">{conditions.windSpeed.toFixed(0)}mph {conditions.windDirection}</p>
+          <p className="font-semibold text-lg">{safeWindSpeed}mph {conditions.windDirection || 'N/A'}</p>
         </div>
       </div>
       <div className="flex items-center">
         <Thermometer className="w-4 h-4 mr-2 text-ocean" />
         <div>
           <p className="text-xs text-gray-500">Water Temp</p>
-          <p className="font-semibold text-lg">{conditions.temperature.toFixed(0)}°F</p>
+          <p className="font-semibold text-lg">{safeTemperature}°F</p>
         </div>
       </div>
     </div>
