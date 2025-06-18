@@ -76,7 +76,7 @@ const SecureAdminLogin: React.FC<SecureAdminLoginProps> = ({ onSuccess }) => {
       
       if (granted) {
         toast.success('Emergency access granted');
-        onSuccess('super_admin');
+        onSuccess('admin');
       } else {
         setError('Invalid emergency code');
       }

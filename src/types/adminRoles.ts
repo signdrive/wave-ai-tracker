@@ -1,5 +1,5 @@
 
-export type AdminRole = 'super_admin' | 'admin' | 'moderator';
+export type AdminRole = 'admin' | 'moderator';
 
 export interface AdminPermission {
   resource: string;
@@ -14,7 +14,7 @@ export interface RolePermissions {
 
 export const ADMIN_PERMISSIONS: RolePermissions[] = [
   {
-    role: 'super_admin',
+    role: 'admin',
     permissions: [
       { resource: 'system', actions: ['create', 'read', 'update', 'delete'] },
       { resource: 'users', actions: ['create', 'read', 'update', 'delete'] },
@@ -24,17 +24,6 @@ export const ADMIN_PERMISSIONS: RolePermissions[] = [
       { resource: 'analytics', actions: ['read'] },
     ],
     description: 'Full system control including infrastructure changes'
-  },
-  {
-    role: 'admin',
-    permissions: [
-      { resource: 'users', actions: ['create', 'read', 'update'] },
-      { resource: 'api_keys', actions: ['read', 'update'] },
-      { resource: 'logs', actions: ['read'] },
-      { resource: 'settings', actions: ['read', 'update'] },
-      { resource: 'analytics', actions: ['read'] },
-    ],
-    description: 'Limited to app management, no infrastructure changes'
   },
   {
     role: 'moderator',
