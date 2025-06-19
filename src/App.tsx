@@ -13,7 +13,6 @@ import AdminApiConfigPage from '@/pages/AdminApiConfigPage';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import PrivacySettingsPage from '@/pages/PrivacySettingsPage';
 import PrivacyPolicyPage from '@/pages/PrivacyPolicyPage';
-import Footer from '@/components/Footer';
 
 const queryClient = new QueryClient();
 
@@ -37,7 +36,6 @@ function App() {
                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
               </Routes>
             </main>
-            <Footer />
           </div>
         </BrowserRouter>
       </ThemeProvider>

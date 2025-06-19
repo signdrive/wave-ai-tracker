@@ -780,6 +780,48 @@ export type Database = {
         }
         Relationships: []
       }
+      surf_sessions: {
+        Row: {
+          conditions_snapshot: Json | null
+          created_at: string
+          duration_minutes: number | null
+          id: string
+          notes: string | null
+          rating: number | null
+          session_date: string
+          spot_id: string
+          spot_name: string | null
+          user_id: string
+          wave_count: number | null
+        }
+        Insert: {
+          conditions_snapshot?: Json | null
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          notes?: string | null
+          rating?: number | null
+          session_date: string
+          spot_id: string
+          spot_name?: string | null
+          user_id: string
+          wave_count?: number | null
+        }
+        Update: {
+          conditions_snapshot?: Json | null
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          notes?: string | null
+          rating?: number | null
+          session_date?: string
+          spot_id?: string
+          spot_name?: string | null
+          user_id?: string
+          wave_count?: number | null
+        }
+        Relationships: []
+      }
       surf_spots: {
         Row: {
           "amenities/0": string | null
