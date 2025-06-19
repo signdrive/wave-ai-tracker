@@ -1,5 +1,4 @@
 
-import { supabase } from '@/integrations/supabase/client';
 import { errorHandlingService } from './errorHandlingService';
 
 interface ApiKeyResponse {
@@ -17,29 +16,14 @@ class EnhancedSecureApiService {
       throw new Error(`Rate limit exceeded for ${serviceName}`);
     }
 
-    return errorHandlingService.safeApiCall(
-      async () => {
-        const { data, error } = await supabase
-          .from('api_keys')
-          .select('key_value')
-          .eq('service_name', serviceName)
-          .eq('is_active', true)
-          .single();
+    // Always use fallback keys to prevent Supabase API calls
+    const fallbackKey = errorHandlingService.getFallbackKey(serviceName);
+    if (fallbackKey && fallbackKey !== 'demo-key') {
+      return fallbackKey;
+    }
 
-        if (error) {
-          throw new Error(`Database error: ${error.message}`);
-        }
-
-        if (!data?.key_value) {
-          throw new Error(`No active key found for ${serviceName}`);
-        }
-
-        return data.key_value;
-      },
-      // Fallback to stored key or empty string
-      errorHandlingService.getFallbackKey(serviceName) || '',
-      `get_api_key_${serviceName}`
-    );
+    console.warn(`No API key available for ${serviceName}, using demo mode`);
+    return 'demo-key';
   }
 
   async getStormGlassForecast(lat: number, lng: number): Promise<any> {
@@ -48,8 +32,8 @@ class EnhancedSecureApiService {
     return errorHandlingService.safeApiCall(
       async () => {
         const apiKey = await this.getSecureApiKey('stormglass');
-        if (!apiKey) {
-          throw new Error('StormGlass API key not available');
+        if (!apiKey || apiKey === 'demo-key') {
+          throw new Error('StormGlass API key not available - using mock data');
         }
 
         const params = 'waveHeight,waveDirection,wavePeriod,windSpeed,windDirection';
@@ -79,8 +63,8 @@ class EnhancedSecureApiService {
     return errorHandlingService.safeApiCall(
       async () => {
         const apiKey = await this.getSecureApiKey('weatherapi');
-        if (!apiKey) {
-          throw new Error('Weather API key not available');
+        if (!apiKey || apiKey === 'demo-key') {
+          throw new Error('Weather API key not available - using mock data');
         }
 
         const response = await fetch(
@@ -124,12 +108,12 @@ class EnhancedSecureApiService {
       forecast: data.hours?.map((hour: any) => ({
         timestamp: new Date(hour.time).getTime(),
         waveHeight: {
-          min: errorHandlingService.safeToFixed(hour.waveHeight?.noaa || 0),
-          max: errorHandlingService.safeToFixed(hour.waveHeight?.sg || 0),
-          avg: errorHandlingService.safeToFixed(hour.waveHeight?.icon || 0)
+          min: errorHandlingService.safeToFixed(hour.waveHeight?.noaa || 0, 1),
+          max: errorHandlingService.safeToFixed(hour.waveHeight?.sg || 0, 1),
+          avg: errorHandlingService.safeToFixed(hour.waveHeight?.icon || 0, 1)
         },
-        period: errorHandlingService.safeToFixed(hour.wavePeriod?.noaa || 0),
-        windSpeed: errorHandlingService.safeToFixed(hour.windSpeed?.noaa || 0),
+        period: errorHandlingService.safeToFixed(hour.wavePeriod?.noaa || 0, 0),
+        windSpeed: errorHandlingService.safeToFixed(hour.windSpeed?.noaa || 0, 0),
         windDirection: hour.windDirection?.noaa || 0
       })) || [],
       generated: new Date().toISOString()
@@ -142,9 +126,13 @@ class EnhancedSecureApiService {
       spotId,
       forecast: [{
         timestamp: Date.now(),
-        waveHeight: { min: '2.0', max: '4.0', avg: '3.0' },
-        period: '10.0',
-        windSpeed: '15.0',
+        waveHeight: { 
+          min: errorHandlingService.safeToFixed(2.0, 1), 
+          max: errorHandlingService.safeToFixed(4.0, 1), 
+          avg: errorHandlingService.safeToFixed(3.0, 1) 
+        },
+        period: errorHandlingService.safeToFixed(10.0, 0),
+        windSpeed: errorHandlingService.safeToFixed(15.0, 0),
         windDirection: 'SW',
         rating: 3
       }],
@@ -156,9 +144,9 @@ class EnhancedSecureApiService {
     return {
       location: { name: location },
       current: {
-        temp_c: 22,
+        temp_c: Number(errorHandlingService.safeToFixed(22, 0)),
         condition: { text: 'Sunny' },
-        wind_kph: 15,
+        wind_kph: Number(errorHandlingService.safeToFixed(15, 0)),
         wind_dir: 'SW'
       }
     };
