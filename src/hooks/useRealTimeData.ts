@@ -33,27 +33,74 @@ export const useWeatherData = (spotId: string, refetchInterval: number = 300000)
   });
 };
 
-// Keep existing hooks for compatibility
+// Fixed surf forecast hook to return correct structure
 export const useSurfForecast = (spotId: string, refetchInterval: number = 600000) => {
   return useQuery({
     queryKey: ['surf-forecast', spotId],
     queryFn: async () => {
       console.log(`Generating safe surf forecast for spot: ${spotId}`);
+      
+      const spotNames: Record<string, string> = {
+        pipeline: 'Pipeline, Oahu',
+        mavericks: 'Mavericks, California',
+        snapper: 'Snapper Rocks, Australia',
+        jeffreys: 'Jeffreys Bay, South Africa'
+      };
+
+      const swellDirections = [
+        { degrees: 0, text: 'N' },
+        { degrees: 45, text: 'NE' },
+        { degrees: 90, text: 'E' },
+        { degrees: 135, text: 'SE' },
+        { degrees: 180, text: 'S' },
+        { degrees: 225, text: 'SW' },
+        { degrees: 270, text: 'W' },
+        { degrees: 315, text: 'NW' }
+      ];
+
+      const conditions = ['Poor', 'Fair', 'Good', 'Very Good', 'Epic'];
+      const windDirections = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+
+      const days = [];
+      for (let i = 0; i < 7; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() + i);
+        
+        const swellDir = swellDirections[Math.floor(Math.random() * swellDirections.length)];
+        const minWave = Math.random() * 3 + 1;
+        const maxWave = minWave + Math.random() * 4 + 1;
+        const rating = Math.floor(Math.random() * 5) + 1;
+        
+        const bestTimes = [];
+        if (rating >= 3) {
+          bestTimes.push('6-9 AM');
+          if (rating >= 4) bestTimes.push('4-6 PM');
+        }
+
+        days.push({
+          date: date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }),
+          timestamp: date.getTime(),
+          waveHeight: {
+            min: errorHandlingService.safeToFixed(minWave, 1),
+            max: errorHandlingService.safeToFixed(maxWave, 1),
+            avg: errorHandlingService.safeToFixed((minWave + maxWave) / 2, 1)
+          },
+          period: errorHandlingService.safeToFixed(Math.random() * 8 + 8, 0),
+          swellDirection: swellDir.degrees,
+          swellDirectionText: swellDir.text,
+          windSpeed: errorHandlingService.safeToFixed(Math.random() * 15 + 5, 0),
+          windDirection: windDirections[Math.floor(Math.random() * windDirections.length)],
+          rating,
+          conditions: conditions[rating - 1],
+          bestTimes
+        });
+      }
+
       return {
         spotId,
-        forecast: Array.from({ length: 5 }, (_, i) => ({
-          timestamp: Date.now() + i * 3600000,
-          waveHeight: {
-            min: errorHandlingService.safeToFixed(Math.random() * 2 + 1, 1),
-            max: errorHandlingService.safeToFixed(Math.random() * 4 + 3, 1),
-            avg: errorHandlingService.safeToFixed(Math.random() * 3 + 2, 1)
-          },
-          period: errorHandlingService.safeToFixed(Math.random() * 5 + 8, 0),
-          windSpeed: errorHandlingService.safeToFixed(Math.random() * 15 + 5, 0),
-          windDirection: ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'][Math.floor(Math.random() * 8)],
-          rating: Math.floor(Math.random() * 5) + 1
-        })),
-        generated: new Date().toISOString()
+        spotName: spotNames[spotId] || `Spot ${spotId}`,
+        generated: new Date().toISOString(),
+        days
       };
     },
     refetchInterval,
@@ -62,20 +109,24 @@ export const useSurfForecast = (spotId: string, refetchInterval: number = 600000
   });
 };
 
+// Fixed tide data hook to return array directly
 export const useTideData = (stationId: string, days: number = 3) => {
   return useQuery({
     queryKey: ['tide-data', stationId, days],
     queryFn: async () => {
       console.log(`Generating safe tide data for station: ${stationId}`);
-      return {
-        stationId,
-        tides: Array.from({ length: 8 }, (_, i) => ({
-          time: new Date(Date.now() + i * 3 * 3600000).toISOString(),
+      
+      const tides = [];
+      for (let i = 0; i < 8; i++) {
+        const time = new Date(Date.now() + i * 3 * 3600000);
+        tides.push({
+          time: time.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true }),
           height: errorHandlingService.safeToFixed(Math.random() * 3 + 1, 1),
           type: i % 2 === 0 ? 'High' : 'Low'
-        })),
-        generated: new Date().toISOString()
-      };
+        });
+      }
+      
+      return tides;
     },
     refetchInterval: 300000,
     staleTime: 300000,
