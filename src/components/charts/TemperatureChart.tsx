@@ -3,6 +3,7 @@ import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useHistoricalTemperatureData } from '@/hooks/useHistoricalData';
 import { Skeleton } from '@/components/ui/skeleton';
+import { errorHandlingService } from '@/services/errorHandlingService';
 
 interface TemperatureChartProps {
   spotId: string;
@@ -24,19 +25,24 @@ const TemperatureChart: React.FC<TemperatureChartProps> = ({ spotId, days }) => 
     );
   }
 
+  // Safe number formatting with bulletproof error protection
+  const safeAvgAirTemp = errorHandlingService.safeToFixed(data.avgAirTemp, 1);
+  const safeAvgWaterTemp = errorHandlingService.safeToFixed(data.avgWaterTemp, 1);
+  const safeTempRange = errorHandlingService.safeToFixed(data.tempRange, 1);
+
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-4 mb-4">
         <div className="text-center p-3 bg-blue-50 rounded-lg">
-          <div className="text-2xl font-bold text-blue-600">{data.avgAirTemp.toFixed(1)}°F</div>
+          <div className="text-2xl font-bold text-blue-600">{safeAvgAirTemp}°F</div>
           <div className="text-sm text-gray-600">Avg Air Temp</div>
         </div>
         <div className="text-center p-3 bg-ocean/10 rounded-lg">
-          <div className="text-2xl font-bold text-ocean-dark">{data.avgWaterTemp.toFixed(1)}°F</div>
+          <div className="text-2xl font-bold text-ocean-dark">{safeAvgWaterTemp}°F</div>
           <div className="text-sm text-gray-600">Avg Water Temp</div>
         </div>
         <div className="text-center p-3 bg-orange-50 rounded-lg">
-          <div className="text-2xl font-bold text-orange-600">{data.tempRange.toFixed(1)}°F</div>
+          <div className="text-2xl font-bold text-orange-600">{safeTempRange}°F</div>
           <div className="text-sm text-gray-600">Temperature Range</div>
         </div>
       </div>
@@ -55,7 +61,7 @@ const TemperatureChart: React.FC<TemperatureChartProps> = ({ spotId, days }) => 
           />
           <Tooltip 
             formatter={(value: number, name: string) => [
-              `${value.toFixed(1)}°F`, 
+              `${errorHandlingService.safeToFixed(value, 1)}°F`, 
               name === 'airTemp' ? 'Air Temperature' : 'Water Temperature'
             ]}
             labelFormatter={(value) => new Date(value).toLocaleDateString('en-US', { 

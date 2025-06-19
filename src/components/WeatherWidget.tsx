@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Wind, Thermometer, Eye, Droplets, Gauge } from 'lucide-react';
+import { errorHandlingService } from '@/services/errorHandlingService';
 
 interface WeatherData {
   temperature: number;
@@ -80,7 +81,17 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ weatherData, isLoading, s
 
   if (!weatherData) return null;
 
-  const uvData = getUVLevel(weatherData.uvIndex);
+  // Safe number formatting with bulletproof error protection
+  const safeTemperature = errorHandlingService.safeToFixed(weatherData.temperature, 0);
+  const safeFeelsLike = errorHandlingService.safeToFixed(weatherData.feelsLike, 0);
+  const safeWindSpeed = errorHandlingService.safeToFixed(weatherData.windSpeed, 0);
+  const safeWindGust = errorHandlingService.safeToFixed(weatherData.windGust, 0);
+  const safeHumidity = errorHandlingService.safeToFixed(weatherData.humidity, 0);
+  const safePressure = errorHandlingService.safeToFixed(weatherData.pressure, 0);
+  const safeVisibility = errorHandlingService.safeToFixed(weatherData.visibility, 0);
+  const safeUVIndex = errorHandlingService.safeToFixed(weatherData.uvIndex, 0);
+
+  const uvData = getUVLevel(Number(safeUVIndex));
 
   return (
     <Card>
@@ -104,8 +115,8 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ weatherData, isLoading, s
               <span className="text-sm text-gray-600">Temperature</span>
               <Thermometer className="w-4 h-4 text-ocean" />
             </div>
-            <div className="text-2xl font-bold text-ocean-dark">{weatherData.temperature}°F</div>
-            <div className="text-xs text-gray-500">Feels like {weatherData.feelsLike}°F</div>
+            <div className="text-2xl font-bold text-ocean-dark">{safeTemperature}°F</div>
+            <div className="text-xs text-gray-500">Feels like {safeFeelsLike}°F</div>
           </div>
           
           <div className="bg-sand/50 p-3 rounded-md">
@@ -113,7 +124,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ weatherData, isLoading, s
               <span className="text-sm text-gray-600">UV Index</span>
               <div className="w-4 h-4 bg-yellow-400 rounded-full"></div>
             </div>
-            <div className="text-2xl font-bold">{weatherData.uvIndex}</div>
+            <div className="text-2xl font-bold">{safeUVIndex}</div>
             <div className={`text-xs font-medium ${uvData.color}`}>{uvData.level}</div>
           </div>
         </div>
@@ -134,11 +145,11 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ weatherData, isLoading, s
                   ↑
                 </div>
               </div>
-              <div className="text-lg font-bold">{weatherData.windSpeed} mph</div>
+              <div className="text-lg font-bold">{safeWindSpeed} mph</div>
               <div className="text-xs text-gray-500">{weatherData.windDirection}</div>
             </div>
             <div className="text-center">
-              <div className="text-lg font-bold">{weatherData.windGust} mph</div>
+              <div className="text-lg font-bold">{safeWindGust} mph</div>
               <div className="text-xs text-gray-500">Gusts</div>
             </div>
             <div className="text-center">
@@ -154,7 +165,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ weatherData, isLoading, s
             <div className="flex items-center justify-center mb-1">
               <Droplets className="w-4 h-4 text-blue-500" />
             </div>
-            <div className="font-semibold">{weatherData.humidity}%</div>
+            <div className="font-semibold">{safeHumidity}%</div>
             <div className="text-xs text-gray-500">Humidity</div>
           </div>
           
@@ -162,7 +173,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ weatherData, isLoading, s
             <div className="flex items-center justify-center mb-1">
               <Gauge className="w-4 h-4 text-gray-600" />
             </div>
-            <div className="font-semibold">{weatherData.pressure} mb</div>
+            <div className="font-semibold">{safePressure} mb</div>
             <div className="text-xs text-gray-500">Pressure</div>
           </div>
           
@@ -170,7 +181,7 @@ const WeatherWidget: React.FC<WeatherWidgetProps> = ({ weatherData, isLoading, s
             <div className="flex items-center justify-center mb-1">
               <Eye className="w-4 h-4 text-gray-600" />
             </div>
-            <div className="font-semibold">{weatherData.visibility} mi</div>
+            <div className="font-semibold">{safeVisibility} mi</div>
             <div className="text-xs text-gray-500">Visibility</div>
           </div>
         </div>
