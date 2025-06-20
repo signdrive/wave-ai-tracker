@@ -1,6 +1,13 @@
+
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { corsHeaders } from "../_shared/cors.ts";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, DELETE, PUT',
+  'Access-Control-Max-Age': '86400',
+};
 
 const getSimpleHeuristicPrediction = (spotId: string): { predicted_level: "Low" | "Medium" | "High", source: string } => {
   const now = new Date();
@@ -51,7 +58,6 @@ const getLatestUserReport = async (supabaseClient: SupabaseClient, spotId: strin
   return null;
 };
 
-
 serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -68,35 +74,18 @@ serve(async (req: Request) => {
       });
     }
 
-    // Initialize Supabase client with user's auth token for RLS
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Missing Authorization header" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    // Initialize Supabase client
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? "", // ANON key is fine, RLS uses the JWT from Authorization header
-      { global: { headers: { Authorization: authHeader } } }
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
     );
 
-    // Verify user authentication (optional, but good practice if function requires auth)
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-    if (userError || !user) {
-      return new Response(JSON.stringify({ error: "Authentication failed" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     let prediction;
-    const latestReport = await getLatestUserReport(supabaseClient, spot_id);
-
-    if (latestReport) {
-      prediction = latestReport;
-    } else {
+    try {
+      const latestReport = await getLatestUserReport(supabaseClient, spot_id);
+      prediction = latestReport || getSimpleHeuristicPrediction(spot_id);
+    } catch (error) {
+      console.error("Error getting crowd prediction:", error);
       prediction = getSimpleHeuristicPrediction(spot_id);
     }
 
@@ -107,7 +96,10 @@ serve(async (req: Request) => {
 
   } catch (error) {
     console.error("General error:", error);
-    return new Response(JSON.stringify({ error: "An unexpected error occurred", details: error.message }), {
+    return new Response(JSON.stringify({ 
+      error: "An unexpected error occurred", 
+      details: error.message 
+    }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

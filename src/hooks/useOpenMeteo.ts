@@ -2,6 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { openMeteoService } from '@/services/openMeteoService';
 import { OpenMeteoResponse } from '@/types/openMeteo';
+import { WeatherData } from '@/types/weather';
 
 /**
  * Hook for fetching current weather from Open-Meteo
@@ -17,7 +18,10 @@ export const useOpenMeteoWeather = (lat: number, lng: number, enabled: boolean =
     enabled: enabled && !isNaN(lat) && !isNaN(lng),
     retry: (failureCount, error) => {
       // Don't retry on client errors (4xx), only on network/server errors
-      if (error && error.message && error.message.includes('Open-Meteo API error')) return false;
+      if (error && typeof error === 'object' && 'message' in error && 
+          typeof error.message === 'string' && error.message.includes('Open-Meteo API error')) {
+        return false;
+      }
       return failureCount < 2;
     },
   });
@@ -66,7 +70,7 @@ export const useOpenMeteoHistorical = (
 /**
  * Transform Open-Meteo response to match existing weather data interface
  */
-export const transformOpenMeteoWeather = (data: OpenMeteoResponse) => {
+export const transformOpenMeteoWeather = (data: OpenMeteoResponse): WeatherData | null => {
   const current = data.current_weather;
   if (!current) return null;
 

@@ -1,8 +1,10 @@
+
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { useOpenMeteoWeather, useOpenMeteoForecast, transformOpenMeteoForecast } from './useOpenMeteo';
+import { useOpenMeteoWeather, useOpenMeteoForecast, transformOpenMeteoForecast, transformOpenMeteoWeather } from './useOpenMeteo';
 import { weatherService } from '@/services/weatherService';
 import { errorHandlingService } from '@/services/errorHandlingService';
+import { WeatherData } from '@/types/weather';
 
 // Enhanced hook for real-time surf conditions with Open-Meteo integration
 export const useSurfConditions = (spotId: string, refetchInterval: number = 30000) => {
@@ -42,13 +44,16 @@ export const useWeatherData = (spotId: string, refetchInterval: number = 300000)
 
   return useQuery({
     queryKey: ['weather-data', spotId],
-    queryFn: async () => {
+    queryFn: async (): Promise<WeatherData> => {
       console.log(`Fetching weather data for spot: ${spotId}`);
       
       // Try Open-Meteo first
       if (openMeteoData && !openMeteoError) {
         console.log('Using Open-Meteo weather data');
-        return openMeteoData;
+        const transformedData = transformOpenMeteoWeather(openMeteoData);
+        if (transformedData) {
+          return transformedData;
+        }
       }
       
       // Fallback to weather service
