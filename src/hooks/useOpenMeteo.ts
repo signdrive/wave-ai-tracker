@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { openMeteoService } from '@/services/openMeteoService';
 import { OpenMeteoResponse } from '@/types/openMeteo';
@@ -62,7 +61,7 @@ export const useOpenMeteoHistorical = (
     queryFn: () => openMeteoService.getHistoricalWeather(lat, lng, startDate, endDate),
     staleTime: 24 * 60 * 60 * 1000, // 24 hours (historical data doesn't change)
     gcTime: 7 * 24 * 60 * 60 * 1000, // 7 days
-    enabled: enabled && !isNaN(lat) && !isNaN(lng) && startDate && endDate,
+    enabled: enabled && !isNaN(lat) && !isNaN(lng) && !!startDate && !!endDate,
     retry: 1,
   });
 };
