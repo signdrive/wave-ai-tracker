@@ -17,7 +17,7 @@ export const useOpenMeteoWeather = (lat: number, lng: number, enabled: boolean =
     enabled: enabled && !isNaN(lat) && !isNaN(lng),
     retry: (failureCount, error) => {
       // Don't retry on client errors (4xx), only on network/server errors
-      if (error.message.includes('Open-Meteo API error')) return false;
+      if (error && error.message && error.message.includes('Open-Meteo API error')) return false;
       return failureCount < 2;
     },
   });

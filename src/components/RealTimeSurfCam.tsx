@@ -15,6 +15,7 @@ import SurfCamVideo from './SurfCamVideo';
 import SpotMetadata from './SpotMetadata';
 import SurfConditionsDisplay from './SurfConditionsDisplay';
 import LiveAnalysisPanel from './LiveAnalysisPanel';
+import { WeatherData } from '@/types/weather';
 
 interface RealTimeSurfCamProps {
   spotId: string;
@@ -45,10 +46,27 @@ const RealTimeSurfCam: React.FC<RealTimeSurfCamProps> = ({
   metadata 
 }) => {
   const { data: conditions, isLoading, error, isRefetching } = useSurfConditions(spotId);
-  const { data: weatherData, isLoading: isWeatherLoading } = useWeatherData(spotId);
+  const { data: rawWeatherData, isLoading: isWeatherLoading } = useWeatherData(spotId);
   const { user } = useAuth();
   const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
+
+  // Transform weather data to ensure it matches WeatherData interface
+  const weatherData: WeatherData | undefined = rawWeatherData ? {
+    temperature: rawWeatherData.temperature || 0,
+    feelsLike: rawWeatherData.feelsLike || rawWeatherData.temperature || 0,
+    humidity: rawWeatherData.humidity || 0,
+    pressure: rawWeatherData.pressure || 0,
+    visibility: rawWeatherData.visibility || 0,
+    windSpeed: rawWeatherData.windSpeed || 0,
+    windDirection: rawWeatherData.windDirection || 'N',
+    windGust: rawWeatherData.windGust || rawWeatherData.windSpeed || 0,
+    weatherCondition: rawWeatherData.weatherCondition || 'Unknown',
+    weatherIcon: rawWeatherData.weatherIcon || 'unknown',
+    uvIndex: rawWeatherData.uvIndex || 0,
+    timestamp: rawWeatherData.timestamp || new Date().toISOString(),
+    source: rawWeatherData.source || 'Unknown'
+  } : undefined;
 
   const handleAuthRequired = () => {
     setIsAuthDialogOpen(true);
