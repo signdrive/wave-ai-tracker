@@ -2,7 +2,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, AlertTriangle } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 interface CrowdPrediction {
   spot_id: string;
@@ -50,20 +50,6 @@ const SpotCrowdDisplay: React.FC<SpotCrowdDisplayProps> = ({ spotId }) => {
     refetchOnReconnect: false, // Don't refetch on reconnect
   });
 
-  const getBadgeVariant = (level?: 'Low' | 'Medium' | 'High'): 'default' | 'secondary' | 'destructive' | 'outline' => {
-    if (!level) return 'outline';
-    switch (level) {
-      case 'Low':
-        return 'default';
-      case 'Medium':
-        return 'secondary';
-      case 'High':
-        return 'destructive';
-      default:
-        return 'outline';
-    }
-  };
-
   const levelColorClasses = {
     Low: 'bg-green-100 text-green-800 border-green-300',
     Medium: 'bg-yellow-100 text-yellow-800 border-yellow-300',
@@ -84,17 +70,20 @@ const SpotCrowdDisplay: React.FC<SpotCrowdDisplayProps> = ({ spotId }) => {
     );
   }
 
-  if (!prediction) {
+  if (!prediction || !prediction.predicted_level) {
     return <div className="text-sm text-gray-400">No crowd data available.</div>;
   }
+
+  // Safely handle the predicted_level to prevent toLowerCase errors
+  const safeLevel = prediction.predicted_level || 'Medium';
 
   return (
     <div className="text-sm">
       Crowd Level: {' '}
       <Badge
-        className={`px-2 py-0.5 text-xs font-medium rounded-md ${getCurrentLevelColor(prediction.predicted_level)}`}
+        className={`px-2 py-0.5 text-xs font-medium rounded-md ${getCurrentLevelColor(safeLevel)}`}
       >
-        {prediction.predicted_level}
+        {safeLevel}
       </Badge>
       <span className="text-xs text-gray-500 ml-1">
         (estimated)

@@ -72,14 +72,21 @@ serve(async (req: Request) => {
       spot_id = url.searchParams.get("spot_id");
     } else if (req.method === "POST") {
       try {
-        const body = await req.json();
-        spot_id = body.spot_id;
+        const bodyText = await req.text();
+        console.log("Raw request body:", bodyText);
+        
+        if (bodyText && bodyText.trim() !== '') {
+          const body = JSON.parse(bodyText);
+          spot_id = body.spot_id;
+        }
       } catch (error) {
         console.error("Error parsing POST body:", error);
+        // Don't throw here, continue with fallback
       }
     }
 
     if (!spot_id) {
+      console.error("Missing spot_id parameter");
       return new Response(JSON.stringify({ error: "Missing spot_id parameter" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -100,6 +107,8 @@ serve(async (req: Request) => {
       console.error("Error getting crowd prediction:", error);
       prediction = getSimpleHeuristicPrediction(spot_id);
     }
+
+    console.log("Returning prediction:", prediction);
 
     return new Response(JSON.stringify({ spot_id, ...prediction }), {
       status: 200,

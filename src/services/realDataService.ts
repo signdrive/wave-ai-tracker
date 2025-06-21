@@ -65,17 +65,21 @@ class RealDataService {
         return this.getFallbackCrowdData(spotId);
       }
 
+      // Ensure we send valid JSON
+      const requestBody = JSON.stringify({ spot_id: spotId });
+      console.log('Sending request body:', requestBody);
+
       // Try Supabase function with proper error handling
       const { data, error } = await supabase.functions.invoke('get-crowd-prediction', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ spot_id: spotId }),
+        body: requestBody,
       });
 
       if (error) {
-        console.warn('Crowd prediction function error:', error.message);
+        console.warn('Crowd prediction function error:', error);
         throw new Error(`Function error: ${error.message}`);
       }
 
@@ -87,7 +91,7 @@ class RealDataService {
           spotId,
           predictedLevel: data.predicted_level,
           confidence: data.confidence || 0.8,
-          source: data.source || 'api_prediction',
+          source: data.source === 'user_report_recent' ? 'user_reports' : 'api_prediction',
           timestamp: new Date().toISOString()
         };
       }
