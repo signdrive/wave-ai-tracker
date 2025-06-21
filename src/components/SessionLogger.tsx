@@ -48,8 +48,8 @@ const SessionLogger: React.FC<SessionLoggerProps> = ({ onSessionSaved }) => {
     duration_minutes: 90, // Default duration
   });
 
-  const logSessionMutation = useMutation(
-    async (newSession: SessionData) => {
+  const logSessionMutation = useMutation({
+    mutationFn: async (newSession: SessionData) => {
       const { data: authData, error: authError } = await supabase.auth.getUser();
       if (authError || !authData.user) throw new Error("User not authenticated.");
 
@@ -66,27 +66,25 @@ const SessionLogger: React.FC<SessionLoggerProps> = ({ onSessionSaved }) => {
       if (error) throw error;
       return data;
     },
-    {
-      onSuccess: () => {
-        toast.success("Surf session logged successfully! 🏄‍♂️");
-        queryClient.invalidateQueries(['surfLogInsights']); // Invalidate insights query
-        queryClient.invalidateQueries(['surfSessions']); // Invalidate sessions list query (if one exists)
-        onSessionSaved?.(); // Call parent callback
-        // Reset form (optional, or clear specific fields)
-        setSessionFormData({
-          session_date: new Date().toISOString().split('T')[0],
-          spot_id: surfSpotsList[0]?.id || '',
-          rating: 5,
-          duration_minutes: 90,
-          wave_count: undefined,
-          notes: '',
-        });
-      },
-      onError: (error: Error) => {
-        toast.error(`Failed to log session: ${error.message}`);
-      },
-    }
-  );
+    onSuccess: () => {
+      toast.success("Surf session logged successfully! 🏄‍♂️");
+      queryClient.invalidateQueries({ queryKey: ['surfLogInsights'] }); // Invalidate insights query
+      queryClient.invalidateQueries({ queryKey: ['surfSessions'] }); // Invalidate sessions list query (if one exists)
+      onSessionSaved?.(); // Call parent callback
+      // Reset form (optional, or clear specific fields)
+      setSessionFormData({
+        session_date: new Date().toISOString().split('T')[0],
+        spot_id: surfSpotsList[0]?.id || '',
+        rating: 5,
+        duration_minutes: 90,
+        wave_count: undefined,
+        notes: '',
+      });
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to log session: ${error.message}`);
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -191,8 +189,8 @@ const SessionLogger: React.FC<SessionLoggerProps> = ({ onSessionSaved }) => {
             />
           </div>
 
-          <Button type="submit" className="w-full" disabled={logSessionMutation.isLoading}>
-            {logSessionMutation.isLoading ? (
+          <Button type="submit" className="w-full" disabled={logSessionMutation.isPending}>
+            {logSessionMutation.isPending ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             ) : (
               <Plus className="w-4 h-4 mr-2" />

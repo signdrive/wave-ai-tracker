@@ -75,11 +75,11 @@ const SurfLogPage = () => {
     isLoading: isLoadingInsights,
     error: insightsError,
     refetch: refetchInsights
-  } = useQuery<SurfLogInsightsData, Error>(
-    ['surfLogInsights'],
-    fetchSurfLogInsights,
-    { staleTime: 5 * 60 * 1000 } // 5 minutes stale time
-  );
+  } = useQuery<SurfLogInsightsData, Error>({
+    queryKey: ['surfLogInsights'],
+    queryFn: fetchSurfLogInsights,
+    staleTime: 5 * 60 * 1000 // 5 minutes stale time
+  });
 
   const sessions = insightsData?.raw_sessions_for_debug || [];
 
