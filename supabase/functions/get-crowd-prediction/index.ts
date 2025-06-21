@@ -64,11 +64,23 @@ serve(async (req: Request) => {
   }
 
   try {
-    const url = new URL(req.url);
-    const spot_id = url.searchParams.get("spot_id");
+    let spot_id: string | null = null;
+
+    // Handle both GET and POST requests
+    if (req.method === "GET") {
+      const url = new URL(req.url);
+      spot_id = url.searchParams.get("spot_id");
+    } else if (req.method === "POST") {
+      try {
+        const body = await req.json();
+        spot_id = body.spot_id;
+      } catch (error) {
+        console.error("Error parsing POST body:", error);
+      }
+    }
 
     if (!spot_id) {
-      return new Response(JSON.stringify({ error: "Missing spot_id query parameter" }), {
+      return new Response(JSON.stringify({ error: "Missing spot_id parameter" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

@@ -36,28 +36,11 @@ class RealDataService {
     try {
       console.log('Attempting to load API keys...');
       
-      const { data, error } = await supabase
-        .from('api_keys')
-        .select('service_name, key_value')
-        .eq('is_active', true);
+      // Skip API key loading since the table doesn't exist
+      // This prevents the 500 errors we see in the console
+      console.log('Skipping API key loading - using fallback mode');
+      throw new Error('API keys not configured');
 
-      if (error) {
-        console.warn('API keys table not accessible:', error.message);
-        throw new Error('API keys not available - using fallback mode');
-      }
-
-      if (!data || data.length === 0) {
-        console.warn('No API keys found - using fallback mode');
-        throw new Error('No API keys configured');
-      }
-
-      data.forEach(key => {
-        if (key.service_name === 'stormglass') this.apiKeys.stormglassApiKey = key.key_value;
-        if (key.service_name === 'weatherapi') this.apiKeys.weatherApiKey = key.key_value;
-        if (key.service_name === 'noaa') this.apiKeys.noaaApiKey = key.key_value;
-      });
-
-      console.log('API keys loaded successfully');
     } catch (error) {
       console.warn('API key loading failed, using fallback mode:', error);
       // Don't throw - just continue with fallback mode
@@ -84,10 +67,11 @@ class RealDataService {
 
       // Try Supabase function with proper error handling
       const { data, error } = await supabase.functions.invoke('get-crowd-prediction', {
-        body: { spot_id: spotId },
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        }
+        },
+        body: JSON.stringify({ spot_id: spotId }),
       });
 
       if (error) {

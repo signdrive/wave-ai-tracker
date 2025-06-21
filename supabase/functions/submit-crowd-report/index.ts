@@ -48,8 +48,22 @@ serve(async (req: Request) => {
     }
     const userId = user.id;
 
-    // Parse request body
-    const payload: CrowdReportPayload = await req.json();
+    // Parse request body safely
+    let payload: CrowdReportPayload;
+    try {
+      const bodyText = await req.text();
+      if (!bodyText || bodyText.trim() === '') {
+        throw new Error('Empty request body');
+      }
+      payload = JSON.parse(bodyText);
+    } catch (error) {
+      console.error("JSON parsing error:", error);
+      return new Response(JSON.stringify({ error: "Invalid JSON in request body" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { spot_id, reported_level } = payload;
 
     // Validate input

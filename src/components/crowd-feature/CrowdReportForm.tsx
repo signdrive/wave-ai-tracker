@@ -26,8 +26,11 @@ const submitCrowdReport = async (payload: SubmitCrowdReportPayload): Promise<any
 
   const { data, error } = await supabase.functions.invoke('submit-crowd-report', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-    body: JSON.stringify(payload), // Ensure body is stringified for functions
+    headers: { 
+      'Content-Type': 'application/json', 
+      Authorization: `Bearer ${session.access_token}` 
+    },
+    body: JSON.stringify(payload),
   });
 
   if (error) {
@@ -64,7 +67,7 @@ const CrowdReportForm: React.FC<CrowdReportFormProps> = ({ spotId }) => {
     onSuccess: () => {
       toast.success('Crowd report submitted! Thanks for contributing.');
       // Invalidate the query for this spot's crowd prediction to refetch
-      queryClient.invalidateQueries({ queryKey: ['crowdPrediction', spotId] });
+      queryClient.invalidateQueries({ queryKey: ['realCrowdData', spotId] });
     },
     onError: (error: Error) => {
       toast.error(`Failed to submit report: ${error.message}`);
