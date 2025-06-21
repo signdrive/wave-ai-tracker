@@ -108,6 +108,7 @@ serve(async (req: Request) => {
       });
     }
     const userId = user.id;
+    console.log('get-surf-log-insights: Fetching insights for userId:', userId); // LOG ADDED
 
     const { data: sessions, error: fetchError } = await supabaseClient
       .from("surf_sessions")
@@ -116,11 +117,15 @@ serve(async (req: Request) => {
       .order("session_date", { ascending: false });
 
     if (fetchError) {
-      console.error("Error fetching surf sessions:", fetchError);
+      console.error('get-surf-log-insights: Error fetching surf sessions:', fetchError.message, fetchError.stack); // Specific log
       return new Response(JSON.stringify({ error: "Failed to fetch surf sessions" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    console.log('get-surf-log-insights: Raw userSessions count:', sessions ? sessions.length : 0); // LOG ADDED
+    console.debug('get-surf-log-insights: Raw userSessions data (first 2):', sessions ? sessions.slice(0,2) : []); // LOG ADDED (use debug)
+
 
     if (!sessions || sessions.length === 0) {
       return new Response(JSON.stringify({ performance_snapshot: { total_sessions: 0 }, preferred_conditions_by_spot: [] }), {
@@ -142,7 +147,7 @@ serve(async (req: Request) => {
       }
       totalDuration += s.duration_minutes || 0;
       totalWaves += s.wave_count || 0;
-      if(s.spot_id) {
+      if(s.spot_id) { // Ensure spot_id is not null or undefined before using as key
         spotFrequency[s.spot_id] = spotFrequency[s.spot_id] || { name: s.spot_name, count: 0};
         spotFrequency[s.spot_id].count++;
       }
@@ -158,11 +163,13 @@ serve(async (req: Request) => {
     };
 
     let maxFreq = 0;
-    for(const spotId in spotFrequency){
-        if(spotFrequency[spotId].count > maxFreq){
-            maxFreq = spotFrequency[spotId].count;
-            performanceSnapshot.most_frequented_spot_id = spotId;
-            performanceSnapshot.most_frequented_spot_name = spotFrequency[spotId].name || spotId;
+    if (Object.keys(spotFrequency).length > 0) { // Check if spotFrequency is not empty
+        for(const spotId in spotFrequency){
+            if(spotFrequency[spotId].count > maxFreq){
+                maxFreq = spotFrequency[spotId].count;
+                performanceSnapshot.most_frequented_spot_id = spotId;
+                performanceSnapshot.most_frequented_spot_name = spotFrequency[spotId].name || spotId;
+            }
         }
     }
 
@@ -215,12 +222,17 @@ serve(async (req: Request) => {
       performance_snapshot: performanceSnapshot,
       preferred_conditions_by_spot: preferredConditionsBySpot,
       raw_sessions_for_debug: sessions, // Optionally remove for production
-    }), {
+    };
+
+    console.log('get-surf-log-insights: Calculated performanceSnapshot:', responsePayload.performance_snapshot); // LOG ADDED
+    console.log('get-surf-log-insights: Calculated preferredConditionsBySpot:', responsePayload.preferred_conditions_by_spot); // LOG ADDED
+
+    return new Response(JSON.stringify(responsePayload), {
       status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
   } catch (e) {
-    console.error("General error in get-surf-log-insights:", e);
+    console.error('get-surf-log-insights: Error:', e.message, e.stack); // Standardized main catch
     return new Response(JSON.stringify({ error: "An unexpected error occurred", details: e.message }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

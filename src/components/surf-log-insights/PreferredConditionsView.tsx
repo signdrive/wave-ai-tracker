@@ -20,6 +20,7 @@ interface PreferredConditionsViewProps {
 }
 
 const PreferredConditionsView: React.FC<PreferredConditionsViewProps> = ({ conditions, isLoading, error /*, title*/ }) => {
+  console.log('PreferredConditionsView: Props conditions:', conditions, 'isLoading:', isLoading, 'error:', error); // LOG ADDED
   const cardTitle = `Preferred Conditions at ${conditions?.spot_name || conditions?.spot_id || 'Selected Spot'}`;
 
   if (isLoading) {

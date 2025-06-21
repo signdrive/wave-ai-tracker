@@ -66,28 +66,10 @@ const SessionLogger: React.FC<SessionLoggerProps> = ({ onSessionSaved }) => {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
-      toast.success("Surf session logged successfully! 🏄‍♂️");
-      queryClient.invalidateQueries({ queryKey: ['surfLogInsights'] }); // Invalidate insights query
-      queryClient.invalidateQueries({ queryKey: ['surfSessions'] }); // Invalidate sessions list query (if one exists)
-      onSessionSaved?.(); // Call parent callback
-      // Reset form (optional, or clear specific fields)
-      setSessionFormData({
-        session_date: new Date().toISOString().split('T')[0],
-        spot_id: surfSpotsList[0]?.id || '',
-        rating: 5,
-        duration_minutes: 90,
-        wave_count: undefined,
-        notes: '',
-      });
-    },
-    onError: (error: Error) => {
-      toast.error(`Failed to log session: ${error.message}`);
-    },
-  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('SessionLogger: Form submission values:', sessionFormData); // LOG ADDED
     if (!sessionFormData.spot_id || !sessionFormData.session_date) {
       toast.error("Please select a spot and date.");
       return;

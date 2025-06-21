@@ -43,7 +43,7 @@ async function getNoaaConditions(latitude: number, longitude: number, sessionDat
     const pointsResponse = await fetch(pointsUrl, { headers: { "User-Agent": userAgent, "Accept": "application/geo+json" } });
     if (!pointsResponse.ok) {
       snapshot.error = `Failed to get gridpoint: ${pointsResponse.status} ${await pointsResponse.text()}`;
-      console.error(snapshot.error);
+      console.error('log-surf-session: NOAA points API error:', snapshot.error); // Specific log
       return snapshot;
     }
     const pointsData = await pointsResponse.json();
@@ -51,7 +51,7 @@ async function getNoaaConditions(latitude: number, longitude: number, sessionDat
 
     if (!gridDataUrl) {
       snapshot.error = "Forecast grid data URL not found in NWS points response.";
-      console.error(snapshot.error);
+      console.error('log-surf-session: NOAA grid data URL not found:', snapshot.error); // Specific log
       return snapshot;
     }
 
@@ -59,10 +59,11 @@ async function getNoaaConditions(latitude: number, longitude: number, sessionDat
     const gridResponse = await fetch(gridDataUrl, { headers: { "User-Agent": userAgent, "Accept": "application/geo+json" } });
     if (!gridResponse.ok) {
       snapshot.error = `Failed to get grid data: ${gridResponse.status} ${await gridResponse.text()}`;
-      console.error(snapshot.error);
+      console.error('log-surf-session: NOAA grid data fetch error:', snapshot.error); // Specific log
       return snapshot;
     }
     const gridData = await gridResponse.json();
+    console.log('log-surf-session: Raw NOAA Grid Data Response:', gridData); // LOG ADDED
     const props = gridData.properties;
 
     // --- Helper to find closest value to sessionDate ---
@@ -127,9 +128,10 @@ async function getNoaaConditions(latitude: number, longitude: number, sessionDat
     }
 
   } catch (e) {
-    console.error("NOAA API call error:", e);
+    console.error('log-surf-session: NOAA API call exception:', e.message, e.stack); // Specific log with stack
     snapshot.error = `Exception during NOAA API call: ${e.message}`;
   }
+  console.log('log-surf-session: Parsed snapshotData:', snapshot); // LOG ADDED
   return snapshot;
 }
 
@@ -138,6 +140,17 @@ serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
+
+  // Clone request to log body, then use original request for processing
+  const reqClone = req.clone();
+  let bodyForLogging = {};
+  try {
+    bodyForLogging = await reqClone.json();
+  } catch (e) {
+    // Could be empty body, or not JSON. Log that it's not typical JSON payload.
+    bodyForLogging = { warning: "Could not parse request body as JSON or body is empty.", firstBytes: await reqClone.text().then(t => t.slice(0,100)) };
+  }
+  console.log('log-surf-session: Input payload:', bodyForLogging); // LOG ADDED
 
   try {
     const authHeader = req.headers.get("Authorization");
@@ -180,13 +193,15 @@ serve(async (req: Request) => {
       .maybeSingle();
 
     if (spotError) {
-      console.error("Error fetching spot location:", spotError);
+      console.error('log-surf-session: Error fetching spot location:', spotError.message, spotError.stack); // Specific log with stack
       // Proceed without conditions if spot location lookup fails, or return error?
       // For MVP, proceeding with null conditions_snapshot.
       conditionsData = { error: "Failed to fetch spot location: " + spotError.message, source: "Internal System" };
     } else if (spotLocation) {
+      console.log('log-surf-session: Fetched coordinates:', { spot_id, latitude: spotLocation.latitude, longitude: spotLocation.longitude }); // LOG ADDED
       conditionsData = await getNoaaConditions(spotLocation.latitude, spotLocation.longitude, sessionDateObj, supabaseClient);
     } else {
+      console.log('log-surf-session: Spot ID not found in locations table:', spot_id); // LOG ADDED
       // Spot not found in surf_spot_locations
       conditionsData = { error: `Spot ID ${spot_id} not found in locations table.`, source: "Internal System" };
     }
@@ -210,7 +225,7 @@ serve(async (req: Request) => {
       .single();
 
     if (insertError) {
-      console.error("Supabase insert error:", insertError);
+      console.error('log-surf-session: Supabase insert error:', insertError.message, insertError.stack); // Specific log with stack
       return new Response(JSON.stringify({ error: "Failed to log session", details: insertError.message }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -221,7 +236,7 @@ serve(async (req: Request) => {
     });
 
   } catch (e) {
-    console.error("General error in log-surf-session:", e);
+    console.error('log-surf-session: Error:', e.message, e.stack); // Standardized main catch
     return new Response(JSON.stringify({ error: "An unexpected error occurred", details: e.message }), {
       status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
