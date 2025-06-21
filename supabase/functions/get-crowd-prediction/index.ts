@@ -59,6 +59,8 @@ const getLatestUserReport = async (supabaseClient: SupabaseClient, spotId: strin
 };
 
 serve(async (req: Request) => {
+  console.log(`Received ${req.method} request to get-crowd-prediction`);
+  
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -66,28 +68,60 @@ serve(async (req: Request) => {
   try {
     let spot_id: string | null = null;
 
-    // Handle both GET and POST requests
+    // Handle both GET and POST requests with better error handling
     if (req.method === "GET") {
       const url = new URL(req.url);
       spot_id = url.searchParams.get("spot_id");
+      console.log("GET request - spot_id from query params:", spot_id);
     } else if (req.method === "POST") {
       try {
-        const bodyText = await req.text();
-        console.log("Raw request body:", bodyText);
+        // For Supabase functions.invoke(), the body comes directly as the parsed object
+        // Let's try both approaches to be safe
+        const contentType = req.headers.get("content-type");
+        console.log("POST request - content-type:", contentType);
         
-        if (bodyText && bodyText.trim() !== '') {
-          const body = JSON.parse(bodyText);
-          spot_id = body.spot_id;
+        if (contentType?.includes("application/json")) {
+          const body = await req.json();
+          console.log("Parsed JSON body:", body);
+          spot_id = body?.spot_id;
+        } else {
+          // Fallback: try to parse as text then JSON
+          const bodyText = await req.text();
+          console.log("Raw body text:", bodyText);
+          
+          if (bodyText && bodyText.trim() !== '') {
+            try {
+              const body = JSON.parse(bodyText);
+              spot_id = body?.spot_id;
+              console.log("Parsed body from text:", body);
+            } catch (parseError) {
+              console.error("Failed to parse body text as JSON:", parseError);
+              // Try to extract spot_id from URL-encoded data or other formats
+              if (bodyText.includes("spot_id=")) {
+                const match = bodyText.match(/spot_id=([^&]+)/);
+                spot_id = match ? decodeURIComponent(match[1]) : null;
+              }
+            }
+          }
         }
       } catch (error) {
-        console.error("Error parsing POST body:", error);
-        // Don't throw here, continue with fallback
+        console.error("Error processing POST body:", error);
+        // Continue without throwing - we'll return an error below
       }
     }
 
+    console.log("Final spot_id:", spot_id);
+
     if (!spot_id) {
       console.error("Missing spot_id parameter");
-      return new Response(JSON.stringify({ error: "Missing spot_id parameter" }), {
+      return new Response(JSON.stringify({ 
+        error: "Missing spot_id parameter",
+        debug: {
+          method: req.method,
+          headers: Object.fromEntries(req.headers.entries()),
+          url: req.url
+        }
+      }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

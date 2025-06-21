@@ -1,4 +1,3 @@
-
 // Real data service - Enhanced error handling with graceful fallbacks
 import { supabase } from '@/integrations/supabase/client';
 
@@ -65,17 +64,12 @@ class RealDataService {
         return this.getFallbackCrowdData(spotId);
       }
 
-      // Ensure we send valid JSON
-      const requestBody = JSON.stringify({ spot_id: spotId });
-      console.log('Sending request body:', requestBody);
+      console.log('Making crowd prediction request for spot:', spotId);
 
-      // Try Supabase function with proper error handling
+      // Use the correct format for Supabase functions.invoke()
+      // The body should be passed directly as an object, not stringified
       const { data, error } = await supabase.functions.invoke('get-crowd-prediction', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: requestBody,
+        body: { spot_id: spotId },
       });
 
       if (error) {
