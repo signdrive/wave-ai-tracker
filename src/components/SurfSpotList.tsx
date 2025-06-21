@@ -22,16 +22,18 @@ const SurfSpotList: React.FC<SurfSpotListProps> = ({
   selectedSpot
 }) => {
   const getDifficultyColor = (difficulty: string) => {
-    if (difficulty.toLowerCase().includes('beginner')) return 'bg-green-500 text-white';
-    if (difficulty.toLowerCase().includes('intermediate')) return 'bg-yellow-500 text-black';
-    if (difficulty.toLowerCase().includes('advanced') || difficulty.toLowerCase().includes('expert')) return 'bg-red-500 text-white';
+    const difficultyLower = (difficulty || '').toLowerCase();
+    if (difficultyLower.includes('beginner')) return 'bg-green-500 text-white';
+    if (difficultyLower.includes('intermediate')) return 'bg-yellow-500 text-black';
+    if (difficultyLower.includes('advanced') || difficultyLower.includes('expert')) return 'bg-red-500 text-white';
     return 'bg-gray-500 text-white';
   };
 
   const getBreakTypeIcon = (waveType: string) => {
-    if (waveType.toLowerCase().includes('reef')) return '🪨';
-    if (waveType.toLowerCase().includes('point')) return '⛰️';
-    if (waveType.toLowerCase().includes('beach')) return '🏖️';
+    const waveTypeLower = (waveType || '').toLowerCase();
+    if (waveTypeLower.includes('reef')) return '🪨';
+    if (waveTypeLower.includes('point')) return '⛰️';
+    if (waveTypeLower.includes('beach')) return '🏖️';
     return '🌊';
   };
 
@@ -49,17 +51,17 @@ const SurfSpotList: React.FC<SurfSpotListProps> = ({
             <div className="flex justify-between items-start mb-3">
               <div className="flex-1">
                 <h3 className="font-semibold text-lg text-ocean-dark mb-1">
-                  {spot.full_name}
+                  {spot.full_name || 'Unknown Spot'}
                 </h3>
                 <div className="flex items-center text-sm text-gray-600 mb-2">
                   <MapPin className="w-4 h-4 mr-1" />
-                  {spot.country}{spot.state && `, ${spot.state}`}
+                  {spot.country || 'Unknown'}{spot.state && `, ${spot.state}`}
                 </div>
               </div>
               
               <div className="flex flex-col items-end space-y-2">
                 <Badge className={getDifficultyColor(spot.difficulty)}>
-                  {spot.difficulty}
+                  {spot.difficulty || 'Unknown'}
                 </Badge>
                 {spot.live_cam && (
                   <CameraStatusIndicator 
@@ -76,7 +78,7 @@ const SurfSpotList: React.FC<SurfSpotListProps> = ({
                   <span className="text-xs text-gray-600">Wave Type</span>
                   <span>{getBreakTypeIcon(spot.wave_type)}</span>
                 </div>
-                <p className="text-sm font-medium">{spot.wave_type}</p>
+                <p className="text-sm font-medium">{spot.wave_type || 'Unknown'}</p>
               </div>
               
               <div className="bg-sand/50 p-2 rounded-md">
@@ -84,13 +86,13 @@ const SurfSpotList: React.FC<SurfSpotListProps> = ({
                   <span className="text-xs text-gray-600">Best Swell</span>
                   <Waves className="w-3 h-3 text-ocean" />
                 </div>
-                <p className="text-sm font-medium">{spot.best_swell_direction}</p>
+                <p className="text-sm font-medium">{spot.best_swell_direction || 'Unknown'}</p>
               </div>
             </div>
 
             <div className="flex items-center justify-between">
               <div className="text-xs text-gray-500">
-                Best: {spot.best_wind} • {spot.best_tide}
+                Best: {spot.best_wind || 'Unknown'} • {spot.best_tide || 'Unknown'}
               </div>
               
               <Button

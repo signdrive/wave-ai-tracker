@@ -144,6 +144,33 @@ export type Database = {
         }
         Relationships: []
       }
+      crowd_reports: {
+        Row: {
+          created_at: string | null
+          id: string
+          reported_level: string
+          source: string | null
+          spot_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          reported_level: string
+          source?: string | null
+          spot_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          reported_level?: string
+          source?: string | null
+          spot_id?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       data_requests: {
         Row: {
           completed_at: string | null
@@ -538,6 +565,39 @@ export type Database = {
         }
         Relationships: []
       }
+      security_events: {
+        Row: {
+          created_at: string | null
+          details: Json
+          event_type: string
+          id: string
+          ip_address: string | null
+          severity: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json
+          event_type: string
+          id?: string
+          ip_address?: string | null
+          severity: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json
+          event_type?: string
+          id?: string
+          ip_address?: string | null
+          severity?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       session_recordings: {
         Row: {
           ai_analysis: Json | null
@@ -717,6 +777,48 @@ export type Database = {
           status?: string | null
           updated_at?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      surf_sessions: {
+        Row: {
+          conditions_snapshot: Json | null
+          created_at: string
+          duration_minutes: number | null
+          id: string
+          notes: string | null
+          rating: number | null
+          session_date: string
+          spot_id: string
+          spot_name: string | null
+          user_id: string
+          wave_count: number | null
+        }
+        Insert: {
+          conditions_snapshot?: Json | null
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          notes?: string | null
+          rating?: number | null
+          session_date: string
+          spot_id: string
+          spot_name?: string | null
+          user_id: string
+          wave_count?: number | null
+        }
+        Update: {
+          conditions_snapshot?: Json | null
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          notes?: string | null
+          rating?: number | null
+          session_date?: string
+          spot_id?: string
+          spot_name?: string | null
+          user_id?: string
+          wave_count?: number | null
         }
         Relationships: []
       }
