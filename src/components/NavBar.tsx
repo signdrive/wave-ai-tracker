@@ -27,7 +27,7 @@ const NavBar = () => {
     { path: '/live-spots', label: 'Live Spots', icon: Waves, description: 'AI camera feeds' },
     { path: '/book-sessions', label: 'Book Sessions', icon: Calendar, description: 'Wave pools & natural spots' },
     { path: '/map', label: 'Heat Map', icon: Map, description: 'Crowd density visualization' },
-    { path: '/surf-log', label: 'My Surf Log', icon: User, description: 'Session history' },
+    { path: '/surf-log', label: 'Surf Log Insights', icon: User, description: 'Log sessions & view AI insights' }, // MODIFIED
   ];
 
   // Add admin links for admin users

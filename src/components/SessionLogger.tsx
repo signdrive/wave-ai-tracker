@@ -77,7 +77,8 @@ const SessionLogger: React.FC<SessionLoggerProps> = ({ onSessionSaved }) => {
       return data;
     },
     {
-      onSuccess: () => {
+      onSuccess: (data) => { // Added data argument
+        console.log('SessionLogger: log-surf-session mutation success:', data); // LOG ADDED
         toast.success("Surf session logged successfully! 🏄‍♂️");
         queryClient.invalidateQueries(['surfLogInsights']); // Invalidate insights query
         queryClient.invalidateQueries(['surfSessions']); // Invalidate sessions list query (if one exists)
@@ -93,6 +94,7 @@ const SessionLogger: React.FC<SessionLoggerProps> = ({ onSessionSaved }) => {
         });
       },
       onError: (error: Error) => {
+        console.error('SessionLogger: log-surf-session mutation error:', error); // LOG ADDED
         toast.error(`Failed to log session: ${error.message}`);
       },
     }
@@ -100,6 +102,7 @@ const SessionLogger: React.FC<SessionLoggerProps> = ({ onSessionSaved }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('SessionLogger: Form submission values:', sessionFormData); // LOG ADDED
     if (!sessionFormData.spot_id || !sessionFormData.session_date) {
       toast.error("Please select a spot and date.");
       return;

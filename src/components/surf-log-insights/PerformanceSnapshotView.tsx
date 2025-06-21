@@ -18,6 +18,8 @@ interface PerformanceSnapshotViewProps {
 }
 
 const PerformanceSnapshotView: React.FC<PerformanceSnapshotViewProps> = ({ snapshotData, isLoading, error }) => {
+  console.log('PerformanceSnapshotView: Props snapshotData:', snapshotData, 'isLoading:', isLoading, 'error:', error); // LOG ADDED
+
   if (isLoading) {
     return (
       <Card>
