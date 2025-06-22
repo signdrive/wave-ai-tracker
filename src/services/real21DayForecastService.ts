@@ -122,23 +122,26 @@ class Real21DayForecastService {
       const prediction = this.lstmModel.predict(input) as tf.Tensor;
       const predictionData = await prediction.data();
 
+      // Convert to Float32Array to ensure type compatibility
+      const predictionArray = new Float32Array(predictionData);
+
       // Create forecast day from LSTM prediction
       const forecastDay: ExtendedForecastDay = {
         date: new Date(Date.now() + (day + 1) * 24 * 60 * 60 * 1000),
-        waveHeight: Math.max(0.5, predictionData[0]),
-        period: Math.max(4, predictionData[1]),
-        windSpeed: Math.max(0, predictionData[2]),
-        windDirection: ((predictionData[3] % 360) + 360) % 360,
-        swellDirection: ((predictionData[4] % 360) + 360) % 360,
-        tideLevel: Math.max(-2, Math.min(2, predictionData[5])),
-        temperature: Math.max(5, Math.min(35, predictionData[6])),
-        qualityScore: this.calculateQualityScore(predictionData)
+        waveHeight: Math.max(0.5, predictionArray[0]),
+        period: Math.max(4, predictionArray[1]),
+        windSpeed: Math.max(0, predictionArray[2]),
+        windDirection: ((predictionArray[3] % 360) + 360) % 360,
+        swellDirection: ((predictionArray[4] % 360) + 360) % 360,
+        tideLevel: Math.max(-2, Math.min(2, predictionArray[5])),
+        temperature: Math.max(5, Math.min(35, predictionArray[6])),
+        qualityScore: this.calculateQualityScore(predictionArray)
       };
 
       forecast.push(forecastDay);
 
       // Update sequence for next prediction (sliding window)
-      currentSequence = [...currentSequence.slice(1), Array.from(predictionData)];
+      currentSequence = [...currentSequence.slice(1), Array.from(predictionArray)];
 
       input.dispose();
       prediction.dispose();
