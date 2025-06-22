@@ -2,6 +2,7 @@
 import React from 'react';
 import Hero from '@/components/Hero';
 import EnhancedSurfInterface from '@/components/EnhancedSurfInterface';
+import SearchableWeatherForecast from '@/components/SearchableWeatherForecast';
 
 const Index = () => {
   return (
@@ -21,6 +22,13 @@ const Index = () => {
           </div>
         </div>
         <EnhancedSurfInterface />
+      </section>
+
+      {/* Enhanced Weather Forecast Search */}
+      <section className="py-8 bg-gray-50 dark:bg-gray-900">
+        <div className="container mx-auto px-4">
+          <SearchableWeatherForecast />
+        </div>
       </section>
     </div>
   );
