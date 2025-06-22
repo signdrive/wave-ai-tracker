@@ -6,13 +6,17 @@ import GranularConsentToggle from '@/components/gdpr/GranularConsentToggle';
 import GdprUserRightsApi from '@/components/gdpr/GdprUserRightsApi';
 import AdminGdprControls from '@/components/gdpr/AdminGdprControls';
 import GdprBreachNotificationTemplate from '@/components/gdpr/GdprBreachNotificationTemplate';
+import SurfSpecificDpia from '@/components/gdpr/SurfSpecificDpia';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Shield, Users, Settings, AlertTriangle, FileText } from 'lucide-react';
+import { Shield, Users, Settings, AlertTriangle, FileText, MapPin } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 
 const GdprCompliancePage: React.FC = () => {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const defaultTab = searchParams.get('tab') || 'policies';
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -31,11 +35,15 @@ const GdprCompliancePage: React.FC = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="policies" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+      <Tabs defaultValue={defaultTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="policies" className="flex items-center gap-2">
             <FileText className="w-4 h-4" />
             Policies
+          </TabsTrigger>
+          <TabsTrigger value="dpia" className="flex items-center gap-2">
+            <MapPin className="w-4 h-4" />
+            DPIA
           </TabsTrigger>
           <TabsTrigger value="consent" className="flex items-center gap-2">
             <Shield className="w-4 h-4" />
@@ -57,6 +65,10 @@ const GdprCompliancePage: React.FC = () => {
 
         <TabsContent value="policies" className="mt-6">
           <GdprPolicyTiers />
+        </TabsContent>
+
+        <TabsContent value="dpia" className="mt-6">
+          <SurfSpecificDpia />
         </TabsContent>
 
         <TabsContent value="consent" className="mt-6">

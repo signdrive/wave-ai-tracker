@@ -1,7 +1,14 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { useMentorship } from '@/hooks/useMentorship';
+import { Shield, FileText, Settings, AlertTriangle } from 'lucide-react';
 
 const Footer: React.FC = () => {
+  const { user } = useAuth();
+  const { userRole } = useMentorship();
+
   return (
     <footer className="bg-ocean-dark text-white">
       <div className="wave-container">
@@ -45,11 +52,11 @@ const Footer: React.FC = () => {
           <div className="md:col-span-1">
             <h3 className="font-semibold text-lg mb-4">Live Features</h3>
             <ul className="space-y-2">
-              <li><a href="/live-spots" className="text-gray-300 hover:text-white">AI Surf Cameras</a></li>
-              <li><a href="/map" className="text-gray-300 hover:text-white">Crowd Heat Map</a></li>
-              <li><a href="/book-sessions" className="text-gray-300 hover:text-white">Wave Pool Booking</a></li>
-              <li><a href="/surf-log" className="text-gray-300 hover:text-white">Session Tracking</a></li>
-              <li><a href="/" className="text-gray-300 hover:text-white">Premium Forecasts</a></li>
+              <li><Link to="/live-spots" className="text-gray-300 hover:text-white">AI Surf Cameras</Link></li>
+              <li><Link to="/map" className="text-gray-300 hover:text-white">Crowd Heat Map</Link></li>
+              <li><Link to="/book-sessions" className="text-gray-300 hover:text-white">Wave Pool Booking</Link></li>
+              <li><Link to="/surf-log" className="text-gray-300 hover:text-white">Session Tracking</Link></li>
+              <li><Link to="/" className="text-gray-300 hover:text-white">Premium Forecasts</Link></li>
             </ul>
           </div>
           
@@ -60,27 +67,68 @@ const Footer: React.FC = () => {
               <li><a href="#" className="text-gray-300 hover:text-white">Mavericks, California</a></li>
               <li><a href="#" className="text-gray-300 hover:text-white">Snapper Rocks, Australia</a></li>
               <li><a href="#" className="text-gray-300 hover:text-white">Jeffreys Bay, South Africa</a></li>
-              <li><a href="/live-spots" className="text-gray-300 hover:text-white">View All Cameras</a></li>
+              <li><Link to="/live-spots" className="text-gray-300 hover:text-white">View All Cameras</Link></li>
             </ul>
           </div>
           
+          {/* GDPR COMPLIANCE SECTION - UNIFIED FOOTER ARCHITECTURE */}
           <div className="md:col-span-1">
-            <h3 className="font-semibold text-lg mb-4">Intelligence</h3>
+            <h3 className="font-semibold text-lg mb-4 flex items-center gap-2">
+              <Shield className="w-5 h-5 text-green-400" />
+              GDPR Hub
+            </h3>
             <ul className="space-y-2">
-              <li><a href="/" className="text-gray-300 hover:text-white">AI Forecasting</a></li>
-              <li><a href="/" className="text-gray-300 hover:text-white">Real-time Analysis</a></li>
-              <li><a href="/" className="text-gray-300 hover:text-white">Weather Integration</a></li>
-              <li><a href="/privacy-settings" className="text-gray-300 hover:text-white">Privacy Settings</a></li>
-              <li><a href="/admin" className="text-gray-300 hover:text-white">Admin Portal</a></li>
+              <li>
+                <Link to="/gdpr-compliance" className="text-gray-300 hover:text-white flex items-center gap-2">
+                  <FileText className="w-4 h-4" />
+                  Data Protection Center
+                </Link>
+              </li>
+              <li>
+                <Link to="/privacy-policy" className="text-gray-300 hover:text-white">Privacy Policy</Link>
+              </li>
+              <li>
+                <Link to="/privacy-settings" className="text-gray-300 hover:text-white">Privacy Settings</Link>
+              </li>
+              <li>
+                <a href="mailto:dpo@wavementor.com" className="text-gray-300 hover:text-white">
+                  DPO Contact
+                </a>
+              </li>
+              
+              {/* ADMIN-ONLY LINKS */}
+              {userRole === 'admin' && (
+                <>
+                  <li>
+                    <Link to="/admin" className="text-orange-300 hover:text-orange-100 flex items-center gap-2">
+                      <Shield className="w-4 h-4" />
+                      🔐 Admin Portal
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/admin/api-config" className="text-orange-300 hover:text-orange-100 flex items-center gap-2">
+                      <Settings className="w-4 h-4" />
+                      API Security
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/gdpr-compliance?tab=breach" className="text-red-300 hover:text-red-100 flex items-center gap-2">
+                      <AlertTriangle className="w-4 h-4" />
+                      Breach History
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
         </div>
         
         <div className="border-t border-gray-700 mt-12 pt-8 text-sm text-gray-400">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p>© 2024 WaveMentor. All rights reserved.</p>
+            <p>© 2024 WaveMentor. All rights reserved. | GDPR Compliant | SOC 2 Audited</p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="/privacy-policy" className="hover:text-white">Privacy Policy</a>
+              <Link to="/privacy-policy" className="hover:text-white">Privacy Policy</Link>
+              <Link to="/gdpr-compliance" className="hover:text-white">GDPR Center</Link>
               <a href="#" className="hover:text-white">Terms of Service</a>
               <a href="#" className="hover:text-white">Cookie Policy</a>
             </div>

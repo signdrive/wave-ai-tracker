@@ -8,8 +8,10 @@ import BookSessionsPage from '@/pages/BookSessionsPage';
 import SurfLogPage from '@/pages/SurfLogPage';
 import MapPage from '@/pages/MapPage';
 import NavBar from '@/components/NavBar';
+import Footer from '@/components/Footer';
 import AdminPage from '@/pages/AdminPage';
 import AdminApiConfigPage from '@/pages/AdminApiConfigPage';
+import GdprCompliancePage from '@/pages/GdprCompliancePage';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import PrivacySettingsPage from '@/pages/PrivacySettingsPage';
 import PrivacyPolicyPage from '@/pages/PrivacyPolicyPage';
@@ -32,10 +34,12 @@ function App() {
                 <Route path="/map" element={<MapPage />} />
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="/admin/api-config" element={<AdminApiConfigPage />} />
+                <Route path="/gdpr-compliance" element={<GdprCompliancePage />} />
                 <Route path="/privacy-settings" element={<PrivacySettingsPage />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
               </Routes>
             </main>
+            <Footer />
           </div>
         </BrowserRouter>
       </ThemeProvider>
