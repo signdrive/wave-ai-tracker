@@ -75,7 +75,10 @@ const SurfLogPage = () => {
     isLoading: isLoadingInsights,
     error: insightsError,
     refetch: refetchInsights
-
+  } = useQuery({
+    queryKey: ['surf-log-insights'],
+    queryFn: fetchSurfLogInsights,
+  });
 
   const sessions = insightsData?.raw_sessions_for_debug || [];
 
