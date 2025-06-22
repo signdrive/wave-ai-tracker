@@ -30,38 +30,34 @@ const MapControls: React.FC = () => {
   };
 
   return (
-    <div className="leaflet-control-container">
-      <div className="leaflet-top leaflet-left">
-        <div className="leaflet-control leaflet-bar">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleLocateUser}
-            className="mb-2 bg-white hover:bg-gray-50 rounded-none border-b"
-            title="Find my location"
-          >
-            <Locate className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleZoomIn}
-            className="mb-1 bg-white hover:bg-gray-50 rounded-none border-b"
-            title="Zoom in"
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleZoomOut}
-            className="bg-white hover:bg-gray-50 rounded-none"
-            title="Zoom out"
-          >
-            <Minus className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
+    <div className="absolute top-4 left-4 z-[1000] flex flex-col space-y-2">
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleLocateUser}
+        className="bg-white hover:bg-gray-50 shadow-md"
+        title="Find my location"
+      >
+        <Locate className="w-4 h-4" />
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleZoomIn}
+        className="bg-white hover:bg-gray-50 shadow-md"
+        title="Zoom in"
+      >
+        <Plus className="w-4 h-4" />
+      </Button>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleZoomOut}
+        className="bg-white hover:bg-gray-50 shadow-md"
+        title="Zoom out"
+      >
+        <Minus className="w-4 h-4" />
+      </Button>
     </div>
   );
 };

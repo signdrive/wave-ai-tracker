@@ -7,6 +7,14 @@ import { SurfSpot } from '@/types/surfSpots';
 import SurfSpotPopup from './SurfSpotPopup';
 import { useSurfSpots } from '@/hooks/useSurfSpots';
 
+// Fix for default markers in react-leaflet
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.1/images/marker-shadow.png',
+});
+
 // Custom surf spot marker icons with dynamic colors based on conditions
 const createSurfSpotIcon = (difficulty: string, hasLiveCam: boolean) => {
   let color = '#0EA5E9'; // Default blue
@@ -109,6 +117,7 @@ const SurfSpotMap: React.FC<SurfSpotMapProps> = ({
         maxZoom={18}
         minZoom={2}
         worldCopyJump={true}
+        key={`${mapCenter[0]}-${mapCenter[1]}-${mapZoom}`}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
