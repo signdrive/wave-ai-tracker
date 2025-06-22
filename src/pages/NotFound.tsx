@@ -15,8 +15,8 @@ const NotFound = () => {
     );
     
     // Optional: Send analytics event for 404 tracking
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'page_not_found', {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'page_not_found', {
         page_path: location.pathname,
         page_title: '404 - Page Not Found'
       });
