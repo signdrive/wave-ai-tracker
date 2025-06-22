@@ -26,9 +26,9 @@ const EnhancedSurfInterface: React.FC = () => {
           <TabsTrigger value="surf-cams">Live Cams</TabsTrigger>
           <TabsTrigger value="forecasts">AI Forecasts</TabsTrigger>
           <TabsTrigger value="map">Spot Map</TabsTrigger>
-          <TabsTrigger value="ar-overlay">AR Vision</TabsTrigger>
-          <TabsTrigger value="surf-coach">AI Coach</TabsTrigger>
-          <TabsTrigger value="compliance">Audit</TabsTrigger>
+          <TabsTrigger value="ar-overlay">AR Zone</TabsTrigger>
+          <TabsTrigger value="surf-coach">AI Instructor</TabsTrigger>
+          <TabsTrigger value="compliance">Dashboard</TabsTrigger>
         </TabsList>
 
         <TabsContent value="surf-cams">
