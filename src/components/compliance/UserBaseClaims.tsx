@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Users, Waves, Info, Star } from 'lucide-react';
+import { Users, Waves, Info, Star, AlertTriangle } from 'lucide-react';
 
 interface UserClaimsVersion {
   id: string;
@@ -19,70 +19,94 @@ const UserBaseClaims: React.FC = () => {
   const [selectedAudience, setSelectedAudience] = useState<'pro' | 'casual'>('casual');
   const [selectedEmphasis, setSelectedEmphasis] = useState<'community' | 'beta-access' | 'feature-preview'>('community');
 
-  // Comprehensive FTC-Compliant User Base Claims
+  // FTC-COMPLIANT User Base Claims - Updated to remove violations
   const userBaseClaims: UserClaimsVersion[] = [
     // Pro Surfer Versions
     {
       id: 'pro-elite-beta',
-      title: "Elite Beta Access",
-      content: "Join verified pro surfers testing real-time wave analytics. Help us refine competitive-grade tracking with limited beta access.",
+      title: "🌟 Join Our Beta Development",
+      content: "We're actively building Wavementor's surf analytics tools. Join our development testing to help shape real-time wave tracking features.",
       audience: 'pro',
       emphasis: 'beta-access',
-      disclaimer: "Beta metrics pending third-party validation (FTC §255.1 compliant)",
-      ctaText: "Apply for Beta Access",
-      legalNotes: ["Uses 'verified' with backend validation", "Avoids false scarcity claims", "Third-party validation pending"]
+      disclaimer: "Beta features may change. User counts reflect signups, not activity levels (FTC §255.5 compliant)",
+      ctaText: "Apply for Beta Testing",
+      legalNotes: [
+        "Removed 'Elite' claims (unverifiable exclusivity)", 
+        "Replaced 'verified pro surfers' with neutral testing language",
+        "Added clear beta-stage disclosure above CTA"
+      ]
     },
     {
       id: 'pro-performance-testing',
-      title: "Performance-Driven Testing", 
-      content: "Work with Wavementor's dev team to fine-tune pro-level analytics. Data accuracy: 75%+ in controlled lab conditions.",
+      title: "Performance Testing Community", 
+      content: "Help us refine surf analytics accuracy. Current lab testing shows 75%+ accuracy under controlled conditions. Real-world performance may vary.",
       audience: 'pro',
       emphasis: 'feature-preview',
-      disclaimer: "Lab conditions may vary from real-world performance",
-      ctaText: "Join Dev Testing",
-      legalNotes: ["Specific accuracy claims with conditions", "Lab vs real-world distinction", "Performance data verified"]
+      disclaimer: "Lab conditions differ from real-world performance. Results not guaranteed",
+      ctaText: "Join Development Testing",
+      legalNotes: [
+        "Specific accuracy claims include testing conditions",
+        "Clear lab vs real-world distinction (FTC requirement)", 
+        "Performance disclaimers prominently displayed"
+      ]
     },
     {
       id: 'pro-community-driven',
-      title: "Competitive Edge Development",
-      content: "Shape the future of surf analytics with fellow competitive surfers. Your feedback drives our AI training algorithms.",
+      title: "Shape Surf Analytics Development",
+      content: "Join fellow surfers in our beta testing community. Your feedback directly influences our development roadmap and feature priorities.",
       audience: 'pro',
       emphasis: 'community',
-      disclaimer: "Community feedback integrated into beta development cycle",
-      ctaText: "Shape the Platform",
-      legalNotes: ["Focus on development process", "Community-driven approach", "No user count claims"]
+      disclaimer: "Community feedback integrated into development cycle. No purchase required to participate",
+      ctaText: "Join Beta Community",
+      legalNotes: [
+        "Focus on development process, not user metrics",
+        "Community-driven language without false claims",
+        "Clear 'no purchase required' disclosure"
+      ]
     },
     
     // Casual Surfer Versions  
     {
-      id: 'casual-surf-tribe',
-      title: "Your Surf Tribe Awaits",
-      content: "We're building Wavementor with surfers like you! Join our beta community to shape the friendliest surf app out there.",
+      id: 'casual-surf-community',
+      title: "🌟 Join Our Beta Community",
+      content: "We're in active development—join early to help build Wavementor's surf tools! Be part of our testing community as we develop new features.",
       audience: 'casual',
       emphasis: 'community',
-      disclaimer: "Community features in active development",
-      ctaText: "Join the Tribe",
-      legalNotes: ["Community focus without metrics", "Aspirational language", "Development transparency"]
+      disclaimer: "Beta features may change. User counts reflect signups, not activity (FTC §255.5). No purchase required to join testing",
+      ctaText: "Join Beta Testing",
+      legalNotes: [
+        "Removed 'friendliest' claims (unverifiable)",
+        "Beta-stage disclosure above CTA (FTC 'clear and conspicuous' rule)",
+        "Community focus without metric promises"
+      ]
     },
     {
       id: 'casual-early-access',
-      title: "Be Among the First",
-      content: "Ride the Wavementor wave! Get exclusive early access as we refine real-time surf tracking for weekend warriors.",
+      title: "Early Development Access",
+      content: "Get early access to Wavementor's development builds. Help us test real-time surf tracking features before public release.",
       audience: 'casual',
       emphasis: 'beta-access',
-      disclaimer: "Early access features rolling out in phases",
-      ctaText: "Get Early Access",
-      legalNotes: ["Exclusive without false scarcity", "Phased rollout disclosure", "Target audience specific"]
+      disclaimer: "Early access features rolling out in phases. Development timeline subject to change",
+      ctaText: "Get Development Access",
+      legalNotes: [
+        "Removed 'exclusive' without false scarcity",
+        "Clear phased rollout disclosure",
+        "Development timeline disclaimers included"
+      ]
     },
     {
-      id: 'casual-surf-smarter',
-      title: "Surf Smarter Community",
-      content: "Beta surfers are learning with Wavementor! Get notified at launch—no wipeouts required. Building the friendliest surf app out there.",
+      id: 'casual-surf-tools',
+      title: "Help Build Surf Tools",
+      content: "Join our beta testing community! Get updates on development progress and be notified when features launch. No experience required.",
       audience: 'casual',
       emphasis: 'feature-preview',
-      disclaimer: "Beta features rolling out soon. Tools may vary by break conditions",
-      ctaText: "Get Launch Updates",
-      legalNotes: ["Friendly tone without metrics", "Condition-dependent disclaimers", "Launch-focused messaging"]
+      disclaimer: "Beta features rolling out soon. Tools effectiveness may vary by break conditions and device capabilities",
+      ctaText: "Get Development Updates",
+      legalNotes: [
+        "Removed subjective quality claims",
+        "Condition-dependent performance disclaimers",
+        "Launch-focused messaging without promises"
+      ]
     }
   ];
 
@@ -180,19 +204,20 @@ const UserBaseClaims: React.FC = () => {
                 
                 <p className="text-gray-700 mb-3">{claim.content}</p>
                 
-                <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors text-sm mb-3">
-                  {claim.ctaText}
-                </button>
-                
-                <div className="bg-blue-50 p-3 rounded mb-3">
+                {/* FTC-COMPLIANT DISCLAIMER - PROMINENTLY DISPLAYED BEFORE CTA */}
+                <div className="bg-yellow-50 border border-yellow-200 p-3 rounded mb-3">
                   <div className="flex items-start">
-                    <Info className="w-4 h-4 text-blue-600 mr-2 mt-0.5" />
+                    <AlertTriangle className="w-4 h-4 text-yellow-600 mr-2 mt-0.5" />
                     <div>
-                      <div className="text-xs font-medium text-blue-800 mb-1">Legal Disclaimer:</div>
-                      <div className="text-xs text-blue-700">{claim.disclaimer}</div>
+                      <div className="text-xs font-medium text-yellow-800 mb-1">Legal Disclaimers:</div>
+                      <div className="text-xs text-yellow-700">{claim.disclaimer}</div>
                     </div>
                   </div>
                 </div>
+                
+                <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors text-sm mb-3">
+                  {claim.ctaText}
+                </button>
                 
                 <div className="bg-gray-50 p-2 rounded">
                   <div className="text-xs font-medium text-gray-700 mb-1">Legal Review Notes:</div>
@@ -205,6 +230,18 @@ const UserBaseClaims: React.FC = () => {
               </CardContent>
             </Card>
           ))}
+        </div>
+        
+        {/* COMPLIANCE SUMMARY */}
+        <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded">
+          <h4 className="font-medium text-green-800 mb-2">✅ FTC Compliance Achieved:</h4>
+          <ul className="text-sm text-green-700 space-y-1">
+            <li>• Disclaimers prominently displayed before CTAs (FTC "clear and conspicuous" rule)</li>
+            <li>• Removed unverifiable claims ("friendliest", "elite", etc.)</li>
+            <li>• Added beta-stage transparency for all user metrics</li>
+            <li>• Included "no purchase required" disclosures</li>
+            <li>• Performance claims include testing conditions</li>
+          </ul>
         </div>
       </CardContent>
     </Card>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { realMLPredictionService } from '@/services/realMLPredictionService';
 import { userAnalyticsService, UserMetrics } from '@/services/userAnalyticsService';
@@ -9,6 +8,7 @@ import LegalGuidelines from '@/components/compliance/LegalGuidelines';
 import FeatureCompliance from '@/components/compliance/FeatureCompliance';
 import UserAnalytics from '@/components/compliance/UserAnalytics';
 import ComplianceNotice from '@/components/compliance/ComplianceNotice';
+import ComplianceReport from '@/components/compliance/ComplianceReport';
 
 interface ComplianceStatus {
   feature: string;
@@ -183,6 +183,7 @@ const ComplianceStatusDashboard: React.FC = () => {
   return (
     <div className="space-y-6">
       <ComplianceHeader overallStatus={overallStatus} />
+      <ComplianceReport />
       <UserBaseClaims />
       <LegalGuidelines />
       <FeatureCompliance complianceStatus={complianceStatus} />
