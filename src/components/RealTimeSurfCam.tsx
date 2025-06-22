@@ -3,9 +3,6 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useSurfConditions, useWeatherData } from '@/hooks/useRealTimeData';
 import { Bell } from 'lucide-react';
-import WeatherWidget from './WeatherWidget';
-import SurfForecast from './SurfForecast';
-import HistoricalCharts from './HistoricalCharts';
 import FavoriteButton from './FavoriteButton';
 import AlertPreferencesDialog from './AlertPreferencesDialog';
 import { Button } from '@/components/ui/button';
@@ -45,7 +42,6 @@ const RealTimeSurfCam: React.FC<RealTimeSurfCamProps> = ({
   metadata 
 }) => {
   const { data: conditions, isLoading, error, isRefetching } = useSurfConditions(spotId);
-  const { data: weatherData, isLoading: isWeatherLoading } = useWeatherData(spotId);
   const { user } = useAuth();
   const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
   const [isAuthDialogOpen, setIsAuthDialogOpen] = useState(false);
@@ -66,13 +62,6 @@ const RealTimeSurfCam: React.FC<RealTimeSurfCamProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Weather Widget */}
-      <WeatherWidget 
-        weatherData={weatherData} 
-        isLoading={isWeatherLoading} 
-        spotName={spotName}
-      />
-
       {/* Current Surf Conditions */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Surf Cam Video */}
@@ -122,12 +111,6 @@ const RealTimeSurfCam: React.FC<RealTimeSurfCamProps> = ({
         {/* Real-time Analysis */}
         <LiveAnalysisPanel conditions={conditions} isLoading={isLoading} />
       </div>
-
-      {/* 7-Day Surf Forecast */}
-      <SurfForecast spotId={spotId} spotName={spotName} />
-
-      {/* Historical Analytics Charts */}
-      <HistoricalCharts spotId={spotId} spotName={spotName} />
 
       {/* Alert Preferences Dialog */}
       <AlertPreferencesDialog
