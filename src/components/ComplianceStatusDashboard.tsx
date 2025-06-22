@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, AlertTriangle, Activity, Users, Waves } from 'lucide-react';
+import { CheckCircle, AlertTriangle, Activity, Users, Waves, Info, Star, Target } from 'lucide-react';
 import { realMLPredictionService } from '@/services/realMLPredictionService';
 import { userAnalyticsService, UserMetrics } from '@/services/userAnalyticsService';
 import { real21DayForecastService } from '@/services/real21DayForecastService';
@@ -15,10 +15,14 @@ interface ComplianceStatus {
 }
 
 interface UserClaimsVersion {
+  id: string;
   title: string;
   content: string;
   audience: 'pro' | 'casual';
+  emphasis: 'community' | 'beta-access' | 'feature-preview';
   disclaimer: string;
+  ctaText: string;
+  legalNotes: string[];
 }
 
 const ComplianceStatusDashboard: React.FC = () => {
@@ -26,6 +30,7 @@ const ComplianceStatusDashboard: React.FC = () => {
   const [userMetrics, setUserMetrics] = useState<UserMetrics | null>(null);
   const [overallStatus, setOverallStatus] = useState<'compliant' | 'violation'>('compliant');
   const [selectedAudience, setSelectedAudience] = useState<'pro' | 'casual'>('casual');
+  const [selectedEmphasis, setSelectedEmphasis] = useState<'community' | 'beta-access' | 'feature-preview'>('community');
 
   useEffect(() => {
     initializeCompliance();
@@ -114,38 +119,107 @@ const ComplianceStatusDashboard: React.FC = () => {
     }
   };
 
-  // FTC-Compliant User Base Claims
+  // Comprehensive FTC-Compliant User Base Claims
   const userBaseClaims: UserClaimsVersion[] = [
     // Pro Surfer Versions
     {
+      id: 'pro-elite-beta',
       title: "Elite Beta Access",
-      content: "Join pro surfers testing real-time wave analytics. Help us refine competitive-grade tracking with verified beta testers.",
+      content: "Join verified pro surfers testing real-time wave analytics. Help us refine competitive-grade tracking with limited beta access.",
       audience: 'pro',
-      disclaimer: "Beta metrics pending third-party validation (FTC §255.1 compliant)"
+      emphasis: 'beta-access',
+      disclaimer: "Beta metrics pending third-party validation (FTC §255.1 compliant)",
+      ctaText: "Apply for Beta Access",
+      legalNotes: ["Uses 'verified' with backend validation", "Avoids false scarcity claims", "Third-party validation pending"]
     },
     {
+      id: 'pro-performance-testing',
       title: "Performance-Driven Testing", 
-      content: "Work with Wavementor's dev team to fine-tune pro-level analytics. Data accuracy: 75%+ in controlled conditions.",
+      content: "Work with Wavementor's dev team to fine-tune pro-level analytics. Data accuracy: 75%+ in controlled lab conditions.",
       audience: 'pro',
-      disclaimer: "Lab conditions may vary from real-world performance"
+      emphasis: 'feature-preview',
+      disclaimer: "Lab conditions may vary from real-world performance",
+      ctaText: "Join Dev Testing",
+      legalNotes: ["Specific accuracy claims with conditions", "Lab vs real-world distinction", "Performance data verified"]
+    },
+    {
+      id: 'pro-community-driven',
+      title: "Competitive Edge Development",
+      content: "Shape the future of surf analytics with fellow competitive surfers. Your feedback drives our AI training algorithms.",
+      audience: 'pro',
+      emphasis: 'community',
+      disclaimer: "Community feedback integrated into beta development cycle",
+      ctaText: "Shape the Platform",
+      legalNotes: ["Focus on development process", "Community-driven approach", "No user count claims"]
     },
     
-    // Casual Surfer Versions
+    // Casual Surfer Versions  
     {
+      id: 'casual-surf-tribe',
+      title: "Your Surf Tribe Awaits",
+      content: "We're building Wavementor with surfers like you! Join our beta community to shape the friendliest surf app out there.",
+      audience: 'casual',
+      emphasis: 'community',
+      disclaimer: "Community features in active development",
+      ctaText: "Join the Tribe",
+      legalNotes: ["Community focus without metrics", "Aspirational language", "Development transparency"]
+    },
+    {
+      id: 'casual-early-access',
+      title: "Be Among the First",
+      content: "Ride the Wavementor wave! Get exclusive early access as we refine real-time surf tracking for weekend warriors.",
+      audience: 'casual',
+      emphasis: 'beta-access',
+      disclaimer: "Early access features rolling out in phases",
+      ctaText: "Get Early Access",
+      legalNotes: ["Exclusive without false scarcity", "Phased rollout disclosure", "Target audience specific"]
+    },
+    {
+      id: 'casual-surf-smarter',
       title: "Surf Smarter Community",
       content: "Beta surfers are learning with Wavementor! Get notified at launch—no wipeouts required. Building the friendliest surf app out there.",
       audience: 'casual',
-      disclaimer: "Beta features rolling out soon. Tools may vary by break conditions"
-    },
-    {
-      title: "Your Surf Tribe Awaits",
-      content: "We're building Wavementor with surfers like you! Join our community to shape the future of surf analytics and wave tracking.",
-      audience: 'casual', 
-      disclaimer: "Community features in active development"
+      emphasis: 'feature-preview',
+      disclaimer: "Beta features rolling out soon. Tools may vary by break conditions",
+      ctaText: "Get Launch Updates",
+      legalNotes: ["Friendly tone without metrics", "Condition-dependent disclaimers", "Launch-focused messaging"]
     }
   ];
 
-  const currentClaims = userBaseClaims.filter(claim => claim.audience === selectedAudience);
+  // Filter claims by current audience and emphasis
+  const getCurrentClaims = () => {
+    return userBaseClaims.filter(claim => 
+      claim.audience === selectedAudience && claim.emphasis === selectedEmphasis
+    );
+  };
+
+  // Legal Review Guidelines - Comprehensive FTC Compliance
+  const legalReviewGuidelines = [
+    {
+      section: "FTC §255.1 - Truth in Advertising",
+      rules: [
+        "✅ Avoid 'active users' → use 'beta testers' or 'registered users'",
+        "✅ No unverified user count claims without backend logs",
+        "✅ 'Elite' implies exclusivity but avoids false scarcity"
+      ]
+    },
+    {
+      section: "FTC §255.2 - Substantiation Required",
+      rules: [
+        "✅ All 'join X+ users' claims require backend signup verification",
+        "✅ Accuracy percentages must cite controlled conditions",
+        "✅ Performance claims need lab vs real-world distinction"
+      ]
+    },
+    {
+      section: "FTC §255.5 - Clear and Conspicuous Disclosures",
+      rules: [
+        "✅ Disclaimers must be adjacent to metrics (no fine print)",
+        "✅ Beta-stage disclaimers prevent misleading expectations",
+        "✅ Condition-dependent language for variable performance"
+      ]
+    }
+  ];
 
   function getStatusColor(status: string) {
     switch (status) {
@@ -189,7 +263,7 @@ const ComplianceStatusDashboard: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* FTC-Compliant User Base Claims Preview */}
+      {/* Enhanced FTC-Compliant User Base Claims Preview */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
@@ -198,43 +272,151 @@ const ComplianceStatusDashboard: React.FC = () => {
               FTC-Compliant User Base Claims
             </span>
             <div className="flex gap-2">
-              <button
-                onClick={() => setSelectedAudience('casual')}
-                className={`px-3 py-1 rounded text-sm ${
-                  selectedAudience === 'casual' 
-                    ? 'bg-blue-500 text-white' 
-                    : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                <Waves className="w-4 h-4 inline mr-1" />
-                Casual
-              </button>
-              <button
-                onClick={() => setSelectedAudience('pro')}
-                className={`px-3 py-1 rounded text-sm ${
-                  selectedAudience === 'pro' 
-                    ? 'bg-orange-500 text-white' 
-                    : 'bg-gray-200 text-gray-700'
-                }`}
-              >
-                🏄‍♂️ Pro
-              </button>
+              {/* Audience Toggle */}
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setSelectedAudience('casual')}
+                  className={`px-3 py-1 rounded text-sm ${
+                    selectedAudience === 'casual' 
+                      ? 'bg-blue-500 text-white' 
+                      : 'bg-gray-200 text-gray-700'
+                  }`}
+                >
+                  <Waves className="w-4 h-4 inline mr-1" />
+                  Casual
+                </button>
+                <button
+                  onClick={() => setSelectedAudience('pro')}
+                  className={`px-3 py-1 rounded text-sm ${
+                    selectedAudience === 'pro' 
+                      ? 'bg-orange-500 text-white' 
+                      : 'bg-gray-200 text-gray-700'
+                  }`}
+                >
+                  🏄‍♂️ Pro
+                </button>
+              </div>
+              
+              {/* Emphasis Toggle */}
+              <div className="flex gap-1">
+                <button
+                  onClick={() => setSelectedEmphasis('community')}
+                  className={`px-2 py-1 rounded text-xs ${
+                    selectedEmphasis === 'community' 
+                      ? 'bg-green-500 text-white' 
+                      : 'bg-gray-100 text-gray-600'
+                  }`}
+                >
+                  Community
+                </button>
+                <button
+                  onClick={() => setSelectedEmphasis('beta-access')}
+                  className={`px-2 py-1 rounded text-xs ${
+                    selectedEmphasis === 'beta-access' 
+                      ? 'bg-purple-500 text-white' 
+                      : 'bg-gray-100 text-gray-600'
+                  }`}
+                >
+                  Beta Access
+                </button>
+                <button
+                  onClick={() => setSelectedEmphasis('feature-preview')}
+                  className={`px-2 py-1 rounded text-xs ${
+                    selectedEmphasis === 'feature-preview' 
+                      ? 'bg-indigo-500 text-white' 
+                      : 'bg-gray-100 text-gray-600'
+                  }`}
+                >
+                  Features
+                </button>
+              </div>
             </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {currentClaims.map((claim, index) => (
-              <Card key={index} className="border-l-4 border-l-blue-500">
+          <div className="grid grid-cols-1 gap-4">
+            {getCurrentClaims().map((claim, index) => (
+              <Card key={claim.id} className="border-l-4 border-l-blue-500">
                 <CardContent className="p-4">
-                  <h4 className="font-semibold text-lg mb-2">{claim.title}</h4>
+                  <div className="flex items-start justify-between mb-3">
+                    <h4 className="font-semibold text-lg">{claim.title}</h4>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs">
+                        {claim.emphasis.replace('-', ' ')}
+                      </Badge>
+                      {claim.audience === 'pro' && <Star className="w-4 h-4 text-orange-500" />}
+                    </div>
+                  </div>
+                  
                   <p className="text-gray-700 mb-3">{claim.content}</p>
-                  <div className="bg-blue-50 p-2 rounded text-xs text-blue-800">
-                    <strong>Legal Disclaimer:</strong> {claim.disclaimer}
+                  
+                  <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-colors text-sm mb-3">
+                    {claim.ctaText}
+                  </button>
+                  
+                  <div className="bg-blue-50 p-3 rounded mb-3">
+                    <div className="flex items-start">
+                      <Info className="w-4 h-4 text-blue-600 mr-2 mt-0.5" />
+                      <div>
+                        <div className="text-xs font-medium text-blue-800 mb-1">Legal Disclaimer:</div>
+                        <div className="text-xs text-blue-700">{claim.disclaimer}</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-gray-50 p-2 rounded">
+                    <div className="text-xs font-medium text-gray-700 mb-1">Legal Review Notes:</div>
+                    <ul className="text-xs text-gray-600 space-y-1">
+                      {claim.legalNotes.map((note, noteIndex) => (
+                        <li key={noteIndex}>• {note}</li>
+                      ))}
+                    </ul>
                   </div>
                 </CardContent>
               </Card>
             ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Comprehensive Legal Review Guidelines */}
+      <Card className="bg-yellow-50 border-yellow-200">
+        <CardHeader>
+          <CardTitle className="text-yellow-800 flex items-center">
+            <AlertTriangle className="w-5 h-5 mr-2" />
+            Comprehensive Legal Review Guidelines
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {legalReviewGuidelines.map((guideline, index) => (
+              <div key={index} className="border-l-4 border-l-yellow-400 pl-4">
+                <h4 className="font-semibold text-yellow-800 mb-2">{guideline.section}</h4>
+                <div className="space-y-1">
+                  {guideline.rules.map((rule, ruleIndex) => (
+                    <p key={ruleIndex} className="text-sm text-yellow-700">{rule}</p>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          <div className="mt-4 p-3 bg-yellow-100 rounded border border-yellow-300">
+            <div className="text-sm font-medium text-yellow-800 mb-2">Dynamic Counter Suggestions (FTC Compliant):</div>
+            <ul className="text-sm text-yellow-700 space-y-1">
+              <li>• "Join 500+ surfers on our beta waitlist!" (requires backend verification)</li>
+              <li>• "1,200+ beta signups and counting" (with signup timestamp logs)</li>
+              <li>• "Active development with 50+ verified beta testers" (verified user tracking)</li>
+            </ul>
+          </div>
+          
+          <div className="mt-3 p-3 bg-yellow-100 rounded border border-yellow-300">
+            <div className="text-sm font-medium text-yellow-800 mb-2">Post-Launch Tooltip Ideas:</div>
+            <ul className="text-sm text-yellow-700 space-y-1">
+              <li>• "Active users verified by third-party analytics (Google Analytics)"</li>
+              <li>• "User metrics independently audited monthly"</li>
+              <li>• "Real-time user count updated every 15 minutes"</li>
+            </ul>
           </div>
         </CardContent>
       </Card>
@@ -268,21 +450,6 @@ const ComplianceStatusDashboard: React.FC = () => {
           </Card>
         ))}
       </div>
-
-      {/* Legal Review Guidelines */}
-      <Card className="bg-yellow-50 border-yellow-200">
-        <CardHeader>
-          <CardTitle className="text-yellow-800">Legal Review Guidelines</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2 text-sm text-yellow-800">
-            <p><strong>✅ FTC §255.1:</strong> Avoid "active users" → use "beta testers" or "registered users"</p>
-            <p><strong>✅ FTC §255.2:</strong> All user count claims require backend verification logs</p>
-            <p><strong>✅ FTC §255.5:</strong> Disclaimers must be adjacent to metrics (no fine print)</p>
-            <p><strong>✅ Truth in Advertising:</strong> Beta-stage disclaimers prevent misleading claims</p>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* User Analytics Dashboard */}
       {userMetrics && (
