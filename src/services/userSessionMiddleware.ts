@@ -39,17 +39,6 @@ class UserSessionMiddleware {
       // Get current server timestamp
       const serverTimestamp = new Date().toISOString();
       
-      // Check for existing session data
-      const { data: existingSession, error } = await supabase
-        .from('user_sessions')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
-
-      if (error && error.code !== 'PGRST116') { // Not found is ok
-        throw error;
-      }
-
       const sessionData: UserSessionData = {
         userId,
         lastUpdated: serverTimestamp,
@@ -58,14 +47,14 @@ class UserSessionMiddleware {
           userAgent: navigator.userAgent,
           timestamp: serverTimestamp
         },
-        preferences: existingSession?.preferences || {},
-        activityLog: existingSession?.activity_log || []
+        preferences: {},
+        activityLog: []
       };
 
-      // Upsert session data
-      await this.saveSessionData(sessionData);
+      // Save session data locally for now
+      this.saveLocalSessionData(sessionData);
       
-      // Start real-time sync
+      // Start real-time sync monitoring
       this.startRealtimeSync(userId);
       
       await enhancedSecurityService.logSecurityEvent({
@@ -86,31 +75,21 @@ class UserSessionMiddleware {
     try {
       // Get local session data
       const localData = this.getLocalSessionData(userId);
-      if (!localData) return false;
-
-      // Get server session data
-      const { data: serverData, error } = await supabase
-        .from('user_sessions')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
-
-      if (error) {
-        console.error('Server session validation failed:', error);
+      if (!localData) {
+        console.log('⚠️ No local session data found');
         return false;
       }
 
-      // Check if local data is stale
-      const localTimestamp = new Date(localData.lastUpdated).getTime();
-      const serverTimestamp = new Date(serverData.last_updated).getTime();
-
-      if (localTimestamp < serverTimestamp) {
-        console.log('🔄 Local session data is stale, syncing...');
+      // For now, without user_sessions table, we'll just validate local data integrity
+      const isValid = this.validateLocalSessionData(localData);
+      
+      if (!isValid) {
+        console.log('🔄 Local session data validation failed');
         await this.syncUserData(userId);
-        return false; // Data was stale
+        return false;
       }
 
-      return true; // Data is consistent
+      return true;
     } catch (error) {
       console.error('Session consistency validation failed:', error);
       return false;
@@ -126,34 +105,18 @@ class UserSessionMiddleware {
     this.pendingSync = true;
 
     try {
-      console.log('🔄 Syncing user data from server...');
-
-      // Get latest server data
-      const { data: serverData, error } = await supabase
-        .from('user_sessions')
-        .select('*')
-        .eq('user_id', userId)
-        .single();
-
-      if (error) throw error;
+      console.log('🔄 Syncing user data...');
 
       // Get local data for conflict resolution
       const localData = this.getLocalSessionData(userId);
       
       if (localData) {
-        // Resolve conflicts
-        const resolvedData = await this.resolveConflicts(localData, serverData);
-        this.saveLocalSessionData(resolvedData);
+        // Refresh local data timestamp
+        localData.lastUpdated = new Date().toISOString();
+        this.saveLocalSessionData(localData);
       } else {
-        // No local data, use server data
-        this.saveLocalSessionData({
-          userId,
-          lastUpdated: serverData.last_updated,
-          sessionId: serverData.session_id,
-          deviceInfo: serverData.device_info,
-          preferences: serverData.preferences,
-          activityLog: serverData.activity_log
-        });
+        // Create new session if none exists
+        await this.initializeSession(userId);
       }
 
       await enhancedSecurityService.logSecurityEvent({
@@ -176,43 +139,17 @@ class UserSessionMiddleware {
     }
   }
 
-  private async resolveConflicts(localData: UserSessionData, serverData: any): Promise<UserSessionData> {
-    const conflicts: ConflictResolution[] = [];
-    const resolvedData = { ...localData };
-
-    // Strategy: Last Write Wins for most conflicts
-    const localTime = new Date(localData.lastUpdated).getTime();
-    const serverTime = new Date(serverData.last_updated).getTime();
-
-    if (serverTime > localTime) {
-      // Server data is newer, use server values
-      resolvedData.preferences = serverData.preferences;
-      resolvedData.lastUpdated = serverData.last_updated;
-      
-      conflicts.push({
-        strategy: 'last_write_wins',
-        field: 'preferences',
-        serverValue: serverData.preferences,
-        clientValue: localData.preferences,
-        resolvedValue: serverData.preferences
-      });
+  private validateLocalSessionData(sessionData: UserSessionData): boolean {
+    // Basic validation checks
+    if (!sessionData.userId || !sessionData.sessionId || !sessionData.lastUpdated) {
+      return false;
     }
 
-    // Merge activity logs (append server activities not in local)
-    const localActivityIds = new Set(localData.activityLog.map(a => `${a.action}_${a.timestamp}`));
-    const serverActivities = serverData.activity_log || [];
-    
-    const newActivities = serverActivities.filter((activity: ActivityEntry) => 
-      !localActivityIds.has(`${activity.action}_${activity.timestamp}`)
-    );
+    // Check if session is not too old (24 hours)
+    const sessionAge = Date.now() - new Date(sessionData.lastUpdated).getTime();
+    const maxAge = 24 * 60 * 60 * 1000; // 24 hours
 
-    if (newActivities.length > 0) {
-      resolvedData.activityLog = [...localData.activityLog, ...newActivities]
-        .sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-    }
-
-    console.log(`🔧 Resolved ${conflicts.length} data conflicts using last-write-wins strategy`);
-    return resolvedData;
+    return sessionAge < maxAge;
   }
 
   private startRealtimeSync(userId: string): void {
@@ -229,48 +166,27 @@ class UserSessionMiddleware {
       }
     }, 30000);
 
-    // Listen for real-time updates
-    const channel = supabase.channel(`user_session_${userId}`)
-      .on('postgres_changes', 
-        { 
-          event: 'UPDATE', 
-          schema: 'public', 
-          table: 'user_sessions',
-          filter: `user_id=eq.${userId}`
-        }, 
-        (payload) => {
-          console.log('📡 Real-time session update received');
-          this.syncUserData(userId);
-        }
-      )
-      .subscribe();
-  }
-
-  private async saveSessionData(sessionData: UserSessionData): Promise<void> {
-    const { error } = await supabase
-      .from('user_sessions')
-      .upsert({
-        user_id: sessionData.userId,
-        session_id: sessionData.sessionId,
-        last_updated: sessionData.lastUpdated,
-        device_info: sessionData.deviceInfo,
-        preferences: sessionData.preferences,
-        activity_log: sessionData.activityLog
-      });
-
-    if (error) throw error;
-
-    // Also save locally
-    this.saveLocalSessionData(sessionData);
+    // For now, without user_sessions table, we'll just monitor local changes
+    console.log('📡 Real-time session monitoring started');
   }
 
   private saveLocalSessionData(sessionData: UserSessionData): void {
-    localStorage.setItem(`session_${sessionData.userId}`, JSON.stringify(sessionData));
+    try {
+      localStorage.setItem(`session_${sessionData.userId}`, JSON.stringify(sessionData));
+      console.log('💾 Session data saved locally');
+    } catch (error) {
+      console.error('Failed to save session data locally:', error);
+    }
   }
 
   private getLocalSessionData(userId: string): UserSessionData | null {
-    const stored = localStorage.getItem(`session_${userId}`);
-    return stored ? JSON.parse(stored) : null;
+    try {
+      const stored = localStorage.getItem(`session_${userId}`);
+      return stored ? JSON.parse(stored) : null;
+    } catch (error) {
+      console.error('Failed to get local session data:', error);
+      return null;
+    }
   }
 
   cleanup(): void {

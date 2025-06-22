@@ -2,7 +2,7 @@
 import { supabase } from '@/integrations/supabase/client';
 import { enhancedSecurityService } from './enhancedSecurityService';
 
-// Admin Permission Matrix (YAML-like structure in TypeScript)
+// Admin Permission Matrix (simplified to use existing roles)
 interface AdminPermissionMatrix {
   users: Permission[];
   analytics: Permission[];
@@ -15,7 +15,7 @@ interface AdminPermissionMatrix {
 type Permission = 'read' | 'write' | 'delete' | 'export' | 'audit';
 
 interface AdminRole {
-  role: 'super_admin' | 'admin' | 'moderator' | 'compliance_officer';
+  role: 'admin' | 'mentor';
   permissions: AdminPermissionMatrix;
   description: string;
   gdpr_compliant: boolean;
@@ -43,10 +43,10 @@ interface AccessLog {
 }
 
 class AdminAccessControl {
-  // Permission Matrix - SOC 2 & GDPR Compliant
+  // Permission Matrix - SOC 2 & GDPR Compliant (using existing roles)
   private readonly PERMISSION_MATRIX: Record<string, AdminRole> = {
-    super_admin: {
-      role: 'super_admin',
+    admin: {
+      role: 'admin',
       permissions: {
         users: ['read', 'write', 'delete', 'export', 'audit'],
         analytics: ['read', 'write', 'export', 'audit'],
@@ -59,22 +59,8 @@ class AdminAccessControl {
       gdpr_compliant: true,
       soc2_compliant: true
     },
-    admin: {
-      role: 'admin',
-      permissions: {
-        users: ['read', 'write', 'export'],
-        analytics: ['read', 'export'],
-        app_config: ['read', 'write'],
-        beta_features: ['read', 'write'],
-        legal_compliance: ['read'],
-        security_logs: ['read']
-      },
-      description: 'Standard admin access without infrastructure control',
-      gdpr_compliant: true,
-      soc2_compliant: true
-    },
-    moderator: {
-      role: 'moderator',
+    mentor: {
+      role: 'mentor',
       permissions: {
         users: ['read'],
         analytics: ['read'],
@@ -83,23 +69,9 @@ class AdminAccessControl {
         legal_compliance: ['read'],
         security_logs: []
       },
-      description: 'User management and monitoring only',
+      description: 'Limited access for mentoring functions',
       gdpr_compliant: true,
       soc2_compliant: false
-    },
-    compliance_officer: {
-      role: 'compliance_officer',
-      permissions: {
-        users: ['read', 'export', 'audit'],
-        analytics: ['read', 'export', 'audit'],
-        app_config: ['read'],
-        beta_features: ['read'],
-        legal_compliance: ['read', 'write', 'export', 'audit'],
-        security_logs: ['read', 'export', 'audit']
-      },
-      description: 'Legal and compliance oversight with audit capabilities',
-      gdpr_compliant: true,
-      soc2_compliant: true
     }
   };
 
@@ -162,14 +134,14 @@ class AdminAccessControl {
         .from('user_roles')
         .select('role')
         .eq('user_id', userId)
-        .in('role', ['admin', 'super_admin', 'moderator', 'compliance_officer']);
+        .in('role', ['admin', 'mentor']);
 
       if (error || !roles || roles.length === 0) {
         return null;
       }
 
       // Return highest privilege role
-      const roleHierarchy = ['super_admin', 'admin', 'compliance_officer', 'moderator'];
+      const roleHierarchy = ['admin', 'mentor'];
       for (const hierarchyRole of roleHierarchy) {
         const hasRole = roles.some(r => r.role === hierarchyRole);
         if (hasRole && this.PERMISSION_MATRIX[hierarchyRole]) {
@@ -216,25 +188,22 @@ class AdminAccessControl {
         }
       };
 
-      // Store in admin_access_logs table
-      const { error } = await supabase
-        .from('admin_access_logs')
-        .insert([{
-          id: accessLog.id,
-          user_id: accessLog.userId,
-          user_email: accessLog.userEmail,
-          resource: accessLog.resource,
-          action: accessLog.action,
-          success: accessLog.success,
-          timestamp: accessLog.timestamp,
-          metadata: accessLog.metadata
-        }]);
+      // For now, log to console since admin_access_logs table doesn't exist yet
+      console.log(`📋 Admin access logged: ${success ? '✅' : '❌'} ${request.resource}:${request.action}`, accessLog);
 
-      if (error) {
-        console.error('Failed to log admin access:', error);
-      } else {
-        console.log(`📋 Admin access logged: ${success ? '✅' : '❌'} ${request.resource}:${request.action}`);
-      }
+      // Store in security_events table instead
+      await enhancedSecurityService.logSecurityEvent({
+        user_id: request.userId,
+        event_type: 'admin_access_attempt',
+        severity: success ? 'low' : 'medium',
+        details: {
+          resource: request.resource,
+          action: request.action,
+          success,
+          reason,
+          justification: request.justification
+        }
+      });
     } catch (error) {
       console.error('Failed to log access attempt:', error);
     }
@@ -253,23 +222,18 @@ class AdminAccessControl {
         throw new Error('Insufficient permissions to access logs');
       }
 
-      const { data: logs, error } = await supabase
-        .from('admin_access_logs')
-        .select('*')
-        .order('timestamp', { ascending: false })
-        .limit(limit);
-
-      if (error) throw error;
-
-      return logs.map(log => ({
-        id: log.id,
-        userId: log.user_id,
-        userEmail: log.user_email,
-        resource: log.resource,
-        action: log.action,
-        success: log.success,
-        timestamp: log.timestamp,
-        metadata: log.metadata
+      // Get logs from security_events table instead
+      const logs = await enhancedSecurityService.getSecurityEvents(userId, 'medium');
+      
+      return logs.slice(0, limit).map(log => ({
+        id: log.id || crypto.randomUUID(),
+        userId: log.user_id || 'unknown',
+        userEmail: 'unknown', // Not available in security_events
+        resource: log.details.resource || 'unknown',
+        action: log.details.action || 'unknown',
+        success: log.details.success || false,
+        timestamp: log.created_at || new Date().toISOString(),
+        metadata: log.details
       }));
     } catch (error) {
       console.error('Failed to get access logs:', error);
@@ -303,31 +267,15 @@ class AdminAccessControl {
 # Admin Permission Matrix - SOC 2 & GDPR Compliant
 
 admin_permissions:
-  super_admin:
-    users: [read, write, delete, export,</S2>]
+  admin:
+    users: [read, write, delete, export, audit]
     analytics: [read, write, export, audit]
     app_config: [read, write, audit]
     beta_features: [read, write, audit]
     legal_compliance: [read, write, export, audit]
     security_logs: [read, export, audit]
     
-  admin:
-    users: [read, write, export]
-    analytics: [read, export]
-    app_config: [read, write]
-    beta_features: [read, write]
-    legal_compliance: [read]
-    security_logs: [read]
-    
-  compliance_officer:
-    users: [read, export, audit]
-    analytics: [read, export, audit]
-    app_config: [read]
-    beta_features: [read]
-    legal_compliance: [read, write, export, audit]
-    security_logs: [read, export, audit]
-    
-  moderator:
+  mentor:
     users: [read]
     analytics: [read]
     app_config: []
