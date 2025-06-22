@@ -66,6 +66,15 @@ const SessionLogger: React.FC<SessionLoggerProps> = ({ onSessionSaved }) => {
       if (error) throw error;
       return data;
     },
+    onSuccess: () => {
+      toast.success("Session logged successfully!");
+      queryClient.invalidateQueries({ queryKey: ['surf-log-insights'] });
+      if (onSessionSaved) onSessionSaved();
+    },
+    onError: (error: Error) => {
+      toast.error(`Failed to log session: ${error.message}`);
+    },
+  });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
