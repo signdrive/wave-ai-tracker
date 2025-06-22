@@ -1,3 +1,4 @@
+
 // COMPLIANCE FIX: Real user analytics and tracking system
 interface UserActivity {
   userId: string;
@@ -166,7 +167,7 @@ class UserAnalyticsService {
   }
 
   // Public method to verify user count claims
-  async verifyUserCountClaims(): Promise<{ verified: boolean;Metrics: UserMetrics }> {
+  async verifyUserCountClaims(): Promise<{ verified: boolean; actualMetrics: UserMetrics }> {
     const metrics = await this.getCurrentMetrics();
     
     // Verify against claimed user counts

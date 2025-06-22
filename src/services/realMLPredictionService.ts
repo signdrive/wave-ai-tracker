@@ -128,11 +128,14 @@ class RealMLPredictionService {
     input.dispose();
     prediction.dispose();
 
+    // Cast to Float32Array to fix TypeScript error
+    const predictionArray = predictionData as Float32Array;
+
     const factors = {
-      waveQuality: Math.round(predictionData[0] * 100),
-      windConditions: Math.round(predictionData[1] * 100),
-      tideOptimality: Math.round(predictionData[2] * 100),
-      crowdFactor: Math.round(predictionData[3] * 100)
+      waveQuality: Math.round(predictionArray[0] * 100),
+      windConditions: Math.round(predictionArray[1] * 100),
+      tideOptimality: Math.round(predictionArray[2] * 100),
+      crowdFactor: Math.round(predictionArray[3] * 100)
     };
 
     // Calculate overall quality score using ML prediction
@@ -144,7 +147,7 @@ class RealMLPredictionService {
     );
 
     // Real confidence based on model certainty
-    const confidence = this.calculateModelConfidence(predictionData);
+    const confidence = this.calculateModelConfidence(predictionArray);
     
     // Validate against ground truth for real accuracy
     const accuracy = await this.validatePrediction(conditions, qualityScore);

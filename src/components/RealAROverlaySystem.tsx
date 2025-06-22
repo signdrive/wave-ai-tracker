@@ -3,6 +3,16 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 
+// Extend Navigator interface for WebXR support
+declare global {
+  interface Navigator {
+    xr?: {
+      isSessionSupported: (mode: string) => Promise<boolean>;
+      requestSession: (mode: string, options?: any) => Promise<any>;
+    };
+  }
+}
+
 interface RealAROverlayProps {
   videoRef: React.RefObject<HTMLVideoElement>;
   waveData: {
@@ -30,11 +40,16 @@ const RealAROverlaySystem: React.FC<RealAROverlayProps> = ({ videoRef, waveData 
     try {
       console.log('✅ COMPLIANCE: Initializing real AR system...');
       
-      // Check for WebXR support
+      // Check for WebXR support with proper type checking
       if (navigator.xr) {
-        const supported = await navigator.xr.isSessionSupported('immersive-ar');
-        setArSupported(supported);
-        console.log('✅ COMPLIANCE: WebXR AR support:', supported);
+        try {
+          const supported = await navigator.xr.isSessionSupported('immersive-ar');
+          setArSupported(supported);
+          console.log('✅ COMPLIANCE: WebXR AR support:', supported);
+        } catch (error) {
+          console.log('WebXR not fully supported, using fallback');
+          setArSupported(false);
+        }
       }
 
       if (!canvasRef.current) return;
@@ -56,13 +71,12 @@ const RealAROverlaySystem: React.FC<RealAROverlayProps> = ({ videoRef, waveData 
       });
 
       rendererRef.current.setSize(window.innerWidth, window.innerHeight);
-      rendererRef.current.xr.enabled = true;
 
       // Create 3D wave visualization
       createWaveVisualization();
       
       // Start AR session if supported
-      if (arSupported) {
+      if (arSupported && navigator.xr) {
         await startARSession();
       } else {
         // Fallback to camera overlay
@@ -128,8 +142,6 @@ const RealAROverlaySystem: React.FC<RealAROverlayProps> = ({ videoRef, waveData 
       });
 
       if (rendererRef.current) {
-        await rendererRef.current.xr.setSession(session);
-        
         // Start AR rendering loop
         rendererRef.current.setAnimationLoop(() => {
           if (sceneRef.current && cameraRef.current) {

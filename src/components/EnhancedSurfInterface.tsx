@@ -1,15 +1,23 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import SurfCamDisplay from './SurfCamDisplay';
 import SurfSpotMap from './SurfSpotMap';
 import MLWavePredictions from './MLWavePredictions';
 import RealAROverlaySystem from './RealAROverlaySystem';
 import PersonalSurfCoach from './PersonalSurfCoach';
-import ComplianceAuditDashboard from './ComplianceAuditDashboard';
+import ComplianceStatusDashboard from './ComplianceStatusDashboard';
 
 const EnhancedSurfInterface: React.FC = () => {
   const [activeTab, setActiveTab] = useState('surf-cams');
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Sample wave data for AR overlay
+  const waveData = {
+    height: 4.2,
+    period: 12.5,
+    direction: 225
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -56,7 +64,7 @@ const EnhancedSurfInterface: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="ar-overlay">
-          <RealAROverlaySystem />
+          <RealAROverlaySystem videoRef={videoRef} waveData={waveData} />
         </TabsContent>
 
         <TabsContent value="surf-coach">
@@ -64,7 +72,7 @@ const EnhancedSurfInterface: React.FC = () => {
         </TabsContent>
 
         <TabsContent value="compliance">
-          <ComplianceAuditDashboard />
+          <ComplianceStatusDashboard />
         </TabsContent>
       </Tabs>
     </div>
