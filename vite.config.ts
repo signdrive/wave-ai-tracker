@@ -45,6 +45,13 @@ export default defineConfig(({ mode }) => {
         "@": path.resolve(__dirname, "./src"),
       },
     },
+    // SPA ROUTING FIX - Add preview configuration for production builds
+    preview: {
+      port: 8080,
+      host: "127.0.0.1",
+      // Configure fallback for SPA routing in preview mode
+      proxy: undefined,
+    },
     build: {
       // Optimize chunk splitting for better caching
       rollupOptions: {

@@ -1,0 +1,6 @@
+
+# Netlify SPA routing configuration
+/*    /index.html   200
+
+# Handle API routes if they exist
+/api/*  /api/:splat  200
