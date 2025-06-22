@@ -4,9 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, MapPin, Loader2 } from 'lucide-react';
-import { useSurfForecast } from '@/hooks/useRealTimeData';
-import SurfForecast from './SurfForecast';
-import HistoricalCharts from './HistoricalCharts';
 
 const SearchableWeatherForecast: React.FC = () => {
   const [searchLocation, setSearchLocation] = useState('Pipeline, Hawaii');
@@ -91,9 +88,18 @@ const SearchableWeatherForecast: React.FC = () => {
         </CardContent>
       </Card>
 
-      <SurfForecast spotId={currentSpotId} spotName={searchLocation} />
-      
-      <HistoricalCharts spotId={currentSpotId} spotName={searchLocation} />
+      {/* Search Results Display */}
+      {currentSpotId && (
+        <Card>
+          <CardContent className="p-6">
+            <div className="text-center text-gray-500">
+              <Search className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+              <h3 className="text-lg font-semibold mb-2">Search Results for {searchLocation}</h3>
+              <p>Connect your forecast API to display real-time surf conditions and historical data for this location.</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
