@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import NavBar from '@/components/NavBar';
@@ -89,7 +88,6 @@ const SurfLogPage = () => {
       )
     : insightsData?.preferred_conditions_by_spot?.[0];
 
-
   const formatDurationFromMinutes = (minutes: number | null | undefined) => {
     if (minutes == null || minutes <= 0) return 'N/A';
     const hours = Math.floor(minutes / 60);
@@ -98,7 +96,6 @@ const SurfLogPage = () => {
     if (hours > 0) return `${hours}h`;
     return `${remainingMinutes}m`;
   };
-
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-ocean/5 to-sand/20">
@@ -129,7 +126,6 @@ const SurfLogPage = () => {
                 error={insightsError as Error | undefined}
               />
             )}
-
 
             {/* Recent Sessions List */}
             <Card>
