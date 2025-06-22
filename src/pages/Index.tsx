@@ -9,13 +9,6 @@ const Index = () => {
     <div className="min-h-screen">
       <Hero />
       
-      {/* Enhanced Weather Forecast Search */}
-      <section className="py-8 bg-gray-50 dark:bg-gray-900">
-        <div className="container mx-auto px-4">
-          <SearchableWeatherForecast />
-        </div>
-      </section>
-
       {/* Advanced Features Interface - AR Zone, AI Instructor, etc. */}
       <section className="py-8">
         <div className="container mx-auto px-4 mb-8">
@@ -29,6 +22,13 @@ const Index = () => {
           </div>
         </div>
         <EnhancedSurfInterface />
+      </section>
+
+      {/* Enhanced Weather Forecast Search */}
+      <section className="py-8 bg-gray-50 dark:bg-gray-900">
+        <div className="container mx-auto px-4">
+          <SearchableWeatherForecast />
+        </div>
       </section>
     </div>
   );
