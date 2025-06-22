@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,7 @@ import { toast } from 'sonner';
 import { Loader2, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client'; // Use the shared Supabase client
 import type { Session } from '@supabase/supabase-js';
+
 
 type CrowdLevel = 'Low' | 'Medium' | 'High';
 
@@ -19,6 +19,7 @@ interface SubmitCrowdReportPayload {
 }
 
 const submitCrowdReport = async (payload: SubmitCrowdReportPayload): Promise<any> => {
+  console.log('CrowdReportForm: Attempting to submit crowd report with payload:', payload); // <-- ADD THIS LINE
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();
   if (sessionError || !session) {
     throw new Error(sessionError?.message || 'User not authenticated');
@@ -26,11 +27,8 @@ const submitCrowdReport = async (payload: SubmitCrowdReportPayload): Promise<any
 
   const { data, error } = await supabase.functions.invoke('submit-crowd-report', {
     method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json', 
-      Authorization: `Bearer ${session.access_token}` 
-    },
-    body: JSON.stringify(payload),
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+    body: JSON.stringify(payload), // Ensure body is stringified for functions
   });
 
   if (error) {
@@ -62,17 +60,19 @@ const CrowdReportForm: React.FC<CrowdReportFormProps> = ({ spotId }) => {
     };
   }, []);
 
-  const mutation = useMutation({
-    mutationFn: (level: CrowdLevel) => submitCrowdReport({ spot_id: spotId, reported_level: level }),
-    onSuccess: () => {
-      toast.success('Crowd report submitted! Thanks for contributing.');
-      // Invalidate the query for this spot's crowd prediction to refetch
-      queryClient.invalidateQueries({ queryKey: ['realCrowdData', spotId] });
-    },
-    onError: (error: Error) => {
-      toast.error(`Failed to submit report: ${error.message}`);
-    },
-  });
+  const mutation = useMutation<any, Error, CrowdLevel>(
+    (level) => submitCrowdReport({ spot_id: spotId, reported_level: level }),
+    {
+      onSuccess: () => {
+        toast.success('Crowd report submitted! Thanks for contributing.');
+        // Invalidate the query for this spot's crowd prediction to refetch
+        queryClient.invalidateQueries(['crowdPrediction', spotId]);
+      },
+      onError: (error) => {
+        toast.error(`Failed to submit report: ${error.message}`);
+      },
+    }
+  );
 
   const handleSubmit = (level: CrowdLevel) => {
     mutation.mutate(level);
@@ -96,10 +96,10 @@ const CrowdReportForm: React.FC<CrowdReportFormProps> = ({ spotId }) => {
             variant="outline"
             size="sm"
             onClick={() => handleSubmit(level)}
-            disabled={mutation.isPending}
+            disabled={mutation.isLoading}
             className="flex-1 text-xs px-2 py-1 h-auto"
           >
-            {mutation.isPending && mutation.variables === level ? (
+            {mutation.isLoading && mutation.variables === level ? (
               <Loader2 className="h-3 w-3 animate-spin mr-1" />
             ) : (
               <Send className="h-3 w-3 mr-1" />

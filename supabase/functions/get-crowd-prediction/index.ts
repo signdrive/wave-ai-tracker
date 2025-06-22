@@ -1,13 +1,6 @@
-
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, DELETE, PUT',
-  'Access-Control-Max-Age': '86400',
-};
+import { corsHeaders } from "../_shared/cors.ts";
 
 const getSimpleHeuristicPrediction = (spotId: string): { predicted_level: "Low" | "Medium" | "High", source: string } => {
   const now = new Date();
@@ -58,91 +51,54 @@ const getLatestUserReport = async (supabaseClient: SupabaseClient, spotId: strin
   return null;
 };
 
+
 serve(async (req: Request) => {
-  console.log(`Received ${req.method} request to get-crowd-prediction`);
-  
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    let spot_id: string | null = null;
-
-    // Handle both GET and POST requests with better error handling
-    if (req.method === "GET") {
-      const url = new URL(req.url);
-      spot_id = url.searchParams.get("spot_id");
-      console.log("GET request - spot_id from query params:", spot_id);
-    } else if (req.method === "POST") {
-      try {
-        // For Supabase functions.invoke(), the body comes directly as the parsed object
-        // Let's try both approaches to be safe
-        const contentType = req.headers.get("content-type");
-        console.log("POST request - content-type:", contentType);
-        
-        if (contentType?.includes("application/json")) {
-          const body = await req.json();
-          console.log("Parsed JSON body:", body);
-          spot_id = body?.spot_id;
-        } else {
-          // Fallback: try to parse as text then JSON
-          const bodyText = await req.text();
-          console.log("Raw body text:", bodyText);
-          
-          if (bodyText && bodyText.trim() !== '') {
-            try {
-              const body = JSON.parse(bodyText);
-              spot_id = body?.spot_id;
-              console.log("Parsed body from text:", body);
-            } catch (parseError) {
-              console.error("Failed to parse body text as JSON:", parseError);
-              // Try to extract spot_id from URL-encoded data or other formats
-              if (bodyText.includes("spot_id=")) {
-                const match = bodyText.match(/spot_id=([^&]+)/);
-                spot_id = match ? decodeURIComponent(match[1]) : null;
-              }
-            }
-          }
-        }
-      } catch (error) {
-        console.error("Error processing POST body:", error);
-        // Continue without throwing - we'll return an error below
-      }
-    }
-
-    console.log("Final spot_id:", spot_id);
+    const url = new URL(req.url);
+    const spot_id = url.searchParams.get("spot_id");
 
     if (!spot_id) {
-      console.error("Missing spot_id parameter");
-      return new Response(JSON.stringify({ 
-        error: "Missing spot_id parameter",
-        debug: {
-          method: req.method,
-          headers: Object.fromEntries(req.headers.entries()),
-          url: req.url
-        }
-      }), {
+      return new Response(JSON.stringify({ error: "Missing spot_id query parameter" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Initialize Supabase client
+    // Initialize Supabase client with user's auth token for RLS
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Missing Authorization header" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+      Deno.env.get("SUPABASE_ANON_KEY") ?? "", // ANON key is fine, RLS uses the JWT from Authorization header
+      { global: { headers: { Authorization: authHeader } } }
     );
 
-    let prediction;
-    try {
-      const latestReport = await getLatestUserReport(supabaseClient, spot_id);
-      prediction = latestReport || getSimpleHeuristicPrediction(spot_id);
-    } catch (error) {
-      console.error("Error getting crowd prediction:", error);
-      prediction = getSimpleHeuristicPrediction(spot_id);
+    // Verify user authentication (optional, but good practice if function requires auth)
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    if (userError || !user) {
+      return new Response(JSON.stringify({ error: "Authentication failed" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    console.log("Returning prediction:", prediction);
+    let prediction;
+    const latestReport = await getLatestUserReport(supabaseClient, spot_id);
+
+    if (latestReport) {
+      prediction = latestReport;
+    } else {
+      prediction = getSimpleHeuristicPrediction(spot_id);
+    }
 
     return new Response(JSON.stringify({ spot_id, ...prediction }), {
       status: 200,
@@ -151,10 +107,7 @@ serve(async (req: Request) => {
 
   } catch (error) {
     console.error("General error:", error);
-    return new Response(JSON.stringify({ 
-      error: "An unexpected error occurred", 
-      details: error.message 
-    }), {
+    return new Response(JSON.stringify({ error: "An unexpected error occurred", details: error.message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

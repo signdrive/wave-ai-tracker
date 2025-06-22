@@ -18,10 +18,10 @@ const Footer: React.FC = () => {
                 <div className="absolute inset-1 bg-ocean-dark rounded-full"></div>
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full"></div>
               </div>
-              <span className="font-bold text-xl">WaveMentor</span>
+              <span className="font-bold text-xl">WaveFinder</span>
             </div>
             <p className="text-gray-300 mb-4">
-              The ultimate surf intelligence platform with AI-powered forecasting and live cam monitoring.
+              The ultimate platform for booking wave pools and checking surf conditions anywhere in the world.
             </p>
             <div className="flex space-x-4">
               <a href="#" aria-label="Facebook" className="hover:text-ocean-light">
@@ -43,44 +43,44 @@ const Footer: React.FC = () => {
           </div>
           
           <div className="md:col-span-1">
-            <h3 className="font-semibold text-lg mb-4">Live Features</h3>
+            <h3 className="font-semibold text-lg mb-4">Wave Pools</h3>
             <ul className="space-y-2">
-              <li><a href="/live-spots" className="text-gray-300 hover:text-white">AI Surf Cameras</a></li>
-              <li><a href="/map" className="text-gray-300 hover:text-white">Crowd Heat Map</a></li>
-              <li><a href="/book-sessions" className="text-gray-300 hover:text-white">Wave Pool Booking</a></li>
-              <li><a href="/surf-log" className="text-gray-300 hover:text-white">Session Tracking</a></li>
-              <li><a href="/" className="text-gray-300 hover:text-white">Premium Forecasts</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white">Kelly Slater Surf Ranch</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white">BSR Surf Resort</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white">Urbnsurf Melbourne</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white">The Wave Bristol</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white">View All Locations</a></li>
             </ul>
           </div>
           
           <div className="md:col-span-1">
-            <h3 className="font-semibold text-lg mb-4">Global Spots</h3>
+            <h3 className="font-semibold text-lg mb-4">Surf Cams</h3>
             <ul className="space-y-2">
               <li><a href="#" className="text-gray-300 hover:text-white">Pipeline, Hawaii</a></li>
               <li><a href="#" className="text-gray-300 hover:text-white">Mavericks, California</a></li>
               <li><a href="#" className="text-gray-300 hover:text-white">Snapper Rocks, Australia</a></li>
               <li><a href="#" className="text-gray-300 hover:text-white">Jeffreys Bay, South Africa</a></li>
-              <li><a href="/live-spots" className="text-gray-300 hover:text-white">View All Cameras</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white">View All Cameras</a></li>
             </ul>
           </div>
           
           <div className="md:col-span-1">
-            <h3 className="font-semibold text-lg mb-4">Intelligence</h3>
+            <h3 className="font-semibold text-lg mb-4">Resources</h3>
             <ul className="space-y-2">
-              <li><a href="/" className="text-gray-300 hover:text-white">AI Forecasting</a></li>
-              <li><a href="/" className="text-gray-300 hover:text-white">Real-time Analysis</a></li>
-              <li><a href="/" className="text-gray-300 hover:text-white">Weather Integration</a></li>
-              <li><a href="/privacy-settings" className="text-gray-300 hover:text-white">Privacy Settings</a></li>
-              <li><a href="/admin" className="text-gray-300 hover:text-white">Admin Portal</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white">Surf Forecasts</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white">Tide Tables</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white">Surf Etiquette</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white">Smartwatch Integration</a></li>
+              <li><a href="#" className="text-gray-300 hover:text-white">AI Wave Detection</a></li>
             </ul>
           </div>
         </div>
         
         <div className="border-t border-gray-700 mt-12 pt-8 text-sm text-gray-400">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p>© 2024 WaveMentor. All rights reserved.</p>
+            <p>© 2023 WaveFinder. All rights reserved.</p>
             <div className="flex space-x-6 mt-4 md:mt-0">
-              <a href="/privacy-policy" className="hover:text-white">Privacy Policy</a>
+              <a href="#" className="hover:text-white">Privacy Policy</a>
               <a href="#" className="hover:text-white">Terms of Service</a>
               <a href="#" className="hover:text-white">Cookie Policy</a>
             </div>

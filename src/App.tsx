@@ -2,7 +2,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import Index from '@/pages/Index';
+import { Dashboard } from '@/pages/Dashboard';
 import LiveSpotsPage from '@/pages/LiveSpotsPage';
 import BookSessionsPage from '@/pages/BookSessionsPage';
 import SurfLogPage from '@/pages/SurfLogPage';
@@ -13,6 +13,7 @@ import AdminApiConfigPage from '@/pages/AdminApiConfigPage';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import PrivacySettingsPage from '@/pages/PrivacySettingsPage';
 import PrivacyPolicyPage from '@/pages/PrivacyPolicyPage';
+import Footer from '@/components/Footer';
 
 const queryClient = new QueryClient();
 
@@ -25,7 +26,7 @@ function App() {
             <NavBar />
             <main className="pt-16 flex-grow">
               <Routes>
-                <Route path="/" element={<Index />} />
+                <Route path="/" element={<Dashboard />} />
                 <Route path="/live-spots" element={<LiveSpotsPage />} />
                 <Route path="/book-sessions" element={<BookSessionsPage />} />
                 <Route path="/surf-log" element={<SurfLogPage />} />
@@ -36,6 +37,7 @@ function App() {
                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
               </Routes>
             </main>
+            <Footer />
           </div>
         </BrowserRouter>
       </ThemeProvider>

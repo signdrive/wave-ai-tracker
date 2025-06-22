@@ -3,7 +3,6 @@ import React from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { useHistoricalWaveData } from '@/hooks/useHistoricalData';
 import { Skeleton } from '@/components/ui/skeleton';
-import { errorHandlingService } from '@/services/errorHandlingService';
 
 interface WaveHeightChartProps {
   spotId: string;
@@ -25,24 +24,19 @@ const WaveHeightChart: React.FC<WaveHeightChartProps> = ({ spotId, days }) => {
     );
   }
 
-  // Safe number formatting with bulletproof error protection
-  const safeAvgHeight = errorHandlingService.safeToFixed(data.avgWaveHeight, 1);
-  const safeMaxHeight = errorHandlingService.safeToFixed(data.maxWaveHeight, 1);
-  const safeMinHeight = errorHandlingService.safeToFixed(data.minWaveHeight, 1);
-
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-3 gap-4 mb-4">
         <div className="text-center p-3 bg-ocean/5 rounded-lg">
-          <div className="text-2xl font-bold text-ocean-dark">{safeAvgHeight}ft</div>
+          <div className="text-2xl font-bold text-ocean-dark">{data.avgWaveHeight.toFixed(1)}ft</div>
           <div className="text-sm text-gray-600">Average Height</div>
         </div>
         <div className="text-center p-3 bg-green-50 rounded-lg">
-          <div className="text-2xl font-bold text-green-600">{safeMaxHeight}ft</div>
+          <div className="text-2xl font-bold text-green-600">{data.maxWaveHeight.toFixed(1)}ft</div>
           <div className="text-sm text-gray-600">Maximum Height</div>
         </div>
         <div className="text-center p-3 bg-blue-50 rounded-lg">
-          <div className="text-2xl font-bold text-blue-600">{safeMinHeight}ft</div>
+          <div className="text-2xl font-bold text-blue-600">{data.minWaveHeight.toFixed(1)}ft</div>
           <div className="text-sm text-gray-600">Minimum Height</div>
         </div>
       </div>
@@ -60,7 +54,7 @@ const WaveHeightChart: React.FC<WaveHeightChartProps> = ({ spotId, days }) => {
             label={{ value: 'Wave Height (ft)', angle: -90, position: 'insideLeft' }}
           />
           <Tooltip 
-            formatter={(value: number) => [`${errorHandlingService.safeToFixed(value, 1)}ft`, 'Wave Height']}
+            formatter={(value: number) => [`${value.toFixed(1)}ft`, 'Wave Height']}
             labelFormatter={(value) => new Date(value).toLocaleDateString('en-US', { 
               weekday: 'short', 
               month: 'short', 
