@@ -38,7 +38,6 @@ function App() {
                 <Route path="/gdpr-compliance" element={<GdprCompliancePage />} />
                 <Route path="/privacy-settings" element={<PrivacySettingsPage />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
-                {/* Catch-all route for 404s - MUST be last */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
