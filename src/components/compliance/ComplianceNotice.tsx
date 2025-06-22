@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle } from 'lucide-react';
 
-const Compliance Notice: React.FC = () => {
+const ComplianceNotice: React.FC = () => {
   return (
     <Card className="bg-green-50 border-green-200">
       <CardContent className="p-4">
