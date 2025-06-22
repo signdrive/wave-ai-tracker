@@ -184,26 +184,44 @@ serve(async (req: Request) => {
 
     const sessionDateObj = new Date(session_date);
 
-    // Fetch spot location (assuming public.surf_spot_locations table)
+    // Fetch spot location (MODIFIED SECTION)
     let conditionsData: ConditionSnapshot | null = null;
-    const { data: spotLocation, error: spotError } = await supabaseClient
-      .from("surf_spot_locations") // This table is assumed to exist
-      .select("latitude, longitude")
-      .eq("spot_id", spot_id)
-      .maybeSingle();
+    const parsedSpotId = parseInt(spot_id); // spot_id from payload is used here
 
-    if (spotError) {
-      console.error('log-surf-session: Error fetching spot location:', spotError.message, spotError.stack); // Specific log with stack
-      // Proceed without conditions if spot location lookup fails, or return error?
-      // For MVP, proceeding with null conditions_snapshot.
-      conditionsData = { error: "Failed to fetch spot location: " + spotError.message, source: "Internal System" };
-    } else if (spotLocation) {
-      console.log('log-surf-session: Fetched coordinates:', { spot_id, latitude: spotLocation.latitude, longitude: spotLocation.longitude }); // LOG ADDED
-      conditionsData = await getNoaaConditions(spotLocation.latitude, spotLocation.longitude, sessionDateObj, supabaseClient);
+    if (isNaN(parsedSpotId)) {
+      console.error('log-surf-session: Invalid spot_id format, cannot parse to integer:', spot_id);
+      // This error should ideally be returned to the client, or handled more gracefully.
+      // For now, it will lead to conditionsData being { error: ... } if we proceed.
+      // Or, we can return early:
+      // return new Response(JSON.stringify({ error: `Invalid spot_id format: ${spot_id}` }), {
+      //   status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      // });
+      // For MVP, let's log and allow session to be saved without NOAA data.
+      conditionsData = { error: `Invalid spot_id format: ${spot_id}. Cannot fetch coordinates.`, source: "Internal System Validation" };
     } else {
-      console.log('log-surf-session: Spot ID not found in locations table:', spot_id); // LOG ADDED
-      // Spot not found in surf_spot_locations
-      conditionsData = { error: `Spot ID ${spot_id} not found in locations table.`, source: "Internal System" };
+      console.log(`log-surf-session: Attempting to fetch coordinates for spot_id (parsed as int): ${parsedSpotId}`);
+      const { data: spotLocation, error: spotError } = await supabaseClient
+        .from("surf_spots") // CORRECTED TABLE
+        .select("lat, lon")  // CORRECTED COLUMNS
+        .eq("id", parsedSpotId) // CORRECTED COLUMN for matching, using parsed int
+        .maybeSingle();
+
+      if (spotError) {
+        console.error(`log-surf-session: Error fetching coordinates for spot_id ${parsedSpotId}:`, spotError.message, spotError.stack);
+        conditionsData = { error: `Failed to fetch coordinates for spot_id ${parsedSpotId}: ${spotError.message}`, source: "Internal System" };
+      } else if (!spotLocation) {
+        console.warn(`log-surf-session: No coordinates found for spot_id ${parsedSpotId} in surf_spots table.`);
+        conditionsData = { error: `No coordinates found for spot_id ${parsedSpotId}.`, source: "Internal System" };
+      } else {
+        console.log(`log-surf-session: Successfully fetched coordinates for spot_id ${parsedSpotId}: lat=${spotLocation.lat}, lon=${spotLocation.lon}`);
+        // Use spotLocation.lat and spotLocation.lon for NOAA call
+        if (spotLocation.lat != null && spotLocation.lon != null) {
+            conditionsData = await getNoaaConditions(spotLocation.lat, spotLocation.lon, sessionDateObj, supabaseClient);
+        } else {
+            console.warn(`log-surf-session: Missing lat/lon for spot_id ${parsedSpotId} even after fetch.`);
+            conditionsData = { error: `Fetched coordinates are incomplete for spot_id ${parsedSpotId}.`, source: "Internal System" };
+        }
+      }
     }
 
     const sessionToInsert = {
