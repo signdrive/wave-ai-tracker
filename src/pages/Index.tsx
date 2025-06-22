@@ -9,7 +9,7 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       <Hero />
-      <SurfForecast />
+      <SurfForecast spotId="default" spotName="Popular Surf Spots" />
       <SurfCamDisplay />
       <AdvancedFeaturesShowcase />
     </div>
