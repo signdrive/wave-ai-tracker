@@ -20,11 +20,25 @@ export function ThemeProvider({
   defaultTheme?: Theme;
   storageKey?: string;
 }) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
-  );
+  const [theme, setTheme] = useState<Theme>(defaultTheme);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Initialize theme from localStorage after component mounts
+  useEffect(() => {
+    try {
+      const storedTheme = localStorage.getItem(storageKey) as Theme;
+      if (storedTheme && ['light', 'dark', 'system'].includes(storedTheme)) {
+        setTheme(storedTheme);
+      }
+    } catch (error) {
+      console.warn('Failed to read theme from localStorage:', error);
+    }
+    setIsInitialized(true);
+  }, [storageKey]);
 
   useEffect(() => {
+    if (!isInitialized) return;
+
     const root = window.document.documentElement;
 
     root.classList.remove('light', 'dark');
@@ -40,13 +54,18 @@ export function ThemeProvider({
     }
 
     root.classList.add(theme);
-  }, [theme]);
+  }, [theme, isInitialized]);
 
   const value = {
     theme,
     setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
-      setTheme(theme);
+      try {
+        localStorage.setItem(storageKey, theme);
+        setTheme(theme);
+      } catch (error) {
+        console.warn('Failed to save theme to localStorage:', error);
+        setTheme(theme);
+      }
     },
   };
 
