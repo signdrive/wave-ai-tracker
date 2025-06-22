@@ -4,11 +4,20 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, MapPin, Loader2 } from 'lucide-react';
+import { useSurfForecast, useWeatherData, useSurfConditions } from '@/hooks/useRealTimeData';
+import SurfForecast from './SurfForecast';
+import WeatherWidget from './WeatherWidget';
+import SurfConditionsDisplay from './SurfConditionsDisplay';
+import TideChart from './TideChart';
 
 const SearchableWeatherForecast: React.FC = () => {
   const [searchLocation, setSearchLocation] = useState('Pipeline, Hawaii');
   const [currentSpotId, setCurrentSpotId] = useState('pipeline');
   const [isSearching, setIsSearching] = useState(false);
+
+  // Fetch real data using existing hooks
+  const { data: weatherData, isLoading: weatherLoading } = useWeatherData(currentSpotId);
+  const { data: surfConditions, isLoading: surfLoading } = useSurfConditions(currentSpotId);
 
   const handleSearch = async () => {
     if (!searchLocation.trim()) return;
@@ -88,17 +97,35 @@ const SearchableWeatherForecast: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Search Results Display */}
+      {/* Display real data components when search is performed */}
       {currentSpotId && (
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-center text-gray-500">
-              <Search className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-              <h3 className="text-lg font-semibold mb-2">Search Results for {searchLocation}</h3>
-              <p>Connect your forecast API to display real-time surf conditions and historical data for this location.</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          {/* Current Weather Conditions */}
+          <WeatherWidget
+            weatherData={weatherData}
+            isLoading={weatherLoading}
+            spotName={searchLocation}
+          />
+
+          {/* Current Surf Conditions */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Current Surf Conditions - {searchLocation}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <SurfConditionsDisplay
+                conditions={surfConditions}
+                isLoading={surfLoading}
+              />
+            </CardContent>
+          </Card>
+
+          {/* 7-Day Surf Forecast */}
+          <SurfForecast spotId={currentSpotId} spotName={searchLocation} />
+
+          {/* Tide Chart */}
+          <TideChart />
+        </div>
       )}
     </div>
   );
