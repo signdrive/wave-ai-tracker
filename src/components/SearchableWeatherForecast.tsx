@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Search, MapPin, Loader2 } from 'lucide-react';
 import { useSurfForecast } from '@/hooks/useRealTimeData';
 import SurfForecast from './SurfForecast';
+import HistoricalCharts from './HistoricalCharts';
 
 const SearchableWeatherForecast: React.FC = () => {
   const [searchLocation, setSearchLocation] = useState('Pipeline, Hawaii');
@@ -91,6 +92,8 @@ const SearchableWeatherForecast: React.FC = () => {
       </Card>
 
       <SurfForecast spotId={currentSpotId} spotName={searchLocation} />
+      
+      <HistoricalCharts spotId={currentSpotId} spotName={searchLocation} />
     </div>
   );
 };
