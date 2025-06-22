@@ -4,7 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Loader2, Send } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client'; // Use the shared Supabase client
+import { supabase } from '@/integrations/supabase/client';
 import type { Session } from '@supabase/supabase-js';
 
 type CrowdLevel = 'Low' | 'Medium' | 'High';
@@ -19,23 +19,29 @@ interface SubmitCrowdReportPayload {
 }
 
 const submitCrowdReport = async (payload: SubmitCrowdReportPayload): Promise<any> => {
+  console.log('Submitting crowd report with payload:', payload);
+  
   const { data: { session }, error: sessionError } = await supabase.auth.getSession();
   if (sessionError || !session) {
     throw new Error(sessionError?.message || 'User not authenticated');
   }
 
+  console.log('Session token available:', !!session.access_token);
+
   const { data, error } = await supabase.functions.invoke('submit-crowd-report', {
-    method: 'POST',
+    body: payload, // Removed JSON.stringify - Supabase client handles this
     headers: { 
-      'Content-Type': 'application/json', 
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${session.access_token}` 
     },
-    body: JSON.stringify(payload),
   });
 
   if (error) {
+    console.error('Supabase functions error:', error);
     throw new Error(error.message || 'Failed to submit crowd report');
   }
+  
+  console.log('Crowd report submitted successfully:', data);
   return data;
 };
 
@@ -63,18 +69,23 @@ const CrowdReportForm: React.FC<CrowdReportFormProps> = ({ spotId }) => {
   }, []);
 
   const mutation = useMutation({
-    mutationFn: (level: CrowdLevel) => submitCrowdReport({ spot_id: spotId, reported_level: level }),
+    mutationFn: (level: CrowdLevel) => {
+      console.log('Mutation called with level:', level, 'spotId:', spotId);
+      return submitCrowdReport({ spot_id: spotId, reported_level: level });
+    },
     onSuccess: () => {
       toast.success('Crowd report submitted! Thanks for contributing.');
       // Invalidate the query for this spot's crowd prediction to refetch
       queryClient.invalidateQueries({ queryKey: ['realCrowdData', spotId] });
     },
     onError: (error: Error) => {
+      console.error('Crowd report mutation error:', error);
       toast.error(`Failed to submit report: ${error.message}`);
     },
   });
 
   const handleSubmit = (level: CrowdLevel) => {
+    console.log('Handle submit called with:', level);
     mutation.mutate(level);
   };
 
