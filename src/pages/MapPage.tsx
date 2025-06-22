@@ -5,7 +5,7 @@ import DatabaseMapView from '@/components/DatabaseMapView';
 
 const MapPage = () => {
   return (
-    <div className="bg-gradient-to-br from-ocean/5 to-sand/20 h-full">
+    <div className="bg-gradient-to-br from-ocean/5 to-sand/20 min-h-screen">
       <PremiumGate>
         <DatabaseMapView />
       </PremiumGate>

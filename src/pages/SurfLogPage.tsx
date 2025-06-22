@@ -22,30 +22,28 @@ const SurfLogPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-ocean/5 to-sand/20">
-      <main className="pt-16">
-        <PremiumGate>
-          <div className="container mx-auto px-4 py-8 space-y-8">
-            <SurfLogHeader />
+      <PremiumGate>
+        <div className="container mx-auto px-4 py-8 space-y-8">
+          <SurfLogHeader />
 
-            {/* Session Logger Form */}
-            <SessionLogger onSessionSaved={refetchInsights} />
+          {/* Session Logger Form */}
+          <SessionLogger onSessionSaved={refetchInsights} />
 
-            {/* Surf Log Insights */}
-            <SurfLogInsights 
-              insightsData={insightsData}
-              isLoading={isLoadingInsights}
-              error={insightsError as Error | undefined}
-            />
+          {/* Surf Log Insights */}
+          <SurfLogInsights 
+            insightsData={insightsData}
+            isLoading={isLoadingInsights}
+            error={insightsError as Error | undefined}
+          />
 
-            {/* Recent Sessions List */}
-            <RecentSessionsList 
-              sessions={sessions}
-              isLoading={isLoadingInsights}
-              error={insightsError as Error | null}
-            />
-          </div>
-        </PremiumGate>
-      </main>
+          {/* Recent Sessions List */}
+          <RecentSessionsList 
+            sessions={sessions}
+            isLoading={isLoadingInsights}
+            error={insightsError as Error | null}
+          />
+        </div>
+      </PremiumGate>
     </div>
   );
 };

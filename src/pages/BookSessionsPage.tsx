@@ -7,7 +7,7 @@ import BookingMarketplace from '@/components/BookingMarketplace';
 
 const BookSessionsPage = () => {
   return (
-    <div className="bg-gradient-to-br from-ocean/5 to-sand/20 h-full">
+    <div className="bg-gradient-to-br from-ocean/5 to-sand/20 min-h-screen">
       <PremiumGate>
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8">
