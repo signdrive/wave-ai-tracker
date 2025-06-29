@@ -17,30 +17,30 @@ const TideChart: React.FC<TideChartProps> = ({ spotId, locationName }) => {
   // Set up real-time updates
   useRealTimeUpdates();
 
-  // Map spot IDs to appropriate tide station data
+  // Map spot IDs to appropriate tide station data - using consistent location names
   const getTideStationForSpot = (spotId: string | undefined, locationName: string | undefined) => {
     const stationMappings: Record<string, { id: string; name: string }> = {
-      'pipeline': { id: 'honolulu-hi', name: 'Honolulu, HI' },
-      'mavericks': { id: 'half-moon-bay-ca', name: 'Half Moon Bay, CA' },
-      'bondi': { id: 'sydney-au', name: 'Sydney, AU' },
-      'jeffreys': { id: 'port-elizabeth-za', name: 'Port Elizabeth, ZA' },
-      'trestles': { id: 'san-diego-ca', name: 'San Diego, CA' },
-      'mundaka': { id: 'bilbao-es', name: 'Bilbao, ES' },
-      'uluwatu': { id: 'bali-id', name: 'Bali, ID' },
-      'bells': { id: 'melbourne-au', name: 'Melbourne, AU' },
-      'cloudbreak': { id: 'suva-fj', name: 'Suva, FJ' },
-      'teahupoo': { id: 'tahiti-pf', name: 'Tahiti, PF' }
+      'pipeline': { id: 'honolulu-hi', name: 'Pipeline, Hawaii' },
+      'mavericks': { id: 'mavericks-ca', name: 'Mavericks, CA' },
+      'bondi': { id: 'sydney-au', name: 'Bondi Beach, AU' },
+      'jeffreys': { id: 'port-elizabeth-za', name: 'Jeffreys Bay, SA' },
+      'trestles': { id: 'san-diego-ca', name: 'Trestles, CA' },
+      'mundaka': { id: 'bilbao-es', name: 'Mundaka, ES' },
+      'uluwatu': { id: 'bali-id', name: 'Uluwatu, ID' },
+      'bells': { id: 'melbourne-au', name: 'Bells Beach, AU' },
+      'cloudbreak': { id: 'suva-fj', name: 'Cloudbreak, FJ' },
+      'teahupoo': { id: 'tahiti-pf', name: 'Teahupoo, PF' }
     };
 
     if (spotId && stationMappings[spotId]) {
       return stationMappings[spotId];
     }
 
-    // If we have a location name but no specific mapping, use the location name
+    // If we have a location name, use it directly for consistency
     if (locationName) {
       return {
         id: locationName.toLowerCase().replace(/[^a-z0-9]/g, '-'),
-        name: locationName
+        name: locationName // Use the exact same name as the search input
       };
     }
 
