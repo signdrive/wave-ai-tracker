@@ -123,8 +123,8 @@ const SearchableWeatherForecast: React.FC = () => {
           {/* 7-Day Surf Forecast */}
           <SurfForecast spotId={currentSpotId} spotName={searchLocation} />
 
-          {/* Tide Chart */}
-          <TideChart />
+          {/* Tide Chart - Now connected to the searched location */}
+          <TideChart spotId={currentSpotId} locationName={searchLocation} />
         </div>
       )}
     </div>

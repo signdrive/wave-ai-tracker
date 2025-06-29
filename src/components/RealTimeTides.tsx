@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTideData } from '@/hooks/useRealTimeData';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, MapPin } from 'lucide-react';
 
 interface RealTimeTidesProps {
   stationId: string;
@@ -33,7 +33,7 @@ const RealTimeTides: React.FC<RealTimeTidesProps> = ({ stationId, stationName, d
     return (
       <Card>
         <CardContent className="p-4">
-          <p className="text-red-500">Error loading tide data</p>
+          <p className="text-red-500">Error loading tide data for {stationName}</p>
         </CardContent>
       </Card>
     );
@@ -43,7 +43,10 @@ const RealTimeTides: React.FC<RealTimeTidesProps> = ({ stationId, stationName, d
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          <span>Live Tide Chart - {stationName}</span>
+          <div className="flex items-center">
+            <MapPin className="w-4 h-4 mr-2 text-ocean" />
+            <span>Live Tide Chart - {stationName}</span>
+          </div>
           {isRefetching && <RefreshCw className="w-4 h-4 animate-spin" />}
         </CardTitle>
       </CardHeader>
@@ -104,6 +107,12 @@ const RealTimeTides: React.FC<RealTimeTidesProps> = ({ stationId, stationName, d
                   {tideData.find(t => t.type === 'Low')?.time || 'N/A'}
                 </p>
               </div>
+            </div>
+
+            <div className="mt-4 text-center">
+              <p className="text-xs text-gray-500">
+                Tide data for {stationName} • Station ID: {stationId}
+              </p>
             </div>
           </>
         ) : null}
