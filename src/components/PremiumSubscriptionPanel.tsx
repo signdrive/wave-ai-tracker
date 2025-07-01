@@ -1,55 +1,24 @@
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Check, X, Zap, Crown, Loader2, AlertCircle } from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
-import { supabase } from '@/integrations/supabase/client';
-import { toast } from '@/components/ui/use-toast';
+import React, { useState } from 'react';
+import { Zap, Crown } from 'lucide-react';
+import { usePremiumSubscription } from '@/hooks/usePremiumSubscription';
 import AuthDialog from '@/components/AuthDialog';
+import PlanCard from '@/components/premium/PlanCard';
+import SubscriptionStatus from '@/components/premium/SubscriptionStatus';
 
 const PremiumSubscriptionPanel = () => {
-  const { user, session } = useAuth();
-  const [loading, setLoading] = useState<string | null>(null);
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const [subscriptionStatus, setSubscriptionStatus] = useState<{
-    subscribed: boolean;
-    subscription_tier?: string;
-    subscription_end?: string;
-  } | null>(null);
-
-  useEffect(() => {
-    if (user && session) {
-      checkSubscriptionStatus();
-    }
-  }, [user, session]);
-
-  // Handle post-login plan selection
-  useEffect(() => {
-    const storedPlan = sessionStorage.getItem('selectedPlan');
-    if (storedPlan && user && session && !loading) {
-      sessionStorage.removeItem('selectedPlan');
-      handleUpgrade(storedPlan as 'pro' | 'elite');
-    }
-  }, [user, session]);
-
-  const checkSubscriptionStatus = async () => {
-    if (!session) return;
-    
-    try {
-      const { data, error } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-
-      if (error) throw error;
-      setSubscriptionStatus(data);
-    } catch (error) {
-      console.error('Error checking subscription:', error);
-    }
-  };
+  const {
+    user,
+    session,
+    loading,
+    selectedPlan,
+    setSelectedPlan,
+    subscriptionStatus,
+    checkSubscriptionStatus,
+    handleUpgrade,
+    handleManageSubscription,
+  } = usePremiumSubscription();
 
   const handlePlanSelection = async (planType: 'pro' | 'elite') => {
     setSelectedPlan(planType);
@@ -64,81 +33,6 @@ const PremiumSubscriptionPanel = () => {
 
     // User is authenticated, proceed with checkout
     await handleUpgrade(planType);
-  };
-
-  const handleUpgrade = async (planType: 'pro' | 'elite') => {
-    if (!session) {
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in to upgrade your plan.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setLoading(planType);
-    
-    try {
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { planType },
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-
-      if (error) throw error;
-      
-      // Open Stripe checkout in a new tab
-      window.open(data.url, '_blank');
-      
-      toast({
-        title: "Redirecting to Payment",
-        description: "Opening Stripe checkout in a new tab...",
-      });
-    } catch (error) {
-      console.error('Error creating checkout:', error);
-      toast({
-        title: "Error",
-        description: "Failed to create checkout session. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(null);
-      setSelectedPlan(null);
-    }
-  };
-
-  const handleManageSubscription = async () => {
-    if (!session) return;
-    
-    setLoading('manage');
-    
-    try {
-      const { data, error } = await supabase.functions.invoke('customer-portal', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-
-      if (error) throw error;
-      
-      // Open Stripe customer portal in a new tab
-      window.open(data.url, '_blank');
-      
-      toast({
-        title: "Opening Customer Portal",
-        description: "Managing your subscription in a new tab...",
-      });
-    } catch (error) {
-      console.error('Error opening customer portal:', error);
-      toast({
-        title: "Error",
-        description: "Failed to open customer portal. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(null);
-    }
   };
 
   const currentPlan = subscriptionStatus?.subscription_tier || 'Wave Tracker';
@@ -215,145 +109,24 @@ const PremiumSubscriptionPanel = () => {
   return (
     <>
       <div className="py-12">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            Choose Your WaveMentor Plan
-          </h2>
-          <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Get AI-powered surf forecasts, premium features, and exclusive access to the best waves.
-          </p>
-          {subscriptionStatus && (
-            <div className="mt-4 space-y-2">
-              <p className="text-sm text-gray-600">
-                Current Plan: <span className="font-semibold">{currentPlan}</span>
-              </p>
-              {isSubscribed && (
-                <Button
-                  onClick={handleManageSubscription}
-                  variant="outline"
-                  size="sm"
-                  disabled={loading === 'manage'}
-                >
-                  {loading === 'manage' ? (
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  ) : null}
-                  Manage Subscription
-                </Button>
-              )}
-            </div>
-          )}
-        </div>
+        <SubscriptionStatus
+          currentPlan={currentPlan}
+          isSubscribed={isSubscribed}
+          loading={loading}
+          onManageSubscription={handleManageSubscription}
+          onRefreshStatus={checkSubscriptionStatus}
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {plans.map((plan, index) => (
-            <Card
+          {plans.map((plan) => (
+            <PlanCard
               key={plan.name}
-              className={`relative transition-all duration-300 hover:scale-105 ${
-                plan.name === currentPlan
-                  ? 'border-2 border-green-500 shadow-xl'
-                  : plan.popular
-                  ? 'border-2 border-purple-500 shadow-xl'
-                  : 'border border-gray-200 dark:border-gray-700'
-              }`}
-            >
-              {plan.name === currentPlan && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-green-500 text-white px-4 py-1 rounded-full text-sm font-medium">
-                    Your Plan
-                  </span>
-                </div>
-              )}
-              
-              {plan.popular && plan.name !== currentPlan && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-purple-500 text-white px-4 py-1 rounded-full text-sm font-medium">
-                    Most Popular
-                  </span>
-                </div>
-              )}
-              
-              {plan.badge && plan.name !== currentPlan && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-yellow-500 text-white px-4 py-1 rounded-full text-sm font-medium">
-                    {plan.badge}
-                  </span>
-                </div>
-              )}
-
-              <CardHeader className="text-center pb-4">
-                <div className="flex justify-center mb-4">
-                  <plan.icon className="w-12 h-12 text-ocean dark:text-ocean-light" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {plan.name}
-                </h3>
-                <div className="mt-4">
-                  <span className="text-4xl font-bold text-gray-900 dark:text-white">
-                    {plan.price}
-                  </span>
-                  <span className="text-gray-600 dark:text-gray-400 ml-1">
-                    {plan.period}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
-                  {plan.description}
-                </p>
-              </CardHeader>
-
-              <CardContent className="pt-0">
-                <div className="space-y-4 mb-8">
-                  {plan.features.map((feature, featureIndex) => (
-                    <div key={featureIndex} className="flex items-center">
-                      {feature.included ? (
-                        <Check className="w-5 h-5 text-green-500 mr-3 flex-shrink-0" />
-                      ) : (
-                        <X className="w-5 h-5 text-gray-400 dark:text-gray-500 mr-3 flex-shrink-0" />
-                      )}
-                      <span
-                        className={`text-sm ${
-                          feature.included
-                            ? 'text-gray-900 dark:text-white'
-                            : 'text-gray-400 dark:text-gray-500'
-                        }`}
-                      >
-                        {feature.name}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                <Button
-                  className={`w-full ${
-                    plan.name === currentPlan
-                      ? 'bg-green-600 hover:bg-green-700 text-white'
-                      : plan.popular
-                      ? 'bg-purple-600 hover:bg-purple-700 text-white'
-                      : plan.buttonVariant === 'outline'
-                      ? 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300'
-                      : 'bg-ocean hover:bg-ocean-dark text-white'
-                  }`}
-                  variant={plan.name === currentPlan ? 'default' : plan.buttonVariant}
-                  disabled={plan.buttonText === 'Current Plan' || loading === plan.planType}
-                  onClick={() => plan.planType && handlePlanSelection(plan.planType)}
-                >
-                  {loading === plan.planType ? (
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  ) : null}
-                  {plan.buttonText}
-                </Button>
-              </CardContent>
-            </Card>
+              {...plan}
+              currentPlan={currentPlan}
+              loading={loading}
+              onPlanSelect={handlePlanSelection}
+            />
           ))}
-        </div>
-        
-        <div className="text-center mt-8">
-          <Button
-            onClick={checkSubscriptionStatus}
-            variant="outline"
-            size="sm"
-          >
-            Refresh Subscription Status
-          </Button>
         </div>
       </div>
 
