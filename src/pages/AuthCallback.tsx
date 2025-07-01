@@ -21,11 +21,11 @@ const AuthCallback = () => {
           sessionStorage.removeItem('selectedPlan');
           
           toast({
-            title: "Welcome!",
-            description: "Authentication successful. You can now complete your plan selection.",
+            title: "Authentication successful!",
+            description: "Proceeding with your selected plan...",
           });
           
-          // Redirect to pricing/premium page
+          // Redirect back to the premium page where the plan selection will be handled
           navigate('/', { replace: true });
         } else {
           toast({
@@ -33,7 +33,7 @@ const AuthCallback = () => {
             description: "You've successfully signed in.",
           });
           
-          // Redirect to dashboard
+          // Redirect to homepage
           navigate('/', { replace: true });
         }
       } else {

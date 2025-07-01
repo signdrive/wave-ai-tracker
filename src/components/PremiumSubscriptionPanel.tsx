@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Zap, Crown } from 'lucide-react';
 import { usePremiumSubscription } from '@/hooks/usePremiumSubscription';
@@ -21,10 +20,12 @@ const PremiumSubscriptionPanel = () => {
   } = usePremiumSubscription();
 
   const handlePlanSelection = async (planType: 'pro' | 'elite') => {
+    console.log('Plan selected:', planType);
     setSelectedPlan(planType);
 
     // Check if user is authenticated
     if (!user || !session) {
+      console.log('User not authenticated, storing plan and showing auth dialog');
       // Store selected plan for post-login redirect
       sessionStorage.setItem('selectedPlan', planType);
       setAuthDialogOpen(true);
@@ -32,6 +33,7 @@ const PremiumSubscriptionPanel = () => {
     }
 
     // User is authenticated, proceed with checkout
+    console.log('User authenticated, proceeding to checkout');
     await handleUpgrade(planType);
   };
 

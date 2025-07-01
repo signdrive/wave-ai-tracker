@@ -22,14 +22,16 @@ export const usePremiumSubscription = () => {
     }
   }, [user, session]);
 
-  // Handle post-login plan selection
+  // Handle post-login plan selection - check immediately when user becomes available
   useEffect(() => {
     const storedPlan = sessionStorage.getItem('selectedPlan');
     if (storedPlan && user && session && !loading) {
+      console.log('Found stored plan after auth:', storedPlan);
       sessionStorage.removeItem('selectedPlan');
+      // Automatically trigger the upgrade process
       handleUpgrade(storedPlan as 'pro' | 'elite');
     }
-  }, [user, session]);
+  }, [user, session, loading]);
 
   const checkSubscriptionStatus = async () => {
     if (!session) return;
@@ -50,6 +52,8 @@ export const usePremiumSubscription = () => {
 
   const handleUpgrade = async (planType: 'pro' | 'elite') => {
     if (!session) {
+      // Store the plan and redirect to auth
+      sessionStorage.setItem('selectedPlan', planType);
       toast({
         title: "Authentication Required",
         description: "Please sign in to upgrade your plan.",
