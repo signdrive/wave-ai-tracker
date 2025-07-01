@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Index from '@/pages/Index';
 import LiveSpotsPage from '@/pages/LiveSpotsPage';
@@ -16,6 +15,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import PrivacySettingsPage from '@/pages/PrivacySettingsPage';
 import PrivacyPolicyPage from '@/pages/PrivacyPolicyPage';
 import NotFound from '@/pages/NotFound';
+import PaymentSuccessPage from '@/pages/PaymentSuccessPage';
 
 const queryClient = new QueryClient();
 
@@ -23,7 +23,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-        <BrowserRouter>
+        <Router>
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
             <NavBar />
             <main className="pt-16 flex-grow">
@@ -38,12 +38,13 @@ function App() {
                 <Route path="/gdpr-compliance" element={<GdprCompliancePage />} />
                 <Route path="/privacy-settings" element={<PrivacySettingsPage />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+                <Route path="/payment-success" element={<PaymentSuccessPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
             <Footer />
           </div>
-        </BrowserRouter>
+        </Router>
       </ThemeProvider>
     </QueryClientProvider>
   );

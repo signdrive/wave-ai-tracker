@@ -68,7 +68,7 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange }) => {
       } else {
         toast({
           title: "Account Created!",
-          description: "Check your email for confirmation.",
+          description: "Check your email for confirmation, then you can proceed with your selected plan.",
         });
         onOpenChange(false);
         setEmail('');
@@ -90,7 +90,7 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange }) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Welcome to WaveFinder</DialogTitle>
+          <DialogTitle>Sign in to continue with your plan</DialogTitle>
         </DialogHeader>
 
         <Tabs defaultValue="signin" className="w-full">
@@ -122,7 +122,7 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange }) => {
                 />
               </div>
               <Button type="submit" className="w-full bg-ocean hover:bg-ocean-dark" disabled={loading}>
-                {loading ? 'Signing In...' : 'Sign In'}
+                {loading ? 'Signing In...' : 'Sign In & Continue'}
               </Button>
             </form>
           </TabsContent>
@@ -161,7 +161,7 @@ const AuthDialog: React.FC<AuthDialogProps> = ({ open, onOpenChange }) => {
                 />
               </div>
               <Button type="submit" className="w-full bg-ocean hover:bg-ocean-dark" disabled={loading}>
-                {loading ? 'Creating Account...' : 'Sign Up'}
+                {loading ? 'Creating Account...' : 'Create Account & Continue'}
               </Button>
             </form>
           </TabsContent>
