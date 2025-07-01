@@ -22,14 +22,28 @@ export const usePremiumSubscription = () => {
     }
   }, [user, session]);
 
-  // Handle post-login plan selection - check immediately when user becomes available
+  // Handle post-login plan selection with improved timing
   useEffect(() => {
-    const storedPlan = sessionStorage.getItem('selectedPlan');
-    if (storedPlan && user && session && !loading) {
-      console.log('Found stored plan after auth:', storedPlan);
-      sessionStorage.removeItem('selectedPlan');
-      // Automatically trigger the upgrade process
-      handleUpgrade(storedPlan as 'pro' | 'elite');
+    const handleStoredPlan = async () => {
+      const storedPlan = sessionStorage.getItem('selectedPlan');
+      
+      if (storedPlan && user && session && !loading) {
+        console.log('Processing stored plan after authentication:', storedPlan);
+        
+        // Clear the stored plan immediately to prevent re-processing
+        sessionStorage.removeItem('selectedPlan');
+        
+        // Add a small delay to ensure all auth state is settled
+        setTimeout(() => {
+          console.log('Triggering upgrade for stored plan:', storedPlan);
+          handleUpgrade(storedPlan as 'pro' | 'elite');
+        }, 500);
+      }
+    };
+
+    // Only process if we have a user and session, and we're not currently loading
+    if (user && session && loading === null) {
+      handleStoredPlan();
     }
   }, [user, session, loading]);
 
@@ -63,6 +77,7 @@ export const usePremiumSubscription = () => {
     }
 
     setLoading(planType);
+    console.log('Starting checkout process for plan:', planType);
     
     try {
       const { data, error } = await supabase.functions.invoke('create-checkout', {
@@ -73,6 +88,8 @@ export const usePremiumSubscription = () => {
       });
 
       if (error) throw error;
+      
+      console.log('Checkout session created, redirecting to Stripe:', data.url);
       
       // Open Stripe checkout in a new tab
       window.open(data.url, '_blank');

@@ -17,15 +17,13 @@ const AuthCallback = () => {
         const selectedPlan = sessionStorage.getItem('selectedPlan');
         
         if (selectedPlan) {
-          // Clear the stored plan
-          sessionStorage.removeItem('selectedPlan');
-          
           toast({
             title: "Authentication successful!",
             description: "Proceeding with your selected plan...",
           });
           
-          // Redirect back to the premium page where the plan selection will be handled
+          // Don't clear the stored plan here - let usePremiumSubscription handle it
+          // Navigate to homepage where the plan selection will be processed
           navigate('/', { replace: true });
         } else {
           toast({
