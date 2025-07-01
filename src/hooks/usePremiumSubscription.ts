@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,6 +14,7 @@ export const usePremiumSubscription = () => {
   const [loading, setLoading] = useState<string | null>(null);
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState<SubscriptionStatus | null>(null);
+  const [hasProcessedStoredPlan, setHasProcessedStoredPlan] = useState(false);
 
   useEffect(() => {
     if (user && session) {
@@ -27,8 +27,11 @@ export const usePremiumSubscription = () => {
     const handleStoredPlan = async () => {
       const storedPlan = sessionStorage.getItem('selectedPlan');
       
-      if (storedPlan && user && session && !loading) {
+      if (storedPlan && user && session && !hasProcessedStoredPlan && !loading) {
         console.log('Processing stored plan after authentication:', storedPlan);
+        
+        // Mark as processed immediately to prevent re-processing
+        setHasProcessedStoredPlan(true);
         
         // Clear the stored plan immediately to prevent re-processing
         sessionStorage.removeItem('selectedPlan');
@@ -41,11 +44,11 @@ export const usePremiumSubscription = () => {
       }
     };
 
-    // Only process if we have a user and session, and we're not currently loading
-    if (user && session && loading === null) {
+    // Only process if we have a user and session, haven't processed yet, and not currently loading
+    if (user && session && !hasProcessedStoredPlan) {
       handleStoredPlan();
     }
-  }, [user, session, loading]);
+  }, [user, session, hasProcessedStoredPlan, loading]);
 
   const checkSubscriptionStatus = async () => {
     if (!session) return;
