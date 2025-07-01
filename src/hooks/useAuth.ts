@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -219,6 +218,25 @@ export const useAuth = () => {
     }
   };
 
+  const signInWithApple = async () => {
+    try {
+      clearError();
+      
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'apple',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      return { data, error };
+    } catch (error) {
+      const authError = error as AuthError;
+      setAuthState(prev => ({ ...prev, error: authError }));
+      return { data: null, error: authError };
+    }
+  };
+
   const signOut = async () => {
     try {
       clearError();
@@ -263,6 +281,7 @@ export const useAuth = () => {
     signUp,
     signIn,
     signInWithGoogle,
+    signInWithApple,
     signOut,
     resetPassword,
     clearError,

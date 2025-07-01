@@ -1,12 +1,15 @@
+
 import React, { useState } from 'react';
 import { Zap, Crown } from 'lucide-react';
 import { usePremiumSubscription } from '@/hooks/usePremiumSubscription';
-import AuthDialog from '@/components/AuthDialog';
+import EnhancedPremiumAuthDialog from '@/components/EnhancedPremiumAuthDialog';
 import PlanCard from '@/components/premium/PlanCard';
 import SubscriptionStatus from '@/components/premium/SubscriptionStatus';
 
 const PremiumSubscriptionPanel = () => {
   const [authDialogOpen, setAuthDialogOpen] = useState(false);
+  const [selectedPlanForAuth, setSelectedPlanForAuth] = useState<string>('');
+
   const {
     user,
     session,
@@ -28,6 +31,7 @@ const PremiumSubscriptionPanel = () => {
       console.log('User not authenticated, storing plan and showing auth dialog');
       // Store selected plan for post-login redirect
       sessionStorage.setItem('selectedPlan', planType);
+      setSelectedPlanForAuth(planType);
       setAuthDialogOpen(true);
       return;
     }
@@ -132,9 +136,10 @@ const PremiumSubscriptionPanel = () => {
         </div>
       </div>
 
-      <AuthDialog 
+      <EnhancedPremiumAuthDialog 
         open={authDialogOpen} 
         onOpenChange={setAuthDialogOpen}
+        selectedPlan={selectedPlanForAuth}
       />
     </>
   );
