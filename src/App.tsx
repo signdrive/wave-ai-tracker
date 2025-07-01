@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -16,6 +17,7 @@ import PrivacySettingsPage from '@/pages/PrivacySettingsPage';
 import PrivacyPolicyPage from '@/pages/PrivacyPolicyPage';
 import NotFound from '@/pages/NotFound';
 import PaymentSuccessPage from '@/pages/PaymentSuccessPage';
+import AuthCallback from '@/pages/AuthCallback';
 
 const queryClient = new QueryClient();
 
@@ -39,6 +41,7 @@ function App() {
                 <Route path="/privacy-settings" element={<PrivacySettingsPage />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
                 <Route path="/payment-success" element={<PaymentSuccessPage />} />
+                <Route path="/auth/callback" element={<AuthCallback />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
