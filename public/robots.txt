@@ -14,6 +14,12 @@ Allow: /
 User-agent: *
 Allow: /
 
-# Prevent indexing of redirect URLs
+# Prevent indexing of redirect URLs and duplicates
 Disallow: /*#
 Disallow: /*?*redirect*
+Disallow: /*?utm_*
+Disallow: /*/amp
+Disallow: /*?*sessionid*
+
+# Canonical sitemap
+Sitemap: https://www.wavementor.com/sitemap.xml

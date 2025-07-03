@@ -18,6 +18,7 @@ import PrivacyPolicyPage from '@/pages/PrivacyPolicyPage';
 import NotFound from '@/pages/NotFound';
 import PaymentSuccessPage from '@/pages/PaymentSuccessPage';
 import AuthCallback from '@/pages/AuthCallback';
+import CanonicalUrl from '@/components/CanonicalUrl';
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
         <Router>
+          <CanonicalUrl />
           <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
             <NavBar />
             <main className="pt-16 flex-grow">
