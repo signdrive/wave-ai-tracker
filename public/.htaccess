@@ -18,3 +18,10 @@
   Header always set X-XSS-Protection "1; mode=block"
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
+
+# Prevent redirect chains
+<IfModule mod_headers.c>
+  Header always set Cache-Control "no-cache, no-store, must-revalidate"
+  Header always set Pragma "no-cache"
+  Header always set Expires "0"
+</IfModule>

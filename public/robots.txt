@@ -1,3 +1,4 @@
+
 User-agent: Googlebot
 Allow: /
 
@@ -12,3 +13,7 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+# Prevent indexing of redirect URLs
+Disallow: /*#
+Disallow: /*?*redirect*
