@@ -149,6 +149,48 @@ export type Database = {
         }
         Relationships: []
       }
+      challenges: {
+        Row: {
+          badge_icon: string | null
+          badge_name: string | null
+          created_at: string
+          criteria: Json
+          description: string
+          id: string
+          is_active: boolean | null
+          name: string
+          reward_points: number | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          badge_icon?: string | null
+          badge_name?: string | null
+          created_at?: string
+          criteria: Json
+          description: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          reward_points?: number | null
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          badge_icon?: string | null
+          badge_name?: string | null
+          created_at?: string
+          criteria?: Json
+          description?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          reward_points?: number | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       crowd_reports: {
         Row: {
           created_at: string | null
@@ -932,6 +974,38 @@ export type Database = {
         }
         Relationships: []
       }
+      user_achievements: {
+        Row: {
+          challenge_id: string
+          earned_at: string
+          id: string
+          points_earned: number | null
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          earned_at?: string
+          id?: string
+          points_earned?: number | null
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          earned_at?: string
+          id?: string
+          points_earned?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_achievements_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_activities: {
         Row: {
           created_at: string | null
@@ -949,6 +1023,47 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_challenge_progress: {
+        Row: {
+          challenge_id: string
+          completed_at: string | null
+          created_at: string
+          id: string
+          is_completed: boolean | null
+          progress_data: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          is_completed?: boolean | null
+          progress_data?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          is_completed?: boolean | null
+          progress_data?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_challenge_progress_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_favorites: {
         Row: {
@@ -1012,6 +1127,45 @@ export type Database = {
           created_at?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_stats: {
+        Row: {
+          achievements_count: number | null
+          created_at: string
+          current_streak: number | null
+          id: string
+          level: number | null
+          longest_streak: number | null
+          total_points: number | null
+          total_sessions: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          achievements_count?: number | null
+          created_at?: string
+          current_streak?: number | null
+          id?: string
+          level?: number | null
+          longest_streak?: number | null
+          total_points?: number | null
+          total_sessions?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          achievements_count?: number | null
+          created_at?: string
+          current_streak?: number | null
+          id?: string
+          level?: number | null
+          longest_streak?: number | null
+          total_points?: number | null
+          total_sessions?: number | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: []

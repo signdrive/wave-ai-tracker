@@ -19,6 +19,7 @@ import NotFound from '@/pages/NotFound';
 import PaymentSuccessPage from '@/pages/PaymentSuccessPage';
 import AuthCallback from '@/pages/AuthCallback';
 import CanonicalUrl from '@/components/CanonicalUrl';
+import ChallengesPage from '@/components/challenges/ChallengesPage';
 
 const queryClient = new QueryClient();
 
@@ -44,6 +45,7 @@ function App() {
                 <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
                 <Route path="/payment-success" element={<PaymentSuccessPage />} />
                 <Route path="/auth/callback" element={<AuthCallback />} />
+                <Route path="/challenges" element={<ChallengesPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Waves, BarChart3, Calendar, Map, User, Shield, Settings } from 'lucide-react';
+import { Menu, X, Waves, BarChart3, Calendar, Map, User, Shield, Settings, Trophy } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
 import { useMentorship } from '@/hooks/useMentorship';
@@ -25,6 +25,7 @@ const NavBar = () => {
   const navItems = [
     { path: '/', label: 'Dashboard', icon: BarChart3, description: 'Surf conditions summary' },
     { path: '/live-spots', label: 'Live Spots', icon: Waves, description: 'AI camera feeds' },
+    { path: '/challenges', label: 'Challenges', icon: Trophy, description: 'Complete challenges and earn achievements' },
     { path: '/book-sessions', label: 'Book Sessions', icon: Calendar, description: 'Wave pools & natural spots' },
     { path: '/map', label: 'Heat Map', icon: Map, description: 'Crowd density visualization' },
     { path: '/surf-log', label: 'Surf Log Insights', icon: User, description: 'Log sessions & view AI insights' }, // MODIFIED
