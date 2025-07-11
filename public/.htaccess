@@ -1,9 +1,14 @@
 
-# Apache SPA routing configuration
+# Apache canonical redirects and SPA routing
 <IfModule mod_rewrite.c>
   RewriteEngine On
   
-  # Handle Angular and React Router - serve index.html for all routes
+  # Force HTTPS
+  RewriteCond %{HTTPS} off [OR]
+  RewriteCond %{HTTP_HOST} ^wavementor\.com$ [NC]
+  RewriteRule ^(.*)$ https://www.wavementor.com/$1 [R=301,L]
+  
+  # Handle SPA routing - serve index.html for all routes
   RewriteBase /
   RewriteRule ^index\.html$ - [L]
   RewriteCond %{REQUEST_FILENAME} !-f
