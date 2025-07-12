@@ -179,43 +179,102 @@ export type Database = {
         }
         Relationships: []
       }
+      challenge_leaderboard: {
+        Row: {
+          challenge_id: string
+          id: string
+          last_updated: string | null
+          progress_data: Json | null
+          rank: number | null
+          score: number
+          user_id: string
+        }
+        Insert: {
+          challenge_id: string
+          id?: string
+          last_updated?: string | null
+          progress_data?: Json | null
+          rank?: number | null
+          score: number
+          user_id: string
+        }
+        Update: {
+          challenge_id?: string
+          id?: string
+          last_updated?: string | null
+          progress_data?: Json | null
+          rank?: number | null
+          score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "challenge_leaderboard_challenge_id_fkey"
+            columns: ["challenge_id"]
+            isOneToOne: false
+            referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       challenges: {
         Row: {
           badge_icon: string | null
           badge_name: string | null
+          category: string | null
           created_at: string
           criteria: Json
+          current_participants: number | null
           description: string
+          difficulty: string | null
+          end_date: string | null
+          featured: boolean | null
           id: string
           is_active: boolean | null
+          max_participants: number | null
           name: string
           reward_points: number | null
+          start_date: string | null
           type: string
           updated_at: string
         }
         Insert: {
           badge_icon?: string | null
           badge_name?: string | null
+          category?: string | null
           created_at?: string
           criteria: Json
+          current_participants?: number | null
           description: string
+          difficulty?: string | null
+          end_date?: string | null
+          featured?: boolean | null
           id?: string
           is_active?: boolean | null
+          max_participants?: number | null
           name: string
           reward_points?: number | null
+          start_date?: string | null
           type: string
           updated_at?: string
         }
         Update: {
           badge_icon?: string | null
           badge_name?: string | null
+          category?: string | null
           created_at?: string
           criteria?: Json
+          current_participants?: number | null
           description?: string
+          difficulty?: string | null
+          end_date?: string | null
+          featured?: boolean | null
           id?: string
           is_active?: boolean | null
+          max_participants?: number | null
           name?: string
           reward_points?: number | null
+          start_date?: string | null
           type?: string
           updated_at?: string
         }
@@ -374,6 +433,89 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      leaderboard_entries: {
+        Row: {
+          id: string
+          last_updated: string | null
+          leaderboard_id: string
+          period_end: string | null
+          period_start: string | null
+          rank: number | null
+          score: number
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          last_updated?: string | null
+          leaderboard_id: string
+          period_end?: string | null
+          period_start?: string | null
+          rank?: number | null
+          score: number
+          user_id: string
+        }
+        Update: {
+          id?: string
+          last_updated?: string | null
+          leaderboard_id?: string
+          period_end?: string | null
+          period_start?: string | null
+          rank?: number | null
+          score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leaderboard_entries_leaderboard_id_fkey"
+            columns: ["leaderboard_id"]
+            isOneToOne: false
+            referencedRelation: "leaderboards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leaderboards: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          location: string | null
+          metric: string
+          name: string
+          spot_id: string | null
+          time_period: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          location?: string | null
+          metric: string
+          name: string
+          spot_id?: string | null
+          time_period?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          location?: string | null
+          metric?: string
+          name?: string
+          spot_id?: string | null
+          time_period?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
       lesson_bookings: {
         Row: {
@@ -715,6 +857,127 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      photo_contest_entries: {
+        Row: {
+          contest_id: string
+          created_at: string | null
+          description: string | null
+          id: string
+          location: string | null
+          photo_url: string
+          taken_at: string | null
+          title: string
+          user_id: string
+          vote_count: number | null
+        }
+        Insert: {
+          contest_id: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          location?: string | null
+          photo_url: string
+          taken_at?: string | null
+          title: string
+          user_id: string
+          vote_count?: number | null
+        }
+        Update: {
+          contest_id?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          location?: string | null
+          photo_url?: string
+          taken_at?: string | null
+          title?: string
+          user_id?: string
+          vote_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photo_contest_entries_contest_id_fkey"
+            columns: ["contest_id"]
+            isOneToOne: false
+            referencedRelation: "photo_contests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      photo_contest_votes: {
+        Row: {
+          created_at: string | null
+          entry_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          entry_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          entry_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photo_contest_votes_entry_id_fkey"
+            columns: ["entry_id"]
+            isOneToOne: false
+            referencedRelation: "photo_contest_entries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      photo_contests: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          end_date: string
+          id: string
+          max_entries_per_user: number | null
+          prize_description: string | null
+          start_date: string
+          status: string | null
+          theme: string | null
+          title: string
+          updated_at: string | null
+          voting_end_date: string
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          end_date: string
+          id?: string
+          max_entries_per_user?: number | null
+          prize_description?: string | null
+          start_date: string
+          status?: string | null
+          theme?: string | null
+          title: string
+          updated_at?: string | null
+          voting_end_date: string
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          end_date?: string
+          id?: string
+          max_entries_per_user?: number | null
+          prize_description?: string | null
+          start_date?: string
+          status?: string | null
+          theme?: string | null
+          title?: string
+          updated_at?: string | null
+          voting_end_date?: string
+        }
+        Relationships: []
       }
       premium_weather_data: {
         Row: {
@@ -1602,6 +1865,66 @@ export type Database = {
           },
         ]
       }
+      user_achievements_detailed: {
+        Row: {
+          achievement_description: string | null
+          achievement_name: string
+          achievement_type: string
+          badge_color: string | null
+          category: Database["public"]["Enums"]["achievement_category"]
+          created_at: string | null
+          icon: string | null
+          id: string
+          is_unlocked: boolean | null
+          points_awarded: number | null
+          progress_current: number | null
+          progress_required: number | null
+          rarity: string | null
+          unlock_criteria: Json | null
+          unlocked_at: string | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          achievement_description?: string | null
+          achievement_name: string
+          achievement_type: string
+          badge_color?: string | null
+          category: Database["public"]["Enums"]["achievement_category"]
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          is_unlocked?: boolean | null
+          points_awarded?: number | null
+          progress_current?: number | null
+          progress_required?: number | null
+          rarity?: string | null
+          unlock_criteria?: Json | null
+          unlocked_at?: string | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          achievement_description?: string | null
+          achievement_name?: string
+          achievement_type?: string
+          badge_color?: string | null
+          category?: Database["public"]["Enums"]["achievement_category"]
+          created_at?: string | null
+          icon?: string | null
+          id?: string
+          is_unlocked?: boolean | null
+          points_awarded?: number | null
+          progress_current?: number | null
+          progress_required?: number | null
+          rarity?: string | null
+          unlock_criteria?: Json | null
+          unlocked_at?: string | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_activities: {
         Row: {
           created_at: string | null
@@ -2013,6 +2336,10 @@ export type Database = {
           demand_ratio: number
           avg_confidence: number
         }[]
+      }
+      calculate_user_level: {
+        Args: { points: number }
+        Returns: number
       }
       cleanup_expired_spots: {
         Args: Record<PropertyKey, never>
@@ -3716,6 +4043,13 @@ export type Database = {
       }
     }
     Enums: {
+      achievement_category:
+        | "sessions"
+        | "streaks"
+        | "exploration"
+        | "social"
+        | "challenges"
+        | "special"
       app_role: "admin" | "mentor" | "student"
       buddy_request_status: "pending" | "accepted" | "declined"
       group_visibility: "public" | "private"
@@ -3854,6 +4188,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      achievement_category: [
+        "sessions",
+        "streaks",
+        "exploration",
+        "social",
+        "challenges",
+        "special",
+      ],
       app_role: ["admin", "mentor", "student"],
       buddy_request_status: ["pending", "accepted", "declined"],
       group_visibility: ["public", "private"],

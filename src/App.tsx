@@ -31,6 +31,7 @@ import PremiumWeatherPage from '@/pages/PremiumWeatherPage';
 import PremiumPage from '@/pages/PremiumPage';
 import CommunityPage from '@/pages/CommunityPage';
 import MentorshipPage from '@/pages/MentorshipPage';
+import GamificationPage from '@/pages/GamificationPage';
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 
 const queryClient = new QueryClient();
@@ -69,6 +70,7 @@ function App() {
                 <Route path="/premium" element={<PremiumPage />} />
                 <Route path="/community" element={<CommunityPage />} />
                 <Route path="/mentorship" element={<MentorshipPage />} />
+                <Route path="/gamification" element={<GamificationPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
