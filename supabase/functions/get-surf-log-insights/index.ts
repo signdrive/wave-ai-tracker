@@ -222,12 +222,7 @@ serve(async (req: Request) => {
       performance_snapshot: performanceSnapshot,
       preferred_conditions_by_spot: preferredConditionsBySpot,
       raw_sessions_for_debug: sessions, // Optionally remove for production
-    };
-
-    console.log('get-surf-log-insights: Calculated performanceSnapshot:', responsePayload.performance_snapshot); // LOG ADDED
-    console.log('get-surf-log-insights: Calculated preferredConditionsBySpot:', responsePayload.preferred_conditions_by_spot); // LOG ADDED
-
-    return new Response(JSON.stringify(responsePayload), {
+    }), {
       status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
 
