@@ -104,13 +104,83 @@ const TravelPackagesPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Header */}
+      {/* Hero Section */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-          Surf Travel Packages
+          Surf Travel Packages & Adventures
         </h1>
-        <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-          Discover the world's best surf destinations with our curated travel packages
+        <p className="text-xl text-gray-600 dark:text-gray-300 max-w-4xl mx-auto mb-6">
+          Discover the world's most incredible surf destinations with our expertly curated travel packages. 
+          From beginner-friendly breaks in Costa Rica to challenging barrels in Portugal, we offer unique 
+          surfing adventures that combine world-class waves with authentic cultural experiences.
+        </p>
+        
+        {/* Why Choose Our Packages */}
+        <div className="grid md:grid-cols-3 gap-6 mt-8 mb-12">
+          <div className="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+            <div className="text-blue-600 dark:text-blue-400 mb-2">
+              <Waves className="w-8 h-8 mx-auto" />
+            </div>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">World-Class Surf Spots</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Access exclusive breaks and hidden gems guided by local surf experts
+            </p>
+          </div>
+          <div className="p-6 bg-green-50 dark:bg-green-900/20 rounded-lg">
+            <div className="text-green-600 dark:text-green-400 mb-2">
+              <Star className="w-8 h-8 mx-auto" />
+            </div>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Expert Coaching</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Improve your skills with certified instructors and video analysis
+            </p>
+          </div>
+          <div className="p-6 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+            <div className="text-orange-600 dark:text-orange-400 mb-2">
+              <Clock className="w-8 h-8 mx-auto" />
+            </div>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">All-Inclusive Experience</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Everything handled from accommodation to equipment and transfers
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Links to Other Features */}
+      <div className="mb-8 p-4 bg-gradient-to-r from-blue-50 to-green-50 dark:from-blue-900/20 dark:to-green-900/20 rounded-lg">
+        <p className="text-center text-gray-700 dark:text-gray-300 mb-3">
+          Enhance your surf trip planning with our advanced tools:
+        </p>
+        <div className="flex flex-wrap justify-center gap-4">
+          <Button variant="outline" size="sm" onClick={() => window.location.href = '/map'}>
+            <MapPin className="w-4 h-4 mr-2" />
+            Explore Surf Spots
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => window.location.href = '/live-spots'}>
+            <Waves className="w-4 h-4 mr-2" />
+            Live Conditions
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => window.location.href = '/mentorship'}>
+            <Users className="w-4 h-4 mr-2" />
+            Find a Mentor
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => window.location.href = '/community'}>
+            <Star className="w-4 h-4 mr-2" />
+            Join Community
+          </Button>
+        </div>
+      </div>
+
+      {/* Search & Filter Section */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+          Find Your Perfect Surf Adventure
+        </h2>
+        <p className="text-gray-600 dark:text-gray-300 mb-6">
+          Filter through our carefully selected surf travel packages to find the perfect match for your skill level, 
+          budget, and adventure preferences. Each package is designed to maximize your time in the water while 
+          ensuring comfort and safety on land.
         </p>
       </div>
 
@@ -350,6 +420,133 @@ const TravelPackagesPage = () => {
           </p>
         </div>
       )}
+
+      {/* Popular Destinations Section */}
+      <div className="mt-16 mb-12">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
+          Why Choose Our Surf Travel Packages
+        </h2>
+        <div className="grid md:grid-cols-2 gap-8 mb-12">
+          <div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Expert Local Guides</h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              Our surf travel packages include experienced local guides who know the best surf spots, optimal conditions, 
+              and hidden gems that typical tourists never discover. These guides ensure your safety while maximizing your 
+              wave count and overall experience.
+            </p>
+            <p className="text-gray-600 dark:text-gray-300">
+              Each guide is certified and has years of experience surfing the local breaks, understanding tide patterns, 
+              wind conditions, and seasonal variations that can make or break your surf session.
+            </p>
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Premium Accommodations</h3>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              We partner with carefully selected accommodations that provide comfort and convenience for surfers. 
+              From beachfront eco-lodges to boutique surf hotels, each property is chosen for its proximity to quality 
+              surf breaks and surfer-friendly amenities.
+            </p>
+            <p className="text-gray-600 dark:text-gray-300">
+              Many of our accommodations offer equipment storage, board repair services, early breakfast for dawn patrol, 
+              and knowledgeable staff who can provide local surf forecasting and conditions updates.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Destinations Overview */}
+      <div className="mb-12">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
+          Popular Surf Destinations We Cover
+        </h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Tropical Paradise</h3>
+            <p className="text-gray-600 dark:text-gray-300 text-sm mb-3">
+              Indonesia, Costa Rica, Philippines - Perfect for warm water surfing with consistent waves year-round. 
+              Ideal for all skill levels with a mix of reef breaks and beach breaks.
+            </p>
+            <Button variant="outline" size="sm" onClick={() => window.location.href = '/map'}>
+              Explore Spots
+            </Button>
+          </div>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">European Classics</h3>
+            <p className="text-gray-600 dark:text-gray-300 text-sm mb-3">
+              Portugal, France, Spain - Experience powerful Atlantic swells and world-class waves. 
+              Perfect for intermediate to advanced surfers seeking challenging conditions.
+            </p>
+            <Button variant="outline" size="sm" onClick={() => window.location.href = '/live-spots'}>
+              Check Conditions
+            </Button>
+          </div>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Adventure Destinations</h3>
+            <p className="text-gray-600 dark:text-gray-300 text-sm mb-3">
+              Morocco, Chile, South Africa - Combine surfing with cultural exploration and adventure activities. 
+              Unique experiences beyond just the waves.
+            </p>
+            <Button variant="outline" size="sm" onClick={() => window.location.href = '/community'}>
+              Join Travelers
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Planning Tips */}
+      <div className="mb-12 bg-gray-50 dark:bg-gray-800/50 p-8 rounded-lg">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
+          Planning Your Perfect Surf Trip
+        </h2>
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div>
+            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Best Time to Travel</h4>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Each destination has optimal seasons for surf conditions. Our packages are timed to maximize wave quality 
+              and favorable weather conditions for the best possible experience.
+            </p>
+          </div>
+          <div>
+            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Skill Level Matching</h4>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              We carefully match destinations and surf spots to your experience level, ensuring safe and progressive 
+              challenges that help improve your surfing while keeping you comfortable in the water.
+            </p>
+          </div>
+          <div>
+            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Equipment & Logistics</h4>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              All surfboards, wetsuits, and safety equipment are included. We handle airport transfers, 
+              accommodation bookings, and local transportation so you can focus on surfing.
+            </p>
+          </div>
+          <div>
+            <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Cultural Experiences</h4>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Beyond surfing, our packages include opportunities to experience local culture, cuisine, and traditions, 
+              making your trip a well-rounded adventure that goes beyond just the waves.
+            </p>
+          </div>
+        </div>
+        
+        <div className="mt-8 text-center">
+          <p className="text-gray-600 dark:text-gray-300 mb-4">
+            Ready to start planning your next surf adventure? Our team is here to help you choose the perfect destination 
+            and package for your skill level, budget, and travel preferences.
+          </p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <Button onClick={() => window.location.href = '/mentorship'}>
+              Get Expert Advice
+            </Button>
+            <Button variant="outline" onClick={() => window.location.href = '/premium'}>
+              View Premium Features
+            </Button>
+            <Button variant="outline" onClick={() => window.location.href = '/'}>
+              Back to Home
+            </Button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
