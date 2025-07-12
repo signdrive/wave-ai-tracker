@@ -40,40 +40,80 @@ self.addEventListener('sync', event => {
 
 // Push notification handler
 self.addEventListener('push', event => {
-  if (event.data) {
-    const data = event.data.json();
-    const options = {
-      body: data.body,
-      icon: '/placeholder.svg',
-      badge: '/placeholder.svg',
-      data: data.data,
-      actions: [
-        {
-          action: 'view',
-          title: 'View Details'
-        },
-        {
-          action: 'dismiss',
-          title: 'Dismiss'
-        }
-      ]
-    };
+  console.log('Push notification received');
+  
+  let notificationData = {
+    title: 'WaveMentor',
+    body: 'You have a new surf alert!',
+    icon: '/favicon.ico',
+    badge: '/favicon.ico',
+    tag: 'surf-alert'
+  };
 
-    event.waitUntil(
-      self.registration.showNotification(data.title, options)
-    );
+  if (event.data) {
+    try {
+      const data = event.data.json();
+      notificationData = { ...notificationData, ...data };
+    } catch (e) {
+      // Fallback for text data
+      notificationData.body = event.data.text();
+    }
   }
+
+  const options = {
+    body: notificationData.body,
+    icon: notificationData.icon,
+    badge: notificationData.badge,
+    tag: notificationData.tag,
+    data: notificationData.data,
+    actions: [
+      {
+        action: 'view',
+        title: 'View Details',
+        icon: '/favicon.ico'
+      },
+      {
+        action: 'dismiss',
+        title: 'Dismiss'
+      }
+    ],
+    requireInteraction: true,
+    vibrate: [200, 100, 200]
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(notificationData.title, options)
+  );
 });
 
 // Notification click handler
 self.addEventListener('notificationclick', event => {
+  console.log('Notification clicked');
   event.notification.close();
 
-  if (event.action === 'view') {
-    event.waitUntil(
-      clients.openWindow('/')
-    );
+  if (event.action === 'dismiss') {
+    return;
   }
+
+  // Default action or 'view' action
+  const urlToOpen = event.notification.data?.url || '/';
+  
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then(clientList => {
+        // Check if there's already a window/tab open with the target URL
+        for (const client of clientList) {
+          if (client.url.includes(urlToOpen) && 'focus' in client) {
+            return client.focus();
+          }
+        }
+        
+        // If no window/tab is open, open a new one
+        if (clients.openWindow) {
+          return clients.openWindow(urlToOpen);
+        }
+      })
+  );
 });
 
 async function syncSurfConditions() {

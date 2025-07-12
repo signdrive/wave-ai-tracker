@@ -397,6 +397,42 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_preferences: {
+        Row: {
+          challenge_alerts: boolean | null
+          created_at: string
+          crowd_alerts: boolean | null
+          daily_forecast: boolean | null
+          id: string
+          session_reminders: boolean | null
+          updated_at: string
+          user_id: string
+          wave_alerts: boolean | null
+        }
+        Insert: {
+          challenge_alerts?: boolean | null
+          created_at?: string
+          crowd_alerts?: boolean | null
+          daily_forecast?: boolean | null
+          id?: string
+          session_reminders?: boolean | null
+          updated_at?: string
+          user_id: string
+          wave_alerts?: boolean | null
+        }
+        Update: {
+          challenge_alerts?: boolean | null
+          created_at?: string
+          crowd_alerts?: boolean | null
+          daily_forecast?: boolean | null
+          id?: string
+          session_reminders?: boolean | null
+          updated_at?: string
+          user_id?: string
+          wave_alerts?: boolean | null
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           created_at: string | null

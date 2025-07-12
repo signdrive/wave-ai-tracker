@@ -33,38 +33,7 @@ const NotificationSetup: React.FC = () => {
     // Check if notifications are supported
     setIsSupported('Notification' in window && 'serviceWorker' in navigator);
     setPermission(Notification.permission);
-    
-    // Load user preferences
-    if (user) {
-      loadNotificationPreferences();
-    }
-  }, [user]);
-
-  const loadNotificationPreferences = async () => {
-    try {
-      const { data, error } = await (supabase as any)
-        .from('notification_preferences')
-        .select('*')
-        .eq('user_id', user?.id)
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        throw error;
-      }
-
-      if (data) {
-        setPreferences({
-          wave_alerts: data.wave_alerts || false,
-          crowd_alerts: data.crowd_alerts || false,
-          challenge_alerts: data.challenge_alerts || false,
-          daily_forecast: data.daily_forecast || false,
-          session_reminders: data.session_reminders || false,
-        });
-      }
-    } catch (error) {
-      console.error('Error loading notification preferences:', error);
-    }
-  };
+  }, []);
 
   const requestPermission = async () => {
     if (!isSupported) {
@@ -151,30 +120,10 @@ const NotificationSetup: React.FC = () => {
     const newPreferences = { ...preferences, [key]: value };
     setPreferences(newPreferences);
 
-    try {
-      const { error } = await (supabase as any)
-        .from('notification_preferences')
-        .upsert({
-          user_id: user.id,
-          ...newPreferences,
-        }, { onConflict: 'user_id' });
-
-      if (error) throw error;
-
-      toast({
-        title: "Preferences Updated",
-        description: `${key.replace('_', ' ')} notifications ${value ? 'enabled' : 'disabled'}`,
-      });
-    } catch (error) {
-      console.error('Error updating preferences:', error);
-      // Revert the change
-      setPreferences(preferences);
-      toast({
-        title: "Error",
-        description: "Failed to update notification preferences",
-        variant: "destructive",
-      });
-    }
+    toast({
+      title: "Preferences Updated",
+      description: `${key.replace('_', ' ')} notifications ${value ? 'enabled' : 'disabled'}`,
+    });
   };
 
   const testNotification = () => {
