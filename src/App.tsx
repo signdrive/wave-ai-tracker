@@ -24,6 +24,11 @@ import NotificationsPage from '@/pages/NotificationsPage';
 import AnalyticsPage from '@/pages/AnalyticsPage';
 import DiscoveryPage from '@/pages/DiscoveryPage';
 import SafetyPage from '@/pages/SafetyPage';
+import MarketplacePage from '@/pages/MarketplacePage';
+import LessonsPage from '@/pages/LessonsPage';
+import TravelPackagesPage from '@/pages/TravelPackagesPage';
+import PremiumWeatherPage from '@/pages/PremiumWeatherPage';
+import PremiumPage from '@/pages/PremiumPage';
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 
 const queryClient = new QueryClient();
@@ -55,6 +60,11 @@ function App() {
                 <Route path="/analytics" element={<AnalyticsPage />} />
                 <Route path="/discovery" element={<DiscoveryPage />} />
                 <Route path="/safety" element={<SafetyPage />} />
+                <Route path="/marketplace" element={<MarketplacePage />} />
+                <Route path="/lessons" element={<LessonsPage />} />
+                <Route path="/travel" element={<TravelPackagesPage />} />
+                <Route path="/premium-weather" element={<PremiumWeatherPage />} />
+                <Route path="/premium" element={<PremiumPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

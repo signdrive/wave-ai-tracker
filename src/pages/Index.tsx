@@ -3,6 +3,7 @@ import React from 'react';
 import Hero from '@/components/Hero';
 import EnhancedSurfInterface from '@/components/EnhancedSurfInterface';
 import SearchableWeatherForecast from '@/components/SearchableWeatherForecast';
+import MonetizationShowcase from '@/components/MonetizationShowcase';
 
 const Index = () => {
   return (
@@ -23,6 +24,9 @@ const Index = () => {
         </div>
         <EnhancedSurfInterface />
       </section>
+
+      {/* Monetization Features Showcase */}
+      <MonetizationShowcase />
 
       {/* Enhanced Weather Forecast Search */}
       <section className="py-8 bg-gray-50 dark:bg-gray-900">

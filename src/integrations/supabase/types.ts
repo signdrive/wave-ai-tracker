@@ -313,6 +313,129 @@ export type Database = {
         }
         Relationships: []
       }
+      lesson_bookings: {
+        Row: {
+          created_at: string
+          duration_hours: number
+          id: string
+          instructor_id: string
+          instructor_notes: string | null
+          lesson_date: string
+          lesson_type: string
+          location_description: string | null
+          location_spot_id: string | null
+          payment_status: string | null
+          rating: number | null
+          special_requests: string | null
+          status: string | null
+          student_count: number | null
+          student_feedback: string | null
+          student_id: string
+          total_price: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          duration_hours?: number
+          id?: string
+          instructor_id: string
+          instructor_notes?: string | null
+          lesson_date: string
+          lesson_type: string
+          location_description?: string | null
+          location_spot_id?: string | null
+          payment_status?: string | null
+          rating?: number | null
+          special_requests?: string | null
+          status?: string | null
+          student_count?: number | null
+          student_feedback?: string | null
+          student_id: string
+          total_price: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          duration_hours?: number
+          id?: string
+          instructor_id?: string
+          instructor_notes?: string | null
+          lesson_date?: string
+          lesson_type?: string
+          location_description?: string | null
+          location_spot_id?: string | null
+          payment_status?: string | null
+          rating?: number | null
+          special_requests?: string | null
+          status?: string | null
+          student_count?: number | null
+          student_feedback?: string | null
+          student_id?: string
+          total_price?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      marketplace_listings: {
+        Row: {
+          brand: string | null
+          category: string
+          condition: string
+          created_at: string
+          currency: string | null
+          description: string | null
+          id: string
+          images: string[] | null
+          location_city: string | null
+          location_country: string | null
+          model: string | null
+          price: number
+          size_info: string | null
+          status: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          brand?: string | null
+          category: string
+          condition?: string
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          location_city?: string | null
+          location_country?: string | null
+          model?: string | null
+          price: number
+          size_info?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          brand?: string | null
+          category?: string
+          condition?: string
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          id?: string
+          images?: string[] | null
+          location_city?: string | null
+          location_country?: string | null
+          model?: string | null
+          price?: number
+          size_info?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       mentor_availability: {
         Row: {
           created_at: string | null
@@ -530,6 +653,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      premium_weather_data: {
+        Row: {
+          accuracy_score: number | null
+          created_at: string
+          data_source: string | null
+          detailed_forecast: Json
+          forecast_date: string
+          id: string
+          spot_id: string
+        }
+        Insert: {
+          accuracy_score?: number | null
+          created_at?: string
+          data_source?: string | null
+          detailed_forecast: Json
+          forecast_date: string
+          id?: string
+          spot_id: string
+        }
+        Update: {
+          accuracy_score?: number | null
+          created_at?: string
+          data_source?: string | null
+          detailed_forecast?: Json
+          forecast_date?: string
+          id?: string
+          spot_id?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -863,6 +1016,75 @@ export type Database = {
         }
         Relationships: []
       }
+      surf_instructors: {
+        Row: {
+          availability_schedule: Json | null
+          bio: string | null
+          certifications: string[] | null
+          contact_info: Json | null
+          created_at: string
+          experience_years: number | null
+          hourly_rate: number
+          id: string
+          instructor_name: string
+          is_verified: boolean | null
+          languages: string[] | null
+          location_city: string
+          location_country: string
+          profile_image: string | null
+          rating: number | null
+          specialties: string[] | null
+          status: string | null
+          total_reviews: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          availability_schedule?: Json | null
+          bio?: string | null
+          certifications?: string[] | null
+          contact_info?: Json | null
+          created_at?: string
+          experience_years?: number | null
+          hourly_rate: number
+          id?: string
+          instructor_name: string
+          is_verified?: boolean | null
+          languages?: string[] | null
+          location_city: string
+          location_country: string
+          profile_image?: string | null
+          rating?: number | null
+          specialties?: string[] | null
+          status?: string | null
+          total_reviews?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          availability_schedule?: Json | null
+          bio?: string | null
+          certifications?: string[] | null
+          contact_info?: Json | null
+          created_at?: string
+          experience_years?: number | null
+          hourly_rate?: number
+          id?: string
+          instructor_name?: string
+          is_verified?: boolean | null
+          languages?: string[] | null
+          location_city?: string
+          location_country?: string
+          profile_image?: string | null
+          rating?: number | null
+          specialties?: string[] | null
+          status?: string | null
+          total_reviews?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       surf_sessions: {
         Row: {
           conditions_snapshot: Json | null
@@ -1007,6 +1229,111 @@ export type Database = {
           wave_direction?: string | null
           wave_height_range?: string | null
           wind_direction?: string | null
+        }
+        Relationships: []
+      }
+      travel_bookings: {
+        Row: {
+          booking_status: string | null
+          contact_info: Json | null
+          created_at: string
+          id: string
+          package_id: string
+          participant_count: number
+          payment_status: string | null
+          special_requests: string | null
+          total_price: number
+          travel_dates: unknown
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          booking_status?: string | null
+          contact_info?: Json | null
+          created_at?: string
+          id?: string
+          package_id: string
+          participant_count: number
+          payment_status?: string | null
+          special_requests?: string | null
+          total_price: number
+          travel_dates: unknown
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          booking_status?: string | null
+          contact_info?: Json | null
+          created_at?: string
+          id?: string
+          package_id?: string
+          participant_count?: number
+          payment_status?: string | null
+          special_requests?: string | null
+          total_price?: number
+          travel_dates?: unknown
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      travel_packages: {
+        Row: {
+          best_season: string | null
+          created_at: string
+          description: string
+          destination: string
+          difficulty_level: string
+          duration_days: number
+          id: string
+          included_services: string[] | null
+          max_participants: number | null
+          operator_contact: Json | null
+          package_images: string[] | null
+          package_name: string
+          price_per_person: number
+          status: string | null
+          surf_spots: string[] | null
+          updated_at: string
+          weather_requirements: Json | null
+        }
+        Insert: {
+          best_season?: string | null
+          created_at?: string
+          description: string
+          destination: string
+          difficulty_level: string
+          duration_days: number
+          id?: string
+          included_services?: string[] | null
+          max_participants?: number | null
+          operator_contact?: Json | null
+          package_images?: string[] | null
+          package_name: string
+          price_per_person: number
+          status?: string | null
+          surf_spots?: string[] | null
+          updated_at?: string
+          weather_requirements?: Json | null
+        }
+        Update: {
+          best_season?: string | null
+          created_at?: string
+          description?: string
+          destination?: string
+          difficulty_level?: string
+          duration_days?: number
+          id?: string
+          included_services?: string[] | null
+          max_participants?: number | null
+          operator_contact?: Json | null
+          package_images?: string[] | null
+          package_name?: string
+          price_per_person?: number
+          status?: string | null
+          surf_spots?: string[] | null
+          updated_at?: string
+          weather_requirements?: Json | null
         }
         Relationships: []
       }

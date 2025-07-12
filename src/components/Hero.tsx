@@ -28,7 +28,7 @@ const Hero: React.FC = () => {
             Discover Your Perfect Wave
           </h1>
           <p className="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">
-            Book surf sessions at premium wave pools or find the best natural waves with our AI-powered surf cameras.
+            Book surf sessions, buy gear, learn from pros, and explore surf destinations worldwide with our comprehensive platform.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-ocean hover:bg-ocean-dark text-lg">
