@@ -4027,6 +4027,10 @@ export type Database = {
         Args: { "": string }
         Returns: number
       }
+      update_leaderboard_rankings: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       update_user_reputation: {
         Args: { user_id: string; reputation_change: number }
         Returns: undefined
