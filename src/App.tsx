@@ -29,6 +29,8 @@ import LessonsPage from '@/pages/LessonsPage';
 import TravelPackagesPage from '@/pages/TravelPackagesPage';
 import PremiumWeatherPage from '@/pages/PremiumWeatherPage';
 import PremiumPage from '@/pages/PremiumPage';
+import CommunityPage from '@/pages/CommunityPage';
+import MentorshipPage from '@/pages/MentorshipPage';
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 
 const queryClient = new QueryClient();
@@ -65,6 +67,8 @@ function App() {
                 <Route path="/travel" element={<TravelPackagesPage />} />
                 <Route path="/premium-weather" element={<PremiumWeatherPage />} />
                 <Route path="/premium" element={<PremiumPage />} />
+                <Route path="/community" element={<CommunityPage />} />
+                <Route path="/mentorship" element={<MentorshipPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>

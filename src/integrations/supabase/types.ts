@@ -149,6 +149,36 @@ export type Database = {
         }
         Relationships: []
       }
+      buddy_requests: {
+        Row: {
+          created_at: string | null
+          id: string
+          message: string | null
+          requested_id: string
+          requester_id: string
+          status: Database["public"]["Enums"]["buddy_request_status"] | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          requested_id: string
+          requester_id: string
+          status?: Database["public"]["Enums"]["buddy_request_status"] | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          message?: string | null
+          requested_id?: string
+          requester_id?: string
+          status?: Database["public"]["Enums"]["buddy_request_status"] | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       challenges: {
         Row: {
           badge_icon: string | null
@@ -312,6 +342,38 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      group_members: {
+        Row: {
+          group_id: string
+          id: string
+          joined_at: string | null
+          role: string | null
+          user_id: string
+        }
+        Insert: {
+          group_id: string
+          id?: string
+          joined_at?: string | null
+          role?: string | null
+          user_id: string
+        }
+        Update: {
+          group_id?: string
+          id?: string
+          joined_at?: string | null
+          role?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "group_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "surf_groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lesson_bookings: {
         Row: {
@@ -834,6 +896,132 @@ export type Database = {
         }
         Relationships: []
       }
+      session_comments: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          post_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          post_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          post_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "session_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_likes: {
+        Row: {
+          created_at: string | null
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "session_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      session_posts: {
+        Row: {
+          comment_count: number | null
+          created_at: string | null
+          crowd_level: string | null
+          description: string | null
+          fun_rating: number | null
+          id: string
+          like_count: number | null
+          location: string | null
+          photos: string[] | null
+          session_id: string | null
+          title: string
+          updated_at: string | null
+          user_id: string
+          visibility: string | null
+          wave_rating: number | null
+        }
+        Insert: {
+          comment_count?: number | null
+          created_at?: string | null
+          crowd_level?: string | null
+          description?: string | null
+          fun_rating?: number | null
+          id?: string
+          like_count?: number | null
+          location?: string | null
+          photos?: string[] | null
+          session_id?: string | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+          visibility?: string | null
+          wave_rating?: number | null
+        }
+        Update: {
+          comment_count?: number | null
+          created_at?: string | null
+          crowd_level?: string | null
+          description?: string | null
+          fun_rating?: number | null
+          id?: string
+          like_count?: number | null
+          location?: string | null
+          photos?: string[] | null
+          session_id?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+          visibility?: string | null
+          wave_rating?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "session_posts_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "surf_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       session_recordings: {
         Row: {
           ai_analysis: Json | null
@@ -1013,6 +1201,51 @@ export type Database = {
           status?: string | null
           updated_at?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      surf_groups: {
+        Row: {
+          beach_region: string | null
+          created_at: string | null
+          creator_id: string
+          description: string | null
+          group_image: string | null
+          id: string
+          location: string
+          max_members: number | null
+          member_count: number | null
+          name: string
+          updated_at: string | null
+          visibility: Database["public"]["Enums"]["group_visibility"] | null
+        }
+        Insert: {
+          beach_region?: string | null
+          created_at?: string | null
+          creator_id: string
+          description?: string | null
+          group_image?: string | null
+          id?: string
+          location: string
+          max_members?: number | null
+          member_count?: number | null
+          name: string
+          updated_at?: string | null
+          visibility?: Database["public"]["Enums"]["group_visibility"] | null
+        }
+        Update: {
+          beach_region?: string | null
+          created_at?: string | null
+          creator_id?: string
+          description?: string | null
+          group_image?: string | null
+          id?: string
+          location?: string
+          max_members?: number | null
+          member_count?: number | null
+          name?: string
+          updated_at?: string | null
+          visibility?: Database["public"]["Enums"]["group_visibility"] | null
         }
         Relationships: []
       }
@@ -3484,6 +3717,8 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "mentor" | "student"
+      buddy_request_status: "pending" | "accepted" | "declined"
+      group_visibility: "public" | "private"
     }
     CompositeTypes: {
       geometry_dump: {
@@ -3620,6 +3855,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "mentor", "student"],
+      buddy_request_status: ["pending", "accepted", "declined"],
+      group_visibility: ["public", "private"],
     },
   },
 } as const

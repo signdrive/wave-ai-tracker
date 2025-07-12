@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Waves, BarChart3, Calendar, Map, User, Shield, Settings, Trophy, Bell, TrendingUp, Search, AlertTriangle, ShoppingBag, GraduationCap, Plane, Cloud } from 'lucide-react';
+import { Menu, X, Waves, BarChart3, Calendar, Map, User, Shield, Settings, Trophy, Bell, TrendingUp, Search, AlertTriangle, ShoppingBag, GraduationCap, Plane, Cloud, Users, UserPlus } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
 import { useMentorship } from '@/hooks/useMentorship';
@@ -29,6 +29,8 @@ const NavBar = () => {
     { path: '/lessons', label: 'Lessons', icon: GraduationCap, description: 'Book surf lessons with instructors' },
     { path: '/travel', label: 'Travel', icon: Plane, description: 'Curated surf trip packages' },
     { path: '/premium-weather', label: 'Premium Weather', icon: Cloud, description: 'Extended forecasts & analytics' },
+    { path: '/community', label: 'Community', icon: Users, description: 'Connect with fellow surfers and join groups' },
+    { path: '/mentorship', label: 'Mentorship', icon: UserPlus, description: 'Find mentors or become one' },
     { path: '/challenges', label: 'Challenges', icon: Trophy, description: 'Complete challenges and earn achievements' },
     { path: '/notifications', label: 'Notifications', icon: Bell, description: 'Push notifications and alerts' },
     { path: '/analytics', label: 'Analytics', icon: TrendingUp, description: 'Personal surf analytics and insights' },
