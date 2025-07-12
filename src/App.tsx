@@ -22,6 +22,7 @@ import CanonicalUrl from '@/components/CanonicalUrl';
 import ChallengesPage from '@/components/challenges/ChallengesPage';
 import NotificationsPage from '@/pages/NotificationsPage';
 import AnalyticsPage from '@/pages/AnalyticsPage';
+import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,7 @@ function App() {
               </Routes>
             </main>
             <Footer />
+            <PWAInstallPrompt />
           </div>
         </Router>
       </ThemeProvider>

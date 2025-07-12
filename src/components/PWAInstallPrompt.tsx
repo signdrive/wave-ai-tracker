@@ -1,83 +1,135 @@
-
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { X, Smartphone, Download } from 'lucide-react';
-import { usePWA } from '@/hooks/usePWA';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Download, X, Smartphone } from 'lucide-react';
+import { toast } from "sonner";
 
-const PWAInstallPrompt: React.FC = () => {
-  const { isInstallable, installPWA } = usePWA();
-  const [isDismissed, setIsDismissed] = useState(false);
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
+declare global {
+  interface WindowEventMap {
+    beforeinstallprompt: BeforeInstallPromptEvent;
+  }
+}
+
+export const PWAInstallPrompt = () => {
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(false);
 
   useEffect(() => {
-    console.log('PWAInstallPrompt - isInstallable:', isInstallable, 'isDismissed:', isDismissed);
-  }, [isInstallable, isDismissed]);
+    // Check if app is already installed
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    const isInWebApp = (window.navigator as any).standalone;
+    
+    if (isStandalone || isInWebApp) {
+      setIsInstalled(true);
+      return;
+    }
 
-  if (!isInstallable || isDismissed) {
-    console.log('Not showing install prompt - isInstallable:', isInstallable, 'isDismissed:', isDismissed);
+    // Listen for the beforeinstallprompt event
+    const handleBeforeInstallPrompt = (e: BeforeInstallPromptEvent) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      
+      // Check if user has dismissed the prompt before
+      const hasSeenPrompt = localStorage.getItem('pwa-install-dismissed');
+      if (!hasSeenPrompt) {
+        // Show prompt after a short delay
+        setTimeout(() => setShowPrompt(true), 5000);
+      }
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+
+    try {
+      await deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      if (outcome === 'accepted') {
+        toast.success('App installation started! Check your home screen shortly.');
+        setShowPrompt(false);
+        setIsInstalled(true);
+      } else {
+        toast.info('Installation cancelled. You can install later from the browser menu.');
+      }
+      
+      setDeferredPrompt(null);
+    } catch (error) {
+      console.error('Installation failed:', error);
+      toast.error('Installation failed. Please try again later.');
+    }
+  };
+
+  const handleDismiss = () => {
+    setShowPrompt(false);
+    localStorage.setItem('pwa-install-dismissed', 'true');
+    toast.info('You can install the app later from your browser menu.');
+  };
+
+  if (!showPrompt || isInstalled || !deferredPrompt) {
     return null;
   }
 
-  console.log('Showing PWA install prompt');
-
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 animate-in slide-in-from-bottom-4 duration-300 md:left-auto md:right-4 md:w-80">
-      <Card className="bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700">
-        <CardContent className="p-4">
-          <div className="flex items-start justify-between mb-3">
+    <div className="fixed bottom-4 right-4 z-50 max-w-sm">
+      <Card className="border-2 border-ocean/20 shadow-lg">
+        <CardHeader className="pb-3">
+          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <div className="p-2 bg-ocean/10 dark:bg-ocean/20 rounded-lg">
-                <Smartphone className="w-5 h-5 text-ocean dark:text-ocean-light" />
-              </div>
-              <div>
-                <h3 className="font-semibold text-sm">Install Wave AI</h3>
-                <p className="text-xs text-gray-600 dark:text-gray-400">
-                  Get the full app experience
-                </p>
-              </div>
+              <Smartphone className="w-5 h-5 text-ocean" />
+              <CardTitle className="text-lg">Install WaveMentor</CardTitle>
             </div>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => setIsDismissed(true)}
-              className="h-6 w-6 p-0"
+              onClick={handleDismiss}
+              className="p-1 h-auto"
             >
               <X className="w-4 h-4" />
             </Button>
           </div>
-          
-          <div className="space-y-2 mb-4">
-            <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-              <span>• Offline access to surf data</span>
+          <CardDescription>
+            Get faster access to surf forecasts and work offline!
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="space-y-3">
+            <div className="text-sm text-muted-foreground">
+              <p>✓ Instant loading from your home screen</p>
+              <p>✓ Offline access to saved forecasts</p>
+              <p>✓ Push notifications for surf alerts</p>
             </div>
-            <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-              <span>• Push notifications for alerts</span>
+            <div className="flex space-x-2">
+              <Button
+                onClick={handleInstallClick}
+                className="flex-1 bg-ocean hover:bg-ocean-dark"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Install
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleDismiss}
+                className="flex-1"
+              >
+                Not Now
+              </Button>
             </div>
-            <div className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-              <span>• Faster loading times</span>
-            </div>
-          </div>
-          
-          <div className="flex space-x-2">
-            <Button
-              onClick={installPWA}
-              className="flex-1 bg-ocean hover:bg-ocean-dark text-white text-sm"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Install
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setIsDismissed(true)}
-              className="text-sm"
-            >
-              Later
-            </Button>
           </div>
         </CardContent>
       </Card>
     </div>
   );
 };
-
-export default PWAInstallPrompt;

@@ -1,8 +1,8 @@
 
 {
-  "name": "Wave AI Tracker",
-  "short_name": "Wave AI",
-  "description": "The Ultimate Surf Intelligence Platform",
+  "name": "WaveMentor - Smart Surf Forecasting",
+  "short_name": "WaveMentor",
+  "description": "AI-powered surf forecasting with live cameras, crowd reports, and personalized coaching",
   "start_url": "/",
   "display": "standalone",
   "theme_color": "#0077B6",
