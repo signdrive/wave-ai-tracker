@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Waves, BarChart3, Calendar, Map, User, Shield, Settings, Trophy, Bell, TrendingUp } from 'lucide-react';
+import { Menu, X, Waves, BarChart3, Calendar, Map, User, Shield, Settings, Trophy, Bell, TrendingUp, Search, AlertTriangle } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
 import { useMentorship } from '@/hooks/useMentorship';
@@ -28,6 +28,8 @@ const NavBar = () => {
     { path: '/challenges', label: 'Challenges', icon: Trophy, description: 'Complete challenges and earn achievements' },
     { path: '/notifications', label: 'Notifications', icon: Bell, description: 'Push notifications and alerts' },
     { path: '/analytics', label: 'Analytics', icon: TrendingUp, description: 'Personal surf analytics and insights' },
+    { path: '/discovery', label: 'AI Discovery', icon: Search, description: 'AI-powered spot recommendations and equipment suggestions' },
+    { path: '/safety', label: 'Safety', icon: AlertTriangle, description: 'Emergency contacts and safety check-ins' },
     { path: '/book-sessions', label: 'Book Sessions', icon: Calendar, description: 'Wave pools & natural spots' },
     { path: '/map', label: 'Heat Map', icon: Map, description: 'Crowd density visualization' },
     { path: '/surf-log', label: 'Surf Log Insights', icon: User, description: 'Log sessions & view AI insights' }, // MODIFIED

@@ -22,6 +22,8 @@ import CanonicalUrl from '@/components/CanonicalUrl';
 import ChallengesPage from '@/components/challenges/ChallengesPage';
 import NotificationsPage from '@/pages/NotificationsPage';
 import AnalyticsPage from '@/pages/AnalyticsPage';
+import DiscoveryPage from '@/pages/DiscoveryPage';
+import SafetyPage from '@/pages/SafetyPage';
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 
 const queryClient = new QueryClient();
@@ -51,6 +53,8 @@ function App() {
                 <Route path="/challenges" element={<ChallengesPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/analytics" element={<AnalyticsPage />} />
+                <Route path="/discovery" element={<DiscoveryPage />} />
+                <Route path="/safety" element={<SafetyPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
