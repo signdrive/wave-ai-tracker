@@ -1,13 +1,13 @@
 
-{
   "redirects": [
     {
-      "source": "http://wavementor.com/(.*)",
-      "destination": "https://www.wavementor.com/$1",
-      "permanent": true
-    },
-    {
-      "source": "https://wavementor.com/(.*)",
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "wavementor.com"
+        }
+      ],
       "destination": "https://www.wavementor.com/$1",
       "permanent": true
     }
