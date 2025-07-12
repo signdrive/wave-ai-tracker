@@ -8,8 +8,8 @@ const corsHeaders = {
 };
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const supabaseUrl = 'https://psvnvptqcbeyayridgqx.supabase.co';
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzdm52cHRxY2JleWF5cmlkZ3F4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDgyMjYzMjEsImV4cCI6MjA2MzgwMjMyMX0.V1TIAbD6wKHcuDbtNoJy6MXdLMiTw41Tzw_nPuP3DLE';
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
