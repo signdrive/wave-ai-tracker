@@ -42,7 +42,7 @@ const NotificationSetup: React.FC = () => {
 
   const loadNotificationPreferences = async () => {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('notification_preferences')
         .select('*')
         .eq('user_id', user?.id)
@@ -152,7 +152,7 @@ const NotificationSetup: React.FC = () => {
     setPreferences(newPreferences);
 
     try {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('notification_preferences')
         .upsert({
           user_id: user.id,
