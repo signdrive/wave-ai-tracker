@@ -287,7 +287,7 @@ export type Database = {
           reported_level: string
           source: string | null
           spot_id: string
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string | null
@@ -295,7 +295,7 @@ export type Database = {
           reported_level: string
           source?: string | null
           spot_id: string
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           created_at?: string | null
@@ -303,7 +303,7 @@ export type Database = {
           reported_level?: string
           source?: string | null
           spot_id?: string
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -345,7 +345,7 @@ export type Database = {
           id: string
           token: string
           updated_at: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           active?: boolean | null
@@ -354,7 +354,7 @@ export type Database = {
           id?: string
           token: string
           updated_at?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           active?: boolean | null
@@ -363,7 +363,7 @@ export type Database = {
           id?: string
           token?: string
           updated_at?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: [
           {
@@ -2751,6 +2751,15 @@ export type Database = {
       jsonb: {
         Args: { "": unknown }
         Returns: Json
+      }
+      log_security_event: {
+        Args: {
+          p_user_id: string
+          p_event_type: string
+          p_severity: string
+          p_details?: Json
+        }
+        Returns: undefined
       }
       longtransactionsenabled: {
         Args: Record<PropertyKey, never>
