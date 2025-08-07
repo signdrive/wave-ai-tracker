@@ -1,8 +1,15 @@
 
+# Block non-canonical domains completely
+User-agent: *
+Host: https://www.wavementor.com
+
+# Only allow canonical domain
 User-agent: Googlebot
+Crawl-delay: 1
 Allow: /
 
 User-agent: Bingbot
+Crawl-delay: 1
 Allow: /
 
 User-agent: Twitterbot
@@ -11,8 +18,10 @@ Allow: /
 User-agent: facebookexternalhit
 Allow: /
 
+# Block all other domains and redirects
 User-agent: *
-Allow: /
+Disallow: /
+Host: https://www.wavementor.com
 
 # Prevent indexing of redirect URLs and duplicates
 Disallow: /*#
