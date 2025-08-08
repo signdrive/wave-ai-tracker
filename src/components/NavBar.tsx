@@ -25,6 +25,7 @@ const NavBar = () => {
   const navItems = [
     { path: '/', label: 'Dashboard', icon: BarChart3, description: 'Surf conditions summary' },
     { path: '/live-spots', label: 'Live Spots', icon: Waves, description: 'AI camera feeds' },
+    { path: '/surf-blog', label: 'Surf Blog', icon: Search, description: 'World\'s best surf spots guide' },
     { path: '/marketplace', label: 'Marketplace', icon: ShoppingBag, description: 'Buy & sell surf gear' },
     { path: '/lessons', label: 'Lessons', icon: GraduationCap, description: 'Book surf lessons with instructors' },
     { path: '/travel', label: 'Travel', icon: Plane, description: 'Curated surf trip packages' },
@@ -34,7 +35,7 @@ const NavBar = () => {
     { path: '/gamification', label: 'Gamification', icon: Zap, description: 'Challenges, leaderboards, and achievements' },
     { path: '/notifications', label: 'Notifications', icon: Bell, description: 'Push notifications and alerts' },
     { path: '/analytics', label: 'Analytics', icon: TrendingUp, description: 'Personal surf analytics and insights' },
-    { path: '/discovery', label: 'AI Discovery', icon: Search, description: 'AI-powered spot recommendations and equipment suggestions' },
+    { path: '/discovery', label: 'AI Discovery', icon: TrendingUp, description: 'AI-powered spot recommendations and equipment suggestions' },
     { path: '/safety', label: 'Safety', icon: AlertTriangle, description: 'Emergency contacts and safety check-ins' },
     { path: '/book-sessions', label: 'Book Sessions', icon: Calendar, description: 'Wave pools & natural spots' },
     { path: '/map', label: 'Heat Map', icon: Map, description: 'Crowd density visualization' },
