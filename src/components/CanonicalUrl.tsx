@@ -20,9 +20,14 @@ const CanonicalUrl = () => {
     const baseUrl = 'https://www.wavementor.com';
     let canonicalPath = location.pathname;
     
-    // Remove trailing slash except for root
+    // Remove trailing slash except for root and normalize path
     if (canonicalPath !== '/' && canonicalPath.endsWith('/')) {
       canonicalPath = canonicalPath.slice(0, -1);
+    }
+    
+    // Ensure path starts with /
+    if (!canonicalPath.startsWith('/')) {
+      canonicalPath = '/' + canonicalPath;
     }
     
     canonical.href = `${baseUrl}${canonicalPath}`;
@@ -48,6 +53,14 @@ const CanonicalUrl = () => {
       '/book-sessions': {
         title: 'Book Surf Lessons & Coaching Sessions | WaveMentor',
         description: 'Book professional surf lessons and coaching sessions with certified instructors. Improve your skills with personalized mentorship programs.'
+      },
+      '/surf-blog': {
+        title: 'World\'s Best Surf Spots - Epic Wave Guides | WaveMentor',
+        description: 'Discover the most epic surf spots on the planet. Complete guides to legendary breaks, from perfect barrels to massive swells worldwide.'
+      },
+      '/privacy-policy': {
+        title: 'Privacy Policy | WaveMentor',
+        description: 'Learn how WaveMentor protects your privacy and handles your personal data. Complete privacy policy and data protection information.'
       }
     };
 
@@ -71,19 +84,34 @@ const CanonicalUrl = () => {
     document.head.appendChild(canonical);
 
     // Update Open Graph URL and title
-    const ogUrl = document.querySelector('meta[property="og:url"]');
+    let ogUrl = document.querySelector('meta[property="og:url"]');
     if (ogUrl) {
       ogUrl.setAttribute('content', `${baseUrl}${canonicalPath}`);
+    } else {
+      ogUrl = document.createElement('meta');
+      ogUrl.setAttribute('property', 'og:url');
+      ogUrl.setAttribute('content', `${baseUrl}${canonicalPath}`);
+      document.head.appendChild(ogUrl);
     }
     
-    const ogTitle = document.querySelector('meta[property="og:title"]');
+    let ogTitle = document.querySelector('meta[property="og:title"]');
     if (ogTitle) {
       ogTitle.setAttribute('content', metadata.title);
+    } else {
+      ogTitle = document.createElement('meta');
+      ogTitle.setAttribute('property', 'og:title');
+      ogTitle.setAttribute('content', metadata.title);
+      document.head.appendChild(ogTitle);
     }
     
-    const ogDescription = document.querySelector('meta[property="og:description"]');
+    let ogDescription = document.querySelector('meta[property="og:description"]');
     if (ogDescription) {
       ogDescription.setAttribute('content', metadata.description);
+    } else {
+      ogDescription = document.createElement('meta');
+      ogDescription.setAttribute('property', 'og:description');
+      ogDescription.setAttribute('content', metadata.description);
+      document.head.appendChild(ogDescription);
     }
 
     // Add structured data for better SEO
@@ -101,7 +129,12 @@ const CanonicalUrl = () => {
       "isPartOf": {
         "@type": "WebSite",
         "name": "WaveMentor",
-        "url": baseUrl
+        "url": baseUrl,
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": `${baseUrl}/search?q={search_term_string}`,
+          "query-input": "required name=search_term_string"
+        }
       }
     };
 

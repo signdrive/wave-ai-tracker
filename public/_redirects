@@ -1,9 +1,18 @@
 
-# Force HTTPS and www canonical redirects
+# Netlify redirects - Force canonical domain and HTTPS
 http://wavementor.com/*       https://www.wavementor.com/:splat  301!
 https://wavementor.com/*      https://www.wavementor.com/:splat  301!
 http://www.wavementor.com/*   https://www.wavementor.com/:splat  301!
 
-# Netlify SPA routing configuration
-/api/*  /api/:splat  200
-/*      /index.html  200
+# Handle specific problematic redirects from Search Console
+/privacy-policy/              /privacy-policy                    301!
+/map/                         /map                               301!
+/admin/                       /admin                             301!
+/book-sessions/               /book-sessions                     301!
+
+# Remove trailing slashes for SEO consistency
+/*                            /:splat                            301!
+
+# SPA routing - must be last
+/api/*                        /api/:splat                        200
+/*                            /index.html                        200

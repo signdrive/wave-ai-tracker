@@ -1,27 +1,7 @@
 
-# Block non-canonical domains completely
+# WaveMentor Robots Configuration
 User-agent: *
-Host: https://www.wavementor.com
-
-# Only allow canonical domain
-User-agent: Googlebot
-Crawl-delay: 1
 Allow: /
-
-User-agent: Bingbot
-Crawl-delay: 1
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
-# Block all other domains and redirects
-User-agent: *
-Disallow: /
-Host: https://www.wavementor.com
 
 # Prevent indexing of redirect URLs and duplicates
 Disallow: /*#
@@ -29,6 +9,24 @@ Disallow: /*?*redirect*
 Disallow: /*?utm_*
 Disallow: /*/amp
 Disallow: /*?*sessionid*
+Disallow: /admin/
+Disallow: /api/
+Disallow: /*/$
 
-# Canonical sitemap
+# Block specific crawlers that might cause issues
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: AhrefsBot
+Disallow: /
+
+# Canonical sitemap and host
+Host: https://www.wavementor.com
 Sitemap: https://www.wavementor.com/sitemap.xml
+
+# Crawl delays for better server performance
+User-agent: Googlebot
+Crawl-delay: 1
+
+User-agent: Bingbot
+Crawl-delay: 2
