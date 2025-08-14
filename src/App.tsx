@@ -33,6 +33,7 @@ import CommunityPage from '@/pages/CommunityPage';
 import MentorshipPage from '@/pages/MentorshipPage';
 import GamificationPage from '@/pages/GamificationPage';
 import SurfBlogPage from '@/pages/SurfBlogPage';
+import ExpandedSurfBlogPage from '@/pages/ExpandedSurfBlogPage';
 import SurfSpotDetailPage from '@/pages/SurfSpotDetailPage';
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 
@@ -73,7 +74,7 @@ function App() {
                 <Route path="/community" element={<CommunityPage />} />
                 <Route path="/mentorship" element={<MentorshipPage />} />
                 <Route path="/gamification" element={<GamificationPage />} />
-                <Route path="/surf-blog" element={<SurfBlogPage />} />
+                <Route path="/surf-blog" element={<ExpandedSurfBlogPage />} />
                 <Route path="/surf-spots/:spotId" element={<SurfSpotDetailPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>

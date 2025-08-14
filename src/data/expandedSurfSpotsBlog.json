@@ -1,0 +1,614 @@
+{
+  "new_surf_spots": [
+    {
+      "id": "skeleton-bay-namibia",
+      "name": "Skeleton Bay",
+      "location": "Namibia, Africa",
+      "country": "Namibia",
+      "difficulty": "Expert",
+      "wave_type": "Left-hand Barrel",
+      "best_season": "March-September",
+      "coordinates": [-23.0262, 14.1547],
+      "featured_image": "/images/skeleton-bay-hero.jpg",
+      "excerpt": "The world's longest left-hand barrel, offering rides over 2km through the Namib Desert's shifting sands.",
+      "rating": 5,
+      "crowd_level": "Very Low",
+      "break_type": "Sand Point Break",
+      "wave_direction": "Southwest",
+      "optimal_swell": "6-12ft Southwest",
+      "best_tide": "Mid to High",
+      "hazards": ["Remote Location", "Strong Currents", "Shifting Sandbar", "Desert Isolation"],
+      "nearby_spots": ["Donkey Bay", "Swakopmund", "Walvis Bay"],
+      "climate_outlook": {
+        "sea_level_impact": "Minimal due to desert geography",
+        "swell_pattern_changes": "Increasing storm frequency may enhance consistency",
+        "conservation_efforts": "Marine protected area establishment in progress"
+      },
+      "comparative_analysis": "While Pipeline offers powerful barrels in tropical paradise, Skeleton Bay delivers the world's longest rides in one of Earth's most remote locations. Where Pipeline breaks over coral reef, Skeleton Bay's sandbar creates mechanical perfection through desert winds.",
+      "emerging_spots": [
+        {
+          "name": "Donkey Bay",
+          "description": "A hidden gem 15km north, offering shorter but equally perfect barrels with warmer water"
+        },
+        {
+          "name": "Desert Rose",
+          "description": "Secret spot revealed only during specific wind patterns, creating ephemeral perfection"
+        }
+      ],
+      "community_voices": [
+        {
+          "type": "female_surfer",
+          "name": "Sarah Mitchell",
+          "quote": "Skeleton Bay taught me that solitude can be the greatest teacher. When it's just you and 2km of perfect barrel, you discover what you're truly made of."
+        },
+        {
+          "type": "shaper",
+          "name": "Klaus Weber",
+          "quote": "For Skeleton Bay, I craft boards with extra volume and rounded rails. The sand creates different dynamics than reef - you need forgiveness for the long rides."
+        },
+        {
+          "type": "environmental_activist",
+          "name": "David Kambazemba",
+          "quote": "This wave exists because of pristine desert winds meeting untouched ocean. Climate change threatens both ecosystems that create this miracle."
+        }
+      ],
+      "detailed_content": {
+        "introduction": "Skeleton Bay represents surfing's final frontier - a 2-kilometer left-hand barrel that unfolds through the Namib Desert's edge. This mechanical wave machine operates with Swiss precision, created by desert winds sculpting perfect sandbars.",
+        "wave_characteristics": "The wave breaks in distinct sections: The Ledge offers heavy takeoffs, The Raceway provides speed walls, and The End Section delivers final barrels. Sand creates forgiving wipeouts but constantly shifting bathymetry.",
+        "history": "Discovered by big wave surfer Grant 'Twiggy' Baker in 2008, Skeleton Bay remained largely secret until social media exposure. Its remote location still limits crowds to dedicated pilgrims.",
+        "local_knowledge": "Desert winds create afternoon glass-offs. Spring tides shift the sandbar weekly. Local 4WD access requires permits and desert driving experience.",
+        "equipment": "Boards: 6'6\"-7'2\" with extra volume for long rides. Wetsuits: 3/2mm for desert-cooled water. Essential: GPS navigation, emergency supplies.",
+        "accommodation": "Swakopmund offers the nearest accommodation, 45 minutes away. Camping permitted with permits. Desert Lodge provides luxury option with guided access."
+      }
+    },
+    {
+      "id": "raglan-new-zealand",
+      "name": "Raglan",
+      "location": "Waikato, New Zealand",
+      "country": "New Zealand",
+      "difficulty": "Intermediate to Advanced",
+      "wave_type": "Left-hand Point",
+      "best_season": "March-September",
+      "coordinates": [-37.7974, 174.8780],
+      "featured_image": "/images/raglan-hero.jpg",
+      "excerpt": "New Zealand's most famous left-hand point break, offering long rides and a laid-back surf culture.",
+      "rating": 4.5,
+      "crowd_level": "Medium",
+      "break_type": "Point Break",
+      "wave_direction": "West/Southwest",
+      "optimal_swell": "4-8ft Southwest",
+      "best_tide": "Mid",
+      "hazards": ["Cold Water", "Rocks", "Strong Rips"],
+      "nearby_spots": ["Indicators", "Whale Bay", "Manu Bay"],
+      "climate_outlook": {
+        "sea_level_impact": "Coastal erosion affecting access points",
+        "swell_pattern_changes": "Southern Ocean storms intensifying, creating larger swells",
+        "conservation_efforts": "Māori-led marine sanctuary protecting traditional fishing grounds"
+      },
+      "comparative_analysis": "While Jeffreys Bay delivers speed and precision, Raglan offers soul and style. Both are left-hand points, but Raglan's volcanic coastline creates more forgiving waves perfect for progressive surfing.",
+      "emerging_spots": [
+        {
+          "name": "Te Kopua",
+          "description": "Secret Māori spot accessible only at low tide, offering cultural immersion with world-class waves"
+        },
+        {
+          "name": "Ruapuke",
+          "description": "Offshore island break discovered by local fishermen, accessible only by boat"
+        }
+      ],
+      "community_voices": [
+        {
+          "type": "female_surfer",
+          "name": "Aroha Te Kahu",
+          "quote": "Raglan isn't just about waves - it's where our ancestors surfed. Every session connects us to thousands of years of Māori ocean culture."
+        },
+        {
+          "type": "shaper",
+          "name": "Maurice Cole",
+          "quote": "Raglan demands boards that blend performance with soul. I shape long, flowing rails that match the wave's rhythm - not fighting it, but dancing with it."
+        },
+        {
+          "type": "environmental_activist",
+          "name": "Rebecca Hosking",
+          "quote": "Raglan's black sand beaches are retreating due to rising seas. We're working with local iwi to implement nature-based coastal protection."
+        }
+      ],
+      "detailed_content": {
+        "introduction": "Raglan's left-hand points stretch along New Zealand's volcanic west coast, creating a surfer's paradise where Māori culture meets modern surf progression. Three main breaks offer waves for all abilities.",
+        "wave_characteristics": "Indicators offers long, mellow walls perfect for learning. The Point provides performance sections for aerials and carves. Whale Bay delivers powerful barrels for experts.",
+        "history": "Māori have surfed these waters for centuries on wooden boards called 'kōruru.' Modern surf culture began in the 1960s, establishing Raglan as New Zealand's surf capital.",
+        "local_knowledge": "West coast swells arrive year-round. Autumn delivers the most consistent waves. Black iron sand beaches can be scorching in summer, freezing in winter.",
+        "equipment": "Boards: 6'0\"-7'6\" depending on conditions and skill. Wetsuits: 4/3mm minimum, 5/4mm in winter. Booties essential for volcanic rocks.",
+        "accommodation": "Raglan town offers backpacker hostels to luxury lodges. Camping at Ngarunui Beach popular with surf travelers. Local cafes serve excellent coffee and organic food."
+      }
+    },
+    {
+      "id": "trestles-california",
+      "name": "Trestles",
+      "location": "San Clemente, California",
+      "country": "USA",
+      "difficulty": "Intermediate",
+      "wave_type": "Beach/Point Break",
+      "best_season": "August-October",
+      "coordinates": [33.3864, -117.5888],
+      "featured_image": "/images/trestles-hero.jpg",
+      "excerpt": "California's premier high-performance wave, where perfect cobblestone points meet consistent beach breaks.",
+      "rating": 4.5,
+      "crowd_level": "Very High",
+      "break_type": "Cobblestone Point/Beach Break",
+      "wave_direction": "South/Southwest",
+      "optimal_swell": "3-8ft South",
+      "best_tide": "Low to Mid",
+      "hazards": ["Crowds", "Aggressive Competition", "Marine Protected Area Regulations"],
+      "nearby_spots": ["San Onofre", "T-Street", "Church"],
+      "climate_outlook": {
+        "sea_level_impact": "Rising seas threatening coastal access trails",
+        "swell_pattern_changes": "Hurricane patterns shifting, affecting summer consistency",
+        "conservation_efforts": "Save Trestles coalition protecting wave from development"
+      },
+      "comparative_analysis": "While Hossegor delivers raw European power, Trestles offers Californian precision. Both are performance waves, but Trestles' cobblestone bottom creates more predictable sections.",
+      "emerging_spots": [
+        {
+          "name": "The Gravels",
+          "description": "North of Lowers, accessible only during negative tides, offering uncrowded performance waves"
+        },
+        {
+          "name": "Middles Inside",
+          "description": "Secret section that breaks during specific swell directions, known only to longtime locals"
+        }
+      ],
+      "community_voices": [
+        {
+          "type": "female_surfer",
+          "name": "Lakey Peterson",
+          "quote": "Trestles shaped my competitive surfing. Every section teaches you something new about high-performance maneuvers and wave reading."
+        },
+        {
+          "type": "shaper",
+          "name": "Matt Biolos",
+          "quote": "I design boards specifically for Trestles' predictable sections. Shorter, wider outlines with refined rails for quick direction changes."
+        },
+        {
+          "type": "environmental_activist",
+          "name": "Stefanie Sekich",
+          "quote": "Trestles exists because we fought off the toll road. Now we're fighting climate change - the next threat to this perfect wave."
+        }
+      ],
+      "detailed_content": {
+        "introduction": "Trestles represents the pinnacle of California's surf culture, where perfect cobblestone points create waves that have launched countless professional careers. The wave's consistency and quality make it a testing ground for the world's best.",
+        "wave_characteristics": "Lower Trestles offers the most perfect waves - fast, hollow rights with multiple sections. Uppers provides longer walls ideal for performance surfing. Middles bridges the gap between them.",
+        "history": "Named after railroad trestles that once crossed the creek, the area became a surf mecca in the 1960s. The Save Trestles movement successfully protected it from development in 2008.",
+        "local_knowledge": "South swells in summer and fall create the best conditions. Dawn patrol offers the cleanest waves before afternoon winds. Parking fills early on good swell days.",
+        "equipment": "Boards: 5'8\"-6'4\" high-performance shortboards. Spring suits in summer, 3/2mm fullsuits in winter. Competitive mindset essential.",
+        "accommodation": "San Clemente offers beach hotels and vacation rentals. Dana Point provides luxury resorts. Many surfers camp at nearby state beaches."
+      }
+    },
+    {
+      "id": "mundaka-spain",
+      "name": "Mundaka",
+      "location": "Basque Country, Spain",
+      "country": "Spain",
+      "difficulty": "Advanced to Expert",
+      "wave_type": "Left-hand Barrel",
+      "best_season": "September-November",
+      "coordinates": [43.4075, -2.6975],
+      "featured_image": "/images/mundaka-hero.jpg",
+      "excerpt": "Europe's most perfect left-hand barrel, created by river sediment and Atlantic storms.",
+      "rating": 5,
+      "crowd_level": "High",
+      "break_type": "River Mouth Sandbar",
+      "wave_direction": "Northwest",
+      "optimal_swell": "6-12ft Northwest",
+      "best_tide": "Low to Mid",
+      "hazards": ["Heavy Barrels", "Strong Currents", "Competitive Lineup"],
+      "nearby_spots": ["Bakio", "Sopelana", "Zarautz"],
+      "climate_outlook": {
+        "sea_level_impact": "River mouth dynamics changing with increased flooding",
+        "swell_pattern_changes": "Atlantic storm tracks shifting northward",
+        "conservation_efforts": "Biosphere Reserve protection balancing surfing and fishing"
+      },
+      "comparative_analysis": "While Teahupo'o delivers tropical power, Mundaka offers temperate precision. Both create perfect barrels, but Mundaka's sandbar allows for more forgiveness and progression.",
+      "emerging_spots": [
+        {
+          "name": "Meñakoz",
+          "description": "River mouth break 20km east, offering similar barrel potential with fewer crowds"
+        },
+        {
+          "name": "Deba River",
+          "description": "Seasonal sandbar break appearing only after winter storms reshape the coastline"
+        }
+      ],
+      "community_voices": [
+        {
+          "type": "female_surfer",
+          "name": "Garazi Sanchez",
+          "quote": "Mundaka taught me that perfect barrels come from understanding the ocean's rhythm. Each tide brings different possibilities."
+        },
+        {
+          "type": "shaper",
+          "name": "Pukas Surfboards",
+          "quote": "Mundaka demands boards with refined curves - not too much rocker for the fast sections, but enough for the barrel entries."
+        },
+        {
+          "type": "environmental_activist",
+          "name": "Cristina Olazabal",
+          "quote": "The river's health directly affects our wave. Protecting the watershed upstream is protecting Mundaka's future."
+        }
+      ],
+      "detailed_content": {
+        "introduction": "Mundaka stands as Europe's crown jewel, where the Oka River meets the Bay of Biscay to create perfect left-hand barrels. This UNESCO Biosphere Reserve combines world-class waves with rich Basque culture.",
+        "wave_characteristics": "The sandbar creates distinct sections: the Machine for heavy barrels, the Middle for speed walls, and the Inside for final tubes. River sediment constantly reshapes the bottom.",
+        "history": "Local fishermen surfed these waves for generations before international recognition in the 1980s. The WCT held competitions here from 1999-2009, cementing its legendary status.",
+        "local_knowledge": "Northwest storms create the best swells. River flow affects sandbar formation. Local fishermen's knowledge invaluable for reading conditions.",
+        "equipment": "Boards: 6'0\"-6'8\" with moderate rocker for speed and barrels. Wetsuits: 4/3mm minimum, 5/4mm in winter. Helmet recommended for heavy sessions.",
+        "accommodation": "Mundaka village offers charming guesthouses. Bilbao provides urban amenities 45 minutes away. Local pintxos bars serve excellent Basque cuisine."
+      }
+    },
+    {
+      "id": "padang-padang-bali",
+      "name": "Padang Padang",
+      "location": "Uluwatu, Bali",
+      "country": "Indonesia",
+      "difficulty": "Intermediate to Advanced",
+      "wave_type": "Left-hand Barrel",
+      "best_season": "April-October",
+      "coordinates": [-8.8472, 115.0850],
+      "featured_image": "/images/padang-padang-hero.jpg",
+      "excerpt": "The Balinese tube that catapulted into fame, offering perfect barrels in a stunning tropical setting.",
+      "rating": 4.5,
+      "crowd_level": "Very High",
+      "break_type": "Reef Break",
+      "wave_direction": "Southwest",
+      "optimal_swell": "4-8ft Southwest",
+      "best_tide": "Mid to Low",
+      "hazards": ["Sharp Reef", "Strong Currents", "Extreme Crowds", "Shallow Water"],
+      "nearby_spots": ["Uluwatu", "Bingin", "Impossibles"],
+      "climate_outlook": {
+        "sea_level_impact": "Reef exposure timing changing with higher sea levels",
+        "swell_pattern_changes": "Indian Ocean patterns shifting due to temperature changes",
+        "conservation_efforts": "Coral restoration projects protecting wave quality"
+      },
+      "comparative_analysis": "While Uluwatu offers consistent power, Padang Padang provides more accessible barrels. Both break over reef, but Padang's shallower depth creates more intense experiences.",
+      "emerging_spots": [
+        {
+          "name": "Hidden Valley",
+          "description": "Secret cave break accessible only during low tide, offering barrel rides away from crowds"
+        },
+        {
+          "name": "Mushroom Rock",
+          "description": "Offshore bombie visible only during big swells, creating perfect A-frame peaks"
+        }
+      ],
+      "community_voices": [
+        {
+          "type": "female_surfer",
+          "name": "Dhea Nataraj",
+          "quote": "Padang Padang is where I learned to read reef breaks. Every wave teaches you respect for the ocean's power and beauty."
+        },
+        {
+          "type": "shaper",
+          "name": "Made Wiradana",
+          "quote": "For Padang's shallow reef, I craft boards with pulled-in tails and moderate rocker - precision tools for precision waves."
+        },
+        {
+          "type": "environmental_activist",
+          "name": "Ayu Trisna",
+          "quote": "Tourism pressure threatens our reefs. We're teaching visitors that protecting coral means protecting perfect waves."
+        }
+      ],
+      "detailed_content": {
+        "introduction": "Padang Padang burst onto the global surf scene through 'Eat Pray Love,' transforming from local secret to world-famous destination. This perfect left-hand tube embodies Bali's surf magic.",
+        "wave_characteristics": "The wave breaks over sharp coral reef, creating fast, shallow barrels. Different tide heights offer varying levels of difficulty and danger.",
+        "history": "Known to locals for generations, international recognition came in the 2000s. Hollywood exposure brought massive crowds, changing the break's character forever.",
+        "local_knowledge": "Southwest swells during dry season create best conditions. High tide safer for beginners. Ceremony schedule affects local access.",
+        "equipment": "Boards: 5'10\"-6'4\" with reef-specific design. Reef booties essential. Indo-specific wax for tropical conditions.",
+        "accommodation": "Uluwatu area offers everything from backpacker warungs to luxury villas. Booking essential during peak season."
+      }
+    },
+    {
+      "id": "chicama-peru",
+      "name": "Chicama",
+      "location": "La Libertad, Peru",
+      "country": "Peru",
+      "difficulty": "Intermediate to Advanced",
+      "wave_type": "Left-hand Point",
+      "best_season": "March-September",
+      "coordinates": [-7.8461, -79.4658],
+      "featured_image": "/images/chicama-hero.jpg",
+      "excerpt": "The world's longest left-hand wave, offering 2-kilometer rides along Peru's desert coast.",
+      "rating": 4.5,
+      "crowd_level": "Medium",
+      "break_type": "Point Break",
+      "wave_direction": "Southwest",
+      "optimal_swell": "4-8ft Southwest",
+      "best_tide": "All Tides",
+      "hazards": ["Long Rides", "Desert Sun", "Remote Location"],
+      "nearby_spots": ["Huanchaco", "Pacasmayo", "Malabrigo"],
+      "climate_outlook": {
+        "sea_level_impact": "Coastal erosion affecting point stability",
+        "swell_pattern_changes": "El Niño patterns intensifying, creating more variable conditions",
+        "conservation_efforts": "Local fishermen collaborating on marine protection"
+      },
+      "comparative_analysis": "While Skeleton Bay offers desert barrels, Chicama provides desert point perfection. Both are incredibly long rides, but Chicama's consistency makes it more accessible for progression.",
+      "emerging_spots": [
+        {
+          "name": "El Huaro",
+          "description": "Northern section accessible only during big swells, offering perfect waves without the crowds"
+        },
+        {
+          "name": "La Bocana",
+          "description": "River mouth break creating perfect peaks during rainy season floods"
+        }
+      ],
+      "community_voices": [
+        {
+          "type": "female_surfer",
+          "name": "Sofia Mulanovich",
+          "quote": "Chicama shaped my competitive style - those long rides teach you to link maneuvers like nowhere else on Earth."
+        },
+        {
+          "type": "shaper",
+          "name": "Carlos Dogny",
+          "quote": "Chicama boards need extra length for paddle power and stability during those epic 2-kilometer rides."
+        },
+        {
+          "type": "environmental_activist",
+          "name": "Miguel Torres",
+          "quote": "Industrial development threatens our perfect wave. We're fighting to protect Peru's surf heritage for future generations."
+        }
+      ],
+      "detailed_content": {
+        "introduction": "Chicama offers the ultimate test of surfing endurance, where 2-kilometer rides challenge both skill and stamina. This Peruvian point break represents South America's surf crown jewel.",
+        "wave_characteristics": "Four distinct sections create the world's longest ride: The Point, Malpaso, Keys, and El Hombre. Each offers different challenges and opportunities.",
+        "history": "Local fishermen rode waves here for centuries on traditional caballitos de totora. Modern discovery came in the 1960s, with international recognition growing slowly.",
+        "local_knowledge": "Winter swells provide most consistent conditions. Desert winds create offshore conditions most afternoons. UV protection essential in high-altitude sun.",
+        "equipment": "Boards: 6'6\"-7'6\" with extra paddle power for long sessions. High SPF sunscreen and sun protection mandatory.",
+        "accommodation": "Chicama village offers basic accommodation. Puerto Malabrigo provides more amenities. Many surfers camp on the beach."
+      }
+    },
+    {
+      "id": "kirra-australia",
+      "name": "Kirra",
+      "location": "Gold Coast, Australia",
+      "country": "Australia",
+      "difficulty": "Advanced to Expert",
+      "wave_type": "Right-hand Barrel",
+      "best_season": "February-May",
+      "coordinates": [-28.1697, 153.5358],
+      "featured_image": "/images/kirra-hero.jpg",
+      "excerpt": "The Gold Coast's most perfect barrel, offering Superbank quality with less crowds at the southern end.",
+      "rating": 4.5,
+      "crowd_level": "High",
+      "break_type": "Sand Point Break",
+      "wave_direction": "East/Southeast",
+      "optimal_swell": "3-6ft East",
+      "best_tide": "Low to Mid",
+      "hazards": ["Heavy Barrels", "Shallow Sandbar", "Competitive Lineup"],
+      "nearby_spots": ["Superbank", "Snapper Rocks", "Point Danger"],
+      "climate_outlook": {
+        "sea_level_impact": "Beach nourishment programs adapting to rising seas",
+        "swell_pattern_changes": "Cyclone patterns shifting, affecting summer consistency",
+        "conservation_efforts": "Tweed River sand bypass protecting surf breaks"
+      },
+      "comparative_analysis": "While Superbank offers machine-like consistency, Kirra provides soul and power. Both are Gold Coast gems, but Kirra's deeper barrels separate the experts from the crowd.",
+      "emerging_spots": [
+        {
+          "name": "Kirra Inside",
+          "description": "Inner section breaking during bigger swells, offering perfect practice barrels"
+        },
+        {
+          "name": "The Alley",
+          "description": "Southern corner accessible only during specific sand movements"
+        }
+      ],
+      "community_voices": [
+        {
+          "type": "female_surfer",
+          "name": "Stephanie Gilmore",
+          "quote": "Kirra taught me barrel riding - those perfect cylinders demand complete commitment and trust in your instincts."
+        },
+        {
+          "type": "shaper",
+          "name": "Simon Anderson",
+          "quote": "Kirra boards need precise curves for barrel riding - enough rocker for late drops, but not too much for the race sections."
+        },
+        {
+          "type": "environmental_activist",
+          "name": "Dave Rastovich",
+          "quote": "Protecting Kirra means understanding how sand movement creates perfect waves. Natural systems need our respect and protection."
+        }
+      ],
+      "detailed_content": {
+        "introduction": "Kirra represents the Gold Coast's barrel-riding pinnacle, where sand dredging operations accidentally created one of surfing's most perfect tubes. This mechanical wave machine continues to evolve.",
+        "wave_characteristics": "Kirra breaks in powerful, hollow sections perfect for barrel riding. The sandbar constantly shifts, creating different wave characteristics throughout the year.",
+        "history": "Originally a natural point break, sand pumping operations in the 1990s transformed Kirra into a world-class barrel. The Superbank phenomenon extended quality waves southward.",
+        "local_knowledge": "Cyclone swells create the best barrel conditions. Early morning offers cleanest waves before sea breezes. Sand movement affects break quality significantly.",
+        "equipment": "Boards: 5'10\"-6'4\" designed specifically for barrel riding. Board shorts in summer, spring suits in winter.",
+        "accommodation": "Coolangatta offers everything from backpacker hostels to luxury resorts. Kirra Beach provides direct beach access."
+      }
+    },
+    {
+      "id": "pasta-point-maldives",
+      "name": "Pasta Point",
+      "location": "North Malé Atoll, Maldives",
+      "country": "Maldives",
+      "difficulty": "Advanced",
+      "wave_type": "Right-hand Barrel",
+      "best_season": "March-October",
+      "coordinates": [4.7064, 73.4647],
+      "featured_image": "/images/pasta-point-hero.jpg",
+      "excerpt": "The Maldives' most consistent barrel, offering perfect tubes in crystal-clear tropical waters.",
+      "rating": 4.5,
+      "crowd_level": "Medium",
+      "break_type": "Reef Break",
+      "wave_direction": "South/Southwest",
+      "optimal_swell": "4-8ft South",
+      "best_tide": "Low to Mid",
+      "hazards": ["Sharp Reef", "Strong Currents", "Remote Location", "Expensive Access"],
+      "nearby_spots": ["Sultans", "Jailbreaks", "Cokes"],
+      "climate_outlook": {
+        "sea_level_impact": "Extreme vulnerability as nation's highest point is 2.4m above sea level",
+        "swell_pattern_changes": "Indian Ocean warming affecting monsoon patterns",
+        "conservation_efforts": "Marine protected areas balancing tourism and conservation"
+      },
+      "comparative_analysis": "While Cloudbreak offers Fijian power, Pasta Point provides Maldivian precision. Both are tropical reef breaks, but Pasta Point's consistency makes it more accessible for traveling surfers.",
+      "emerging_spots": [
+        {
+          "name": "Secret Spot",
+          "description": "Unnamed break discovered by local guides, accessible only by traditional dhoni boats"
+        },
+        {
+          "name": "Ying Yang",
+          "description": "Left-right combination break visible only during specific tide and swell combinations"
+        }
+      ],
+      "community_voices": [
+        {
+          "type": "female_surfer",
+          "name": "Tara Ruttledge",
+          "quote": "Pasta Point's perfection lies in its predictability - every wave offers a makeable barrel if you commit fully."
+        },
+        {
+          "type": "shaper",
+          "name": "Ashley Lloyd",
+          "quote": "Maldivian reef breaks demand boards with precise reef-riding characteristics - sharp rails, moderate rocker, bulletproof construction."
+        },
+        {
+          "type": "environmental_activist",
+          "name": "Ibrahim Mohamed",
+          "quote": "Our entire nation depends on healthy reefs. Protecting coral means protecting our waves, our fish, and our future."
+        }
+      ],
+      "detailed_content": {
+        "introduction": "Pasta Point represents the Maldives' surf perfection, where consistent Indian Ocean swells meet pristine coral reefs to create world-class barrels in paradise.",
+        "wave_characteristics": "The right-hand barrel offers multiple sections with perfect cylindrical tubes. Crystal-clear water allows surfers to see the reef throughout the ride.",
+        "history": "Discovered by traveling surfers in the 1990s, Pasta Point quickly became a Maldivian surf icon. Resort development brought both access and environmental concerns.",
+        "local_knowledge": "Southwest monsoon provides most consistent swells. Morning sessions offer cleanest conditions. Respect for local fishing traditions essential.",
+        "equipment": "Boards: 6'0\"-6'8\" reef-specific designs. Reef booties mandatory. Tropical wax and high SPF protection essential.",
+        "accommodation": "Resort-based surfing only - various price levels available. Surf charter boats offer alternative access to multiple breaks."
+      }
+    },
+    {
+      "id": "punta-de-lobos-chile",
+      "name": "Punta de Lobos",
+      "location": "Valparaíso, Chile",
+      "country": "Chile",
+      "difficulty": "Advanced to Expert",
+      "wave_type": "Right-hand Point",
+      "best_season": "March-September",
+      "coordinates": [-33.9694, -71.6542],
+      "featured_image": "/images/punta-de-lobos-hero.jpg",
+      "excerpt": "Chile's premier big wave break, offering powerful right-hand points with Andes mountain backdrops.",
+      "rating": 4.5,
+      "crowd_level": "Medium",
+      "break_type": "Rocky Point Break",
+      "wave_direction": "Southwest",
+      "optimal_swell": "6-15ft Southwest",
+      "best_tide": "Mid to High",
+      "hazards": ["Big Waves", "Rocky Bottom", "Cold Water", "Strong Currents"],
+      "nearby_spots": ["La Bocana", "Topocalma", "Matanzas"],
+      "climate_outlook": {
+        "sea_level_impact": "Coastal erosion affecting cliff stability and access",
+        "swell_pattern_changes": "Southern Ocean storm tracks shifting with climate change",
+        "conservation_efforts": "World Surfing Reserve protection balancing conservation and access"
+      },
+      "comparative_analysis": "While Mavericks delivers cold-water power, Punta de Lobos offers Andean drama. Both are big wave breaks, but Chile's consistent swells make it more predictable for progression.",
+      "emerging_spots": [
+        {
+          "name": "El Buey",
+          "description": "Heavy water spot breaking only during massive swells, offering XXL barrels for experts only"
+        },
+        {
+          "name": "Las Piedras",
+          "description": "Protected cove break offering smaller waves perfect for progression and learning"
+        }
+      ],
+      "community_voices": [
+        {
+          "type": "female_surfer",
+          "name": "Lorena Fica",
+          "quote": "Punta de Lobos demands complete respect - the wave, the cold water, and the powerful ocean teach humility with every session."
+        },
+        {
+          "type": "shaper",
+          "name": "Felipe Pomar",
+          "quote": "Chilean waves need boards that handle power and cold water - extra thickness, refined curves, and bulletproof construction."
+        },
+        {
+          "type": "environmental_activist",
+          "name": "Cristian Merello",
+          "quote": "As Chile's first World Surfing Reserve, Punta de Lobos shows how surfing can lead ocean conservation efforts."
+        }
+      ],
+      "detailed_content": {
+        "introduction": "Punta de Lobos stands as South America's big wave proving ground, where consistent Southern Ocean swells meet dramatic Chilean coastline to create world-class surf conditions.",
+        "wave_characteristics": "The main break offers powerful right-hand waves with multiple sections. Smaller inside waves provide progression opportunities. Rocky bottom creates consistent wave shape.",
+        "history": "Local fishermen have ridden waves here for generations. International recognition came through big wave pioneers in the 2000s. World Surfing Reserve designation in 2017.",
+        "local_knowledge": "Autumn and winter deliver biggest swells. Spring offers cleaner conditions. Local fish markets provide fresh seafood and cultural immersion.",
+        "equipment": "Boards: 6'6\"-8'0\" depending on conditions. 5/4mm wetsuits minimum, 6/5mm for winter. Safety equipment recommended for big days.",
+        "accommodation": "Pichilemu town offers hostels to hotels. Local families provide homestay experiences. Camping permitted at designated areas."
+      }
+    },
+    {
+      "id": "the-bubble-fuerteventura",
+      "name": "The Bubble",
+      "location": "Fuerteventura, Canary Islands",
+      "country": "Spain",
+      "difficulty": "Expert",
+      "wave_type": "Left-hand Barrel",
+      "best_season": "October-March",
+      "coordinates": [28.4054, -13.8869],
+      "featured_image": "/images/the-bubble-hero.jpg",
+      "excerpt": "Fuerteventura's heaviest wave, offering perfect barrels in Europe's Atlantic frontier.",
+      "rating": 4.5,
+      "crowd_level": "Low to Medium",
+      "break_type": "Reef Break",
+      "wave_direction": "Northwest",
+      "optimal_swell": "6-12ft Northwest",
+      "best_tide": "Low to Mid",
+      "hazards": ["Heavy Wave", "Sharp Lava Reef", "Remote Location", "Strong Winds"],
+      "nearby_spots": ["Rocky Point", "Esquinzo", "Cotillo"],
+      "climate_outlook": {
+        "sea_level_impact": "Volcanic coastline relatively stable but access points vulnerable",
+        "swell_pattern_changes": "Atlantic storm patterns intensifying due to warming waters",
+        "conservation_efforts": "Marine protected areas balancing fishing and surfing interests"
+      },
+      "comparative_analysis": "While Mundaka offers river-mouth perfection, The Bubble delivers volcanic power. Both are European barrel machines, but The Bubble's isolation creates a more raw experience.",
+      "emerging_spots": [
+        {
+          "name": "Lava Tubes",
+          "description": "Underground break accessible only during specific tide and swell combinations"
+        },
+        {
+          "name": "Shipwreck Point",
+          "description": "Historic wreck site creating unique wave dynamics during winter swells"
+        }
+      ],
+      "community_voices": [
+        {
+          "type": "female_surfer",
+          "name": "Andrea Moller",
+          "quote": "The Bubble taught me that European waves can be as powerful as anywhere - volcanic reefs create incredibly intense experiences."
+        },
+        {
+          "type": "shaper",
+          "name": "Xanadu Surfboards",
+          "quote": "Canary Island waves demand boards that handle both power and precision - thick, strong, and responsive for volcanic reef breaks."
+        },
+        {
+          "type": "environmental_activist",
+          "name": "Carlos Navarro",
+          "quote": "Protecting Fuerteventura's marine ecosystem means understanding how volcanic reefs create perfect waves - nature's engineering at its finest."
+        }
+      ],
+      "detailed_content": {
+        "introduction": "The Bubble represents Europe's heaviest wave, where Atlantic swells meet volcanic reefs to create perfect but dangerous barrels in the Canary Islands' dramatic landscape.",
+        "wave_characteristics": "The left-hand barrel breaks over sharp lava reef, creating fast, hollow tubes. Different swell directions offer varying levels of intensity and danger.",
+        "history": "Discovered by traveling European surfers seeking warm water alternatives to cold Atlantic breaks. Local windsurfers and fishermen provided initial access knowledge.",
+        "local_knowledge": "Winter Atlantic storms provide best swells. Trade winds create challenging conditions. Volcanic landscape offers dramatic scenery but harsh environment.",
+        "equipment": "Boards: 6'0\"-6'8\" designed for reef breaks. 3/2mm wetsuits in winter, boardshorts in summer. Reef protection essential.",
+        "accommodation": "Corralejo offers tourist amenities. Local villages provide authentic Spanish island culture. Vacation rentals popular among surf travelers."
+      }
+    }
+  ]
+}
