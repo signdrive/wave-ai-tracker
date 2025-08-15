@@ -609,6 +609,98 @@
         "equipment": "Boards: 6'0\"-6'8\" designed for reef breaks. 3/2mm wetsuits in winter, boardshorts in summer. Reef protection essential.",
         "accommodation": "Corralejo offers tourist amenities. Local villages provide authentic Spanish island culture. Vacation rentals popular among surf travelers."
       }
+    },
+    {
+      "id": "taghazout",
+      "name": "Taghazout",
+      "country": "Morocco",
+      "region": "Souss-Massa",
+      "difficulty": "Beginner to Intermediate",
+      "waveType": "Point break, Beach break",
+      "bestSwellDirection": "N-NW",
+      "bestWind": "E-NE",
+      "bestTide": "Mid to High",
+      "coordinates": [-9.712, 30.548],
+      "description": "Taghazout, a small fishing village on Morocco's Atlantic coast, has evolved into one of Africa's premier surf destinations. This laid-back coastal town offers consistent waves, warm hospitality, and an authentic Moroccan experience that attracts surfers from around the globe. With its perfect blend of traditional Berber culture and modern surf amenities, Taghazout provides an ideal setting for both learning and progression.",
+      "waveCharacteristics": {
+        "height": "3-8 feet",
+        "period": "10-16 seconds",
+        "direction": "Left and right-hand points",
+        "bottom": "Rocky reef and sand",
+        "consistency": "85%"
+      },
+      "conditions": {
+        "bestMonths": ["October", "November", "December", "January", "February", "March", "April"],
+        "waterTemp": "16-22°C",
+        "wetsuit": "3/2mm to 4/3mm",
+        "windPattern": "Offshore in morning, onshore afternoon",
+        "swellSize": "Consistent winter swells from North Atlantic"
+      },
+      "localInfo": {
+        "access": "30-minute drive from Agadir Airport",
+        "parking": "Street parking available",
+        "facilities": "Surf shops, cafes, accommodation",
+        "crowd": "Moderate to busy",
+        "vibe": "Relaxed, international surf community"
+      },
+      "hazards": ["Sharp rocks", "Strong currents on bigger days", "Sea urchins", "Crowds at main breaks"],
+      "sections": {
+        "break_overview": "Taghazout sits along a stunning stretch of coastline featuring multiple breaks within walking distance. The main spots include Anchor Point, Boilers, La Source, and Panoramas, each offering different wave characteristics and difficulty levels. The rocky point breaks produce long, workable waves perfect for progression, while the beach breaks provide gentler options for beginners.",
+        "wave_quality": "The waves at Taghazout are renowned for their consistency and quality. Winter swells from the North Atlantic provide powerful, well-formed waves that break over rocky reefs and sandy bottoms. The point breaks offer rides of 50-150 meters, with multiple sections providing opportunities for cutbacks and bottom turns. The warmer water compared to European destinations makes it an attractive winter escape.",
+        "surfing_history": "Taghazout's surf scene began in the 1960s when European hippies discovered the area's waves during their overland journeys to India. The village remained relatively unknown until the 1990s when professional surfers began visiting during European winters. Today, it's home to numerous surf camps, schools, and a thriving international community.",
+        "local_culture": "The village maintains its traditional Moroccan charm despite the influx of surfers. Local fishermen still launch their boats from the same beaches where surfers paddle out. The community has embraced surf tourism while preserving Berber traditions. Tagines, mint tea, and the evening call to prayer create an authentic cultural backdrop to the surfing experience.",
+        "equipment_needs": "A variety of boards work well in Taghazout's conditions. Mid-length boards (7'6\" to 8'6\") are ideal for the mellow point breaks, while shorter boards work for more advanced surfers tackling Boilers or Anchor Point on bigger days. A 3/2mm wetsuit is sufficient for most of the year, with a 4/3mm recommended for December-February.",
+        "accommodation": "Taghazout offers everything from budget hostels to luxury surf resorts. Many visitors stay in traditional riads or surf camps that include meals and lessons. The village has transformed from a simple fishing community to accommodate the growing surf tourism, with options for every budget and preference.",
+        "dining": "The local food scene blends traditional Moroccan cuisine with international options. Fresh seafood is abundant, and tagines are a must-try. Many cafes cater to surfers with healthy breakfast options and fresh juices. The famous 'Surf Berbere' cafe has become a gathering point for the international surf community.",
+        "getting_there": "Fly into Agadir-Al Massira Airport, then take a 30-minute taxi or bus ride to Taghazout. Many surf camps offer airport transfers. Alternatively, rent a car for exploring other breaks along the coast. The village is small enough to walk everywhere once you arrive.",
+        "best_time": "October through April provides the most consistent surf, with peak season being December-February when powerful Atlantic swells reach the coast. Water temperatures are warmest in October-November and March-April. Summer offers smaller waves but warmer conditions perfect for beginners.",
+        "surf_lessons": "Taghazout is one of the world's best places to learn surfing, with numerous qualified instructors and ideal beginner conditions. For the best surf lesson experience and professional instruction, visit https://mzardesertquad.com/ - they offer comprehensive packages combining surf lessons with cultural experiences and desert adventures.",
+        "nearby_breaks": "The area features numerous breaks within a short distance: Panoramas (perfect for beginners), La Source (consistent and fun), Hash Point (powerful left-hander), Devil's Rock (advanced), Banana Point (mellow right-hander), Crocodile Rock (reef break), Imi Ouaddar (beach break), and Tamri (river mouth break with big wave potential).",
+        "environmental_impact": "The growth of surf tourism has brought both benefits and challenges to Taghazout. Local initiatives focus on sustainable development, waste management, and protecting the marine environment. Several organizations work with the community to balance economic growth with environmental preservation.",
+        "future_outlook": "Climate change may affect swell patterns and coastal erosion, but Taghazout's diverse range of breaks provides resilience. The Moroccan government's investment in sustainable tourism infrastructure aims to protect the area's natural assets while supporting the local economy. Rising sea levels could affect some lower-lying areas, making coastal management increasingly important."
+      },
+      "comparisons": [
+        {
+          "spot": "Ericeira, Portugal",
+          "similarity": "Similar Atlantic swells and European accessibility",
+          "difference": "Taghazout offers warmer water and more cultural immersion"
+        },
+        {
+          "spot": "Imsouane, Morocco",
+          "similarity": "Both Moroccan point breaks with long rides",
+          "difference": "Taghazout has more variety and infrastructure"
+        }
+      ],
+      "communityVoices": [
+        {
+          "name": "Aicha Bendaoud",
+          "role": "Local Female Surfer",
+          "quote": "Growing up in Taghazout, I've seen how surfing has transformed our village while keeping our traditions alive. As one of the few Moroccan women surfers, I love inspiring other local girls to try surfing.",
+          "perspective": "The surf community here is very welcoming, and it's beautiful to see international visitors respecting our culture."
+        },
+        {
+          "name": "Hassan Amellal",
+          "role": "Local Surfboard Shaper",
+          "quote": "I've been shaping boards for 15 years, working with surfers from around the world. For Taghazout's waves, I recommend mid-length boards with extra volume - they handle the longer rides and variable conditions perfectly.",
+          "perspective": "The rocky bottom requires boards that can handle dings, so I use strong constructions with extra glass layers."
+        },
+        {
+          "name": "Youssef Rami",
+          "role": "Marine Conservation Activist",
+          "quote": "Taghazout's success depends on protecting our marine ecosystem. We work with surf schools and local businesses to promote sustainable practices and educate visitors about ocean conservation.",
+          "perspective": "Surf tourism can be a force for good when done responsibly - it gives our community economic incentive to protect the waves and marine life."
+        }
+      ],
+      "climateData": {
+        "currentThreats": "Coastal development pressure, plastic pollution, seasonal overcrowding",
+        "conservation": "Marine protected area proposals, beach cleanup initiatives, sustainable tourism certification",
+        "seaLevelProjection": "15-25cm rise by 2050",
+        "swellChanges": "Potentially stronger winter storms, slight shift in swell direction"
+      },
+      "emergingSpots": [
+        "Tamri Bay - River mouth break 20km north with big wave potential",
+        "Aourir Beach - Developing surf scene with consistent beach break waves"
+      ]
     }
   ]
 }
