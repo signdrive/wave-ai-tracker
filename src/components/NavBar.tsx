@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Waves, BarChart3, Calendar, Map, User, Shield, Settings, Trophy, Bell, TrendingUp, Search, AlertTriangle, ShoppingBag, GraduationCap, Plane, Cloud, Users, UserPlus, Zap } from 'lucide-react';
+import { Menu, X, Waves, BarChart3, Calendar, Map, User, Shield, Settings, Trophy, Bell, TrendingUp, Search, AlertTriangle, ShoppingBag, GraduationCap, Plane, Cloud, Users, UserPlus, Zap, BookOpen, Star, Camera, Brain, Target } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { useAuth } from '@/hooks/useAuth';
 import { useMentorship } from '@/hooks/useMentorship';
@@ -23,11 +23,34 @@ const NavBar = () => {
   };
 
   const navItems = [
+    // Core Features
     { path: '/', label: 'Dashboard', icon: BarChart3, description: 'Surf conditions summary' },
-    { path: '/live-spots', label: 'Live Spots', icon: Waves, description: 'AI camera feeds' },
-    { path: '/surf-blog', label: 'Surf Blog', icon: Search, description: 'World\'s best surf spots guide' },
-    { path: '/marketplace', label: 'Marketplace', icon: ShoppingBag, description: 'Buy & sell surf gear' },
+    { path: '/live-spots', label: 'Live Spots', icon: Camera, description: 'AI camera feeds' },
+    { path: '/map', label: 'Map', icon: Map, description: 'Interactive surf spot map' },
+    { path: '/surf-log', label: 'Surf Log', icon: BookOpen, description: 'Track your sessions' },
+    
+    // Learning & Growth
     { path: '/lessons', label: 'Lessons', icon: GraduationCap, description: 'Book surf lessons with instructors' },
+    { path: '/mentorship', label: 'Mentorship', icon: Users, description: 'Connect with mentors' },
+    { path: '/challenges', label: 'Challenges', icon: Target, description: 'Surf challenges & goals' },
+    { path: '/gamification', label: 'Gamification', icon: Trophy, description: 'Achievements & rewards' },
+    
+    // Community & Social
+    { path: '/community', label: 'Community', icon: Users, description: 'Connect with surfers' },
+    { path: '/discovery', label: 'Discovery', icon: Search, description: 'Discover new spots' },
+    { path: '/book-sessions', label: 'Sessions', icon: Calendar, description: 'Book surf sessions' },
+    
+    // Premium & Commerce
+    { path: '/premium', label: 'Premium', icon: Zap, description: 'Premium features' },
+    { path: '/premium-weather', label: 'Weather+', icon: Cloud, description: 'Premium weather data' },
+    { path: '/marketplace', label: 'Marketplace', icon: ShoppingBag, description: 'Buy & sell surf gear' },
+    { path: '/travel', label: 'Travel', icon: Plane, description: 'Surf travel packages' },
+    
+    // Content & Tools
+    { path: '/surf-blog', label: 'Surf Blog', icon: Waves, description: 'World\'s best surf spots guide' },
+    { path: '/analytics', label: 'Analytics', icon: TrendingUp, description: 'Performance analytics' },
+    { path: '/notifications', label: 'Notifications', icon: Bell, description: 'Alerts & updates' },
+    { path: '/safety', label: 'Safety', icon: AlertTriangle, description: 'Safety information' },
   ];
 
   // Add admin links for admin users
