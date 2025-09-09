@@ -31,12 +31,18 @@ const NavBar = () => {
   // Core navigation items (always visible)
   const coreNavItems = [
     { path: '/', label: 'Dashboard', icon: BarChart3, description: 'Surf conditions summary' },
-    { path: '/live-spots', label: 'Live Spots', icon: Camera, description: 'AI camera feeds' },
-    { path: '/map', label: 'Map', icon: Map, description: 'Interactive surf spot map' },
   ];
 
   // Grouped navigation items for dropdowns
   const menuGroups = {
+    spots: {
+      label: 'Surf Spots',
+      icon: Map,
+      items: [
+        { path: '/live-spots', label: 'Live Spots', icon: Camera, description: 'AI camera feeds' },
+        { path: '/map', label: 'Map', icon: Map, description: 'Interactive surf spot map' },
+      ]
+    },
     learning: {
       label: 'Learning',
       icon: GraduationCap,
