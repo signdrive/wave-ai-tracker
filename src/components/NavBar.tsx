@@ -29,9 +29,7 @@ const NavBar = () => {
   };
 
   // Core navigation items (always visible)
-  const coreNavItems = [
-    { path: '/', label: 'Dashboard', icon: BarChart3, description: 'Surf conditions summary' },
-  ];
+  const coreNavItems: any[] = [];
 
   // Grouped navigation items for dropdowns
   const menuGroups = {
@@ -77,6 +75,7 @@ const NavBar = () => {
       label: 'Tools',
       icon: Settings,
       items: [
+        { path: '/', label: 'Dashboard', icon: BarChart3, description: 'Surf conditions summary' },
         { path: '/surf-blog', label: 'Surf Blog', icon: Waves, description: 'World\'s best surf spots guide' },
         { path: '/analytics', label: 'Analytics', icon: TrendingUp, description: 'Performance analytics' },
         { path: '/notifications', label: 'Notifications', icon: Bell, description: 'Alerts & updates' },
