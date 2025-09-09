@@ -129,12 +129,7 @@ const CanonicalUrl = () => {
       "isPartOf": {
         "@type": "WebSite",
         "name": "WaveMentor",
-        "url": baseUrl,
-        "potentialAction": {
-          "@type": "SearchAction",
-          "target": `${baseUrl}/search?q={search_term_string}`,
-          "query-input": "required name=search_term_string"
-        }
+        "url": baseUrl
       }
     };
 
