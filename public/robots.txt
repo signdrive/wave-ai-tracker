@@ -11,7 +11,8 @@ Disallow: /*/amp
 Disallow: /*?*sessionid*
 Disallow: /admin/
 Disallow: /api/
-Disallow: /*/$
+Disallow: /auth/callback
+# Remove trailing slash blocking to prevent issues
 
 # Block specific crawlers that might cause issues
 User-agent: SemrushBot
