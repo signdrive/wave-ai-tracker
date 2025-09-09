@@ -73,6 +73,9 @@ export default defineConfig(({ mode }) => {
           },
         },
       },
+      // CSS optimization to reduce render-blocking
+      cssCodeSplit: true,
+      cssMinify: true,
       // Enable source maps in production for debugging
       sourcemap: mode === 'production' ? 'hidden' : true,
       // Optimize bundle size
