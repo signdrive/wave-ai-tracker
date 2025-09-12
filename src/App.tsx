@@ -35,6 +35,7 @@ import GamificationPage from '@/pages/GamificationPage';
 import SurfBlogPage from '@/pages/SurfBlogPage';
 import ExpandedSurfBlogPage from '@/pages/ExpandedSurfBlogPage';
 import SurfSpotDetailPage from '@/pages/SurfSpotDetailPage';
+import SearchPage from '@/pages/SearchPage';
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 
 const queryClient = new QueryClient();
@@ -74,6 +75,7 @@ function App() {
                 <Route path="/community" element={<CommunityPage />} />
                 <Route path="/mentorship" element={<MentorshipPage />} />
                 <Route path="/gamification" element={<GamificationPage />} />
+                <Route path="/search" element={<SearchPage />} />
                 <Route path="/surf-blog" element={<ExpandedSurfBlogPage />} />
                 <Route path="/surf-spots/:spotId" element={<SurfSpotDetailPage />} />
                 <Route path="*" element={<NotFound />} />

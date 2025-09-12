@@ -6,10 +6,22 @@ import SessionLogger from '@/components/SessionLogger';
 import SurfLogHeader from '@/components/surf-log/SurfLogHeader';
 import SurfLogInsights from '@/components/surf-log/SurfLogInsights';
 import RecentSessionsList from '@/components/surf-log/RecentSessionsList';
+import SEOFriendlySurfLogPage from '@/components/SEOFriendlySurfLogPage';
 import { useSurfLogInsights } from '@/hooks/useSurfLogInsights';
 
 const SurfLogPage = () => {
   const queryClient = useQueryClient();
+
+  // Check if this is a search engine crawler or bot
+  const isBot = typeof navigator !== 'undefined' && (
+    /bot|crawler|spider|crawling/i.test(navigator.userAgent) ||
+    navigator.userAgent === '' // Often the case for headless crawlers
+  );
+
+  // For SEO/crawlers, show the SEO-friendly version
+  if (isBot) {
+    return <SEOFriendlySurfLogPage />;
+  }
 
   const {
     data: insightsData,

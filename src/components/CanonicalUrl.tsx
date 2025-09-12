@@ -61,6 +61,10 @@ const CanonicalUrl = () => {
       '/privacy-policy': {
         title: 'Privacy Policy | WaveMentor',
         description: 'Learn how WaveMentor protects your privacy and handles your personal data. Complete privacy policy and data protection information.'
+      },
+      '/search': {
+        title: 'Search Surf Spots - Find Perfect Waves | WaveMentor',
+        description: 'Search for surf spots by location, wave type, or conditions. Find the perfect waves for your next surf session with detailed forecasts.'
       }
     };
 
