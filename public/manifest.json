@@ -1,7 +1,7 @@
 
 {
-  "name": "WaveMentor - Smart Surf Forecasting",
-  "short_name": "WaveMentor",
+  "name": "Wave Mentor - Smart Surf Forecasting",
+  "short_name": "Wave Mentor",
   "description": "AI-powered surf forecasting with live cameras, crowd reports, and personalized coaching",
   "start_url": "/",
   "display": "standalone",
