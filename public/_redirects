@@ -10,8 +10,8 @@ http://www.wavementor.com/*   https://www.wavementor.com/:splat  301!
 /admin/                       /admin                             301!
 /book-sessions/               /book-sessions                     301!
 
-# Remove trailing slashes for SEO consistency
-/*                            /:splat                            301!
+# Remove trailing slashes for SEO consistency - but preserve query params
+/*                            /:splat                            301
 
 # SPA routing - must be last
 /api/*                        /api/:splat                        200

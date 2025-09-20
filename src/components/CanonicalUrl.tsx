@@ -20,6 +20,12 @@ const CanonicalUrl = () => {
     const baseUrl = 'https://www.wavementor.com';
     let canonicalPath = location.pathname;
     
+    // Handle search queries properly to avoid soft 404s
+    if (canonicalPath === '/search') {
+      // Always keep search as /search regardless of query params
+      canonicalPath = '/search';
+    }
+    
     // Remove trailing slash except for root and normalize path
     if (canonicalPath !== '/' && canonicalPath.endsWith('/')) {
       canonicalPath = canonicalPath.slice(0, -1);
@@ -35,35 +41,35 @@ const CanonicalUrl = () => {
     // Route-specific metadata for SEO
     const routeMetadata: Record<string, { title: string; description: string }> = {
       '/': {
-        title: 'WaveMentor - AI-Powered Surf Forecasting & Community',
+        title: 'Wave Mentor - AI-Powered Surf Forecasting & Community',
         description: 'Get real-time surf conditions, AI-powered wave predictions, and connect with the global surfing community. Premium surf forecasting tools for surfers worldwide.'
       },
       '/live-spots': {
-        title: 'Live Surf Spots - Real-Time Conditions | WaveMentor',
+        title: 'Live Surf Spots - Real-Time Conditions | Wave Mentor',
         description: 'View live surf conditions from cameras around the world. Real-time wave height, wind, and weather data for the best surf spots globally.'
       },
       '/map': {
-        title: 'Interactive Surf Spot Map - Global Locations | WaveMentor',
+        title: 'Interactive Surf Spot Map - Global Locations | Wave Mentor',
         description: 'Explore surf spots worldwide with our interactive map. Find wave conditions, local crowds, and detailed forecasts for thousands of locations.'
       },
       '/surf-log': {
-        title: 'Surf Session Log & Analytics - Track Your Progress | WaveMentor',
+        title: 'Surf Session Log & Analytics - Track Your Progress | Wave Mentor',
         description: 'Log your surf sessions and track your progress with AI-powered analytics. Get personalized insights and improve your surfing performance.'
       },
       '/book-sessions': {
-        title: 'Book Surf Lessons & Coaching Sessions | WaveMentor',
+        title: 'Book Surf Lessons & Coaching Sessions | Wave Mentor',
         description: 'Book professional surf lessons and coaching sessions with certified instructors. Improve your skills with personalized mentorship programs.'
       },
       '/surf-blog': {
-        title: 'World\'s Best Surf Spots - Epic Wave Guides | WaveMentor',
+        title: 'World\'s Best Surf Spots - Epic Wave Guides | Wave Mentor',
         description: 'Discover the most epic surf spots on the planet. Complete guides to legendary breaks, from perfect barrels to massive swells worldwide.'
       },
       '/privacy-policy': {
-        title: 'Privacy Policy | WaveMentor',
-        description: 'Learn how WaveMentor protects your privacy and handles your personal data. Complete privacy policy and data protection information.'
+        title: 'Privacy Policy | Wave Mentor',
+        description: 'Learn how Wave Mentor protects your privacy and handles your personal data. Complete privacy policy and data protection information.'
       },
       '/search': {
-        title: 'Search Surf Spots - Find Perfect Waves | WaveMentor',
+        title: 'Search Surf Spots - Find Perfect Waves | Wave Mentor',
         description: 'Search for surf spots by location, wave type, or conditions. Find the perfect waves for your next surf session with detailed forecasts.'
       }
     };
@@ -132,7 +138,7 @@ const CanonicalUrl = () => {
       "url": `${baseUrl}${canonicalPath}`,
       "isPartOf": {
         "@type": "WebSite",
-        "name": "WaveMentor",
+        "name": "Wave Mentor",
         "url": baseUrl
       }
     };
