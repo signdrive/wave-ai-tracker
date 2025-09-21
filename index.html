@@ -21,6 +21,15 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     
+    <!-- Critical CSS inlined for faster first paint -->
+    <style>
+      /* Critical above-the-fold styles */
+      body { margin: 0; font-family: 'Inter', sans-serif; background: hsl(195 100% 98%); color: hsl(200 50% 20%); }
+      #root { min-height: 100vh; }
+      .css-loading { opacity: 0; transition: opacity 0.3s ease; }
+      .css-loaded { opacity: 1; }
+    </style>
+    
     <!-- PWA Icons -->
     <link rel="icon" type="image/svg+xml" href="/placeholder.svg" />
     <link rel="apple-touch-icon" href="/placeholder.svg" />

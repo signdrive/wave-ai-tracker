@@ -74,8 +74,10 @@ export default defineConfig(({ mode }) => {
         },
       },
       // CSS optimization to reduce render-blocking
-      cssCodeSplit: true,
+      cssCodeSplit: false, // Bundle CSS into single file for better caching
       cssMinify: true,
+      // Inline critical CSS for faster initial render
+      cssTarget: 'esnext',
       // Enable source maps in production for debugging
       sourcemap: mode === 'production' ? 'hidden' : true,
       // Optimize bundle size
