@@ -7,6 +7,39 @@ import { MapPin, Globe, Waves } from 'lucide-react';
 // This component provides SEO-friendly content for search engines
 // while actual functionality remains behind the premium gate
 const SEOFriendlyMapPage = () => {
+  // Add structured data for better SEO
+  React.useEffect(() => {
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Interactive Surf Spot Map - Global Locations | Wave Mentor",
+      "description": "Explore surf spots worldwide with our interactive map. Find wave conditions, local crowds, and detailed forecasts for thousands of locations.",
+      "url": "https://www.wavementor.com/map",
+      "mainEntity": {
+        "@type": "Map",
+        "name": "Global Surf Spot Map",
+        "description": "Interactive map showing surf spots worldwide with real-time conditions"
+      },
+      "about": {
+        "@type": "Thing",
+        "name": "Surf Spots",
+        "description": "Surfing locations around the world"
+      }
+    };
+
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.textContent = JSON.stringify(structuredData);
+    document.head.appendChild(script);
+
+    return () => {
+      const existingScript = document.querySelector('script[type="application/ld+json"]');
+      if (existingScript) {
+        existingScript.remove();
+      }
+    };
+  }, []);
+
   return (
     <div className="bg-gradient-to-br from-ocean/5 to-sand/20 min-h-screen">
       <div className="container mx-auto px-4 py-8">

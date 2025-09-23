@@ -7,8 +7,13 @@ http://www.wavementor.com/*   https://www.wavementor.com/:splat  301!
 # Handle specific problematic redirects from Search Console
 /privacy-policy/              /privacy-policy                    301!
 /map/                         /map                               301!
+/surf-log/                    /surf-log                          301!
 /admin/                       /admin                             301!
 /book-sessions/               /book-sessions                     301!
+
+# Force canonical URLs for better indexing
+https://wavementor.com/map    https://www.wavementor.com/map     301!
+https://wavementor.com/surf-log https://www.wavementor.com/surf-log 301!
 
 # Remove trailing slashes for SEO consistency - but preserve query params
 /*                            /:splat                            301

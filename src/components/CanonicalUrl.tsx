@@ -26,6 +26,15 @@ const CanonicalUrl = () => {
       canonicalPath = '/search';
     }
     
+    // Force canonical domain consistency
+    if (canonicalPath === '/map') {
+      canonicalPath = '/map';
+    }
+    
+    if (canonicalPath === '/surf-log') {
+      canonicalPath = '/surf-log';
+    }
+    
     // Remove trailing slash except for root and normalize path
     if (canonicalPath !== '/' && canonicalPath.endsWith('/')) {
       canonicalPath = canonicalPath.slice(0, -1);

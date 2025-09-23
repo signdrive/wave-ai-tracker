@@ -3,6 +3,13 @@
 User-agent: *
 Allow: /
 
+# Allow important pages explicitly
+Allow: /map
+Allow: /surf-log
+Allow: /search
+Allow: /live-spots
+Allow: /surf-blog
+
 # Prevent indexing of redirect URLs and duplicates
 Disallow: /*#
 Disallow: /*?*redirect*
@@ -12,6 +19,7 @@ Disallow: /*?*sessionid*
 Disallow: /admin/
 Disallow: /api/
 Disallow: /auth/callback
+Disallow: /search?q=*
 # Remove trailing slash blocking to prevent issues
 
 # Block specific crawlers that might cause issues
