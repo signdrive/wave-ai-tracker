@@ -6,12 +6,44 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, MapPin, Star, Users, Waves, Calendar, Compass, AlertTriangle, Camera, Wind, Thermometer } from 'lucide-react';
 import surfSpotsData from '@/data/surfSpotsBlog.json';
+import expandedSurfSpotsData from '@/data/expandedSurfSpotsBlog.json';
 import CanonicalUrl from '@/components/CanonicalUrl';
 import NotFound from './NotFound';
 
 const SurfSpotDetailPage = () => {
   const { spotId } = useParams();
-  const spot = surfSpotsData.featured_spots.find(s => s.id === spotId);
+  
+  // Check both data sources for the surf spot
+  let spot = surfSpotsData.featured_spots.find(s => s.id === spotId);
+  let isExpandedSpot = false;
+  
+  if (!spot) {
+    const expandedSpot = expandedSurfSpotsData.new_surf_spots.find(s => s.id === spotId);
+    if (expandedSpot) {
+      // Transform expanded spot data to match expected format
+      spot = {
+        id: expandedSpot.id,
+        name: expandedSpot.name,
+        location: expandedSpot.location || `${expandedSpot.country}`,
+        country: expandedSpot.country,
+        difficulty: expandedSpot.difficulty,
+        wave_type: expandedSpot.wave_type || expandedSpot.waveType || 'Unknown',
+        best_season: expandedSpot.best_season || 'Year Round',
+        coordinates: expandedSpot.coordinates,
+        featured_image: expandedSpot.featured_image || '/images/default-surf-spot.jpg',
+        excerpt: expandedSpot.excerpt || expandedSpot.description || 'A legendary surf spot.',
+        rating: expandedSpot.rating || 4,
+        crowd_level: expandedSpot.crowd_level || 'Medium',
+        break_type: expandedSpot.break_type || 'Reef Break',
+        wave_direction: expandedSpot.wave_direction || expandedSpot.bestSwellDirection || 'Various',
+        optimal_swell: expandedSpot.optimal_swell || 'Variable',
+        best_tide: expandedSpot.best_tide || expandedSpot.bestTide || 'All Tides',
+        hazards: expandedSpot.hazards || [],
+        nearby_spots: expandedSpot.nearby_spots || []
+      };
+      isExpandedSpot = true;
+    }
+  }
 
   if (!spot) {
     return <NotFound />;

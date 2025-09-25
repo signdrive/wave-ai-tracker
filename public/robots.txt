@@ -10,6 +10,14 @@ Allow: /search
 Allow: /live-spots
 Allow: /surf-blog
 
+# Allow specific surf spots that were showing as soft 404s
+Allow: /surf-spots/skeleton-bay-namibia
+Allow: /surf-spots/raglan-new-zealand
+Allow: /surf-spots/padang-padang-bali
+Allow: /surf-spots/trestles-california
+Allow: /surf-spots/chicama-peru
+Allow: /surf-spots/mundaka-spain
+
 # Prevent indexing of redirect URLs and duplicates
 Disallow: /*#
 Disallow: /*?*redirect*
@@ -32,6 +40,7 @@ Disallow: /
 # Canonical sitemap and host
 Host: https://www.wavementor.com
 Sitemap: https://www.wavementor.com/sitemap.xml
+Sitemap: https://www.wavementor.com/surf-spots-sitemap.xml
 
 # Crawl delays for better server performance
 User-agent: Googlebot
