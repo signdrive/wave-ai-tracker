@@ -40,7 +40,9 @@ Disallow: /
 # Canonical sitemap and host
 Host: https://www.wavementor.com
 Sitemap: https://www.wavementor.com/sitemap.xml
+Sitemap: https://www.wavementor.com/main-sitemap.xml
 Sitemap: https://www.wavementor.com/surf-spots-sitemap.xml
+Sitemap: https://www.wavementor.com/blog-sitemap.xml
 
 # Crawl delays for better server performance
 User-agent: Googlebot
