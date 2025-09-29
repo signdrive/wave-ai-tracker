@@ -3,7 +3,7 @@
   <!-- Homepage -->
   <url>
     <loc>https://www.wavementor.com/</loc>
-    <lastmod>2025-09-28</lastmod>
+    <lastmod>2025-09-29</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -69,25 +69,25 @@
   <!-- Learning & Development -->
   <url>
     <loc>https://www.wavementor.com/lessons</loc>
-    <lastmod>2025-09-28</lastmod>
+    <lastmod>2025-09-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.wavementor.com/analytics</loc>
-    <lastmod>2025-09-28</lastmod>
+    <lastmod>2025-09-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.wavementor.com/challenges</loc>
-    <lastmod>2025-09-28</lastmod>
+    <lastmod>2025-09-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
     <loc>https://www.wavementor.com/gamification</loc>
-    <lastmod>2025-09-28</lastmod>
+    <lastmod>2025-09-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
