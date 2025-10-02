@@ -330,6 +330,130 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* SEO Navigation - Crawlable Links for Search Engines */}
+      <section className="py-12 bg-gray-50 dark:bg-gray-900">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+              Explore WaveMentor
+            </h2>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
+              Discover all features and surf spots available on our platform
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-8">
+            {/* Main Features */}
+            <div>
+              <h3 className="font-semibold text-lg mb-3 text-gray-900 dark:text-white">Main Features</h3>
+              <ul className="space-y-2">
+                <li><a href="/" className="text-blue-600 hover:underline">Home</a></li>
+                <li><a href="/map" className="text-blue-600 hover:underline">Interactive Surf Map</a></li>
+                <li><a href="/live-spots" className="text-blue-600 hover:underline">Live Surf Spots & Cams</a></li>
+                <li><a href="/surf-blog" className="text-blue-600 hover:underline">Surf Blog & Guides</a></li>
+                <li><a href="/search" className="text-blue-600 hover:underline">Search Spots</a></li>
+                <li><a href="/dashboard" className="text-blue-600 hover:underline">Dashboard</a></li>
+              </ul>
+            </div>
+
+            {/* Learning & Coaching */}
+            <div>
+              <h3 className="font-semibold text-lg mb-3 text-gray-900 dark:text-white">Learning & Coaching</h3>
+              <ul className="space-y-2">
+                <li><a href="/surf-log" className="text-blue-600 hover:underline">Surf Log & Tracking</a></li>
+                <li><a href="/mentorship" className="text-blue-600 hover:underline">Surf Mentorship</a></li>
+                <li><a href="/lessons" className="text-blue-600 hover:underline">Surf Lessons</a></li>
+                <li><a href="/book-sessions" className="text-blue-600 hover:underline">Book Coaching Sessions</a></li>
+                <li><a href="/challenges" className="text-blue-600 hover:underline">Surf Challenges</a></li>
+                <li><a href="/analytics" className="text-blue-600 hover:underline">Performance Analytics</a></li>
+              </ul>
+            </div>
+
+            {/* Community & Discovery */}
+            <div>
+              <h3 className="font-semibold text-lg mb-3 text-gray-900 dark:text-white">Community</h3>
+              <ul className="space-y-2">
+                <li><a href="/community" className="text-blue-600 hover:underline">Surf Community Hub</a></li>
+                <li><a href="/discovery" className="text-blue-600 hover:underline">Spot Discovery</a></li>
+                <li><a href="/gamification" className="text-blue-600 hover:underline">Leaderboards & Achievements</a></li>
+                <li><a href="/marketplace" className="text-blue-600 hover:underline">Marketplace</a></li>
+                <li><a href="/travel" className="text-blue-600 hover:underline">Surf Travel Packages</a></li>
+              </ul>
+            </div>
+
+            {/* Premium & Tools */}
+            <div>
+              <h3 className="font-semibold text-lg mb-3 text-gray-900 dark:text-white">Premium & Tools</h3>
+              <ul className="space-y-2">
+                <li><a href="/premium" className="text-blue-600 hover:underline">Premium Features</a></li>
+                <li><a href="/premium-weather" className="text-blue-600 hover:underline">Premium Weather</a></li>
+                <li><a href="/notifications" className="text-blue-600 hover:underline">Notifications</a></li>
+                <li><a href="/safety" className="text-blue-600 hover:underline">Safety Resources</a></li>
+                <li><a href="/privacy-settings" className="text-blue-600 hover:underline">Privacy Settings</a></li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Featured Surf Spots - Crawlable Links */}
+          <div className="mt-12">
+            <h3 className="font-semibold text-xl mb-6 text-center text-gray-900 dark:text-white">
+              Featured Surf Spots Around the World
+            </h3>
+            <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-4">
+              <div>
+                <ul className="space-y-2 text-sm">
+                  <li><a href="/surf-spots/pipeline-oahu" className="text-blue-600 hover:underline">Pipeline, Oahu</a></li>
+                  <li><a href="/surf-spots/jeffreys-bay" className="text-blue-600 hover:underline">Jeffreys Bay, SA</a></li>
+                  <li><a href="/surf-spots/uluwatu-bali" className="text-blue-600 hover:underline">Uluwatu, Bali</a></li>
+                  <li><a href="/surf-spots/teahupoo-tahiti" className="text-blue-600 hover:underline">Teahupo'o, Tahiti</a></li>
+                </ul>
+              </div>
+              <div>
+                <ul className="space-y-2 text-sm">
+                  <li><a href="/surf-spots/hossegor-france" className="text-blue-600 hover:underline">Hossegor, France</a></li>
+                  <li><a href="/surf-spots/superbank-gold-coast" className="text-blue-600 hover:underline">Superbank, AU</a></li>
+                  <li><a href="/surf-spots/mavericks-california" className="text-blue-600 hover:underline">Mavericks, CA</a></li>
+                  <li><a href="/surf-spots/cloudbreak-fiji" className="text-blue-600 hover:underline">Cloudbreak, Fiji</a></li>
+                </ul>
+              </div>
+              <div>
+                <ul className="space-y-2 text-sm">
+                  <li><a href="/surf-spots/puerto-escondido-mexico" className="text-blue-600 hover:underline">Puerto Escondido</a></li>
+                  <li><a href="/surf-spots/skeleton-bay-namibia" className="text-blue-600 hover:underline">Skeleton Bay</a></li>
+                  <li><a href="/surf-spots/raglan-new-zealand" className="text-blue-600 hover:underline">Raglan, NZ</a></li>
+                  <li><a href="/surf-spots/trestles-california" className="text-blue-600 hover:underline">Trestles, CA</a></li>
+                </ul>
+              </div>
+              <div>
+                <ul className="space-y-2 text-sm">
+                  <li><a href="/surf-spots/mundaka-spain" className="text-blue-600 hover:underline">Mundaka, Spain</a></li>
+                  <li><a href="/surf-spots/chicama-peru" className="text-blue-600 hover:underline">Chicama, Peru</a></li>
+                  <li><a href="/surf-spots/padang-padang-bali" className="text-blue-600 hover:underline">Padang Padang</a></li>
+                  <li><a href="/surf-spots/ericeira-portugal" className="text-blue-600 hover:underline">Ericeira, Portugal</a></li>
+                </ul>
+              </div>
+              <div>
+                <ul className="space-y-2 text-sm">
+                  <li><a href="/surf-spots/bells-beach-australia" className="text-blue-600 hover:underline">Bells Beach, AU</a></li>
+                  <li><a href="/surf-spots/malibu-california" className="text-blue-600 hover:underline">Malibu, CA</a></li>
+                  <li><a href="/surf-spots/taghazout-morocco" className="text-blue-600 hover:underline">Taghazout, Morocco</a></li>
+                  <li><a href="/sitemap.html" className="text-blue-600 hover:underline font-semibold">View All Spots →</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Legal Links */}
+          <div className="mt-8 text-center border-t border-gray-200 dark:border-gray-700 pt-6">
+            <div className="flex flex-wrap justify-center gap-6 text-sm">
+              <a href="/privacy-policy" className="text-gray-600 dark:text-gray-400 hover:text-blue-600">Privacy Policy</a>
+              <a href="/gdpr-compliance" className="text-gray-600 dark:text-gray-400 hover:text-blue-600">GDPR Compliance</a>
+              <a href="/sitemap.html" className="text-gray-600 dark:text-gray-400 hover:text-blue-600">Full Sitemap</a>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };
