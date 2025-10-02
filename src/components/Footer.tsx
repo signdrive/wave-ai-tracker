@@ -126,7 +126,8 @@ const Footer: React.FC = () => {
         <div className="border-t border-gray-700 mt-12 pt-8 text-sm text-gray-400">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p>© 2024 WaveMentor. All rights reserved. | GDPR Compliant | SOC 2 Audited</p>
-            <div className="flex space-x-6 mt-4 md:mt-0">
+            <div className="flex flex-wrap gap-4 md:gap-6 mt-4 md:mt-0 justify-center">
+              <a href="/sitemap.html" className="hover:text-white">Sitemap</a>
               <Link to="/privacy-policy" className="hover:text-white">Privacy Policy</Link>
               <Link to="/gdpr-compliance" className="hover:text-white">GDPR Center</Link>
               <a href="#" className="hover:text-white">Terms of Service</a>

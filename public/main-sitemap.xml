@@ -159,4 +159,12 @@
     <changefreq>monthly</changefreq>
     <priority>0.3</priority>
   </url>
+  
+  <!-- HTML Sitemap -->
+  <url>
+    <loc>https://www.wavementor.com/sitemap.html</loc>
+    <lastmod>2025-10-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
 </urlset>

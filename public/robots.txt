@@ -44,6 +44,9 @@ Sitemap: https://www.wavementor.com/main-sitemap.xml
 Sitemap: https://www.wavementor.com/surf-spots-sitemap.xml
 Sitemap: https://www.wavementor.com/blog-sitemap.xml
 
+# HTML Sitemap for human-readable navigation
+# https://www.wavementor.com/sitemap.html
+
 # Crawl delays for better server performance
 User-agent: Googlebot
 Crawl-delay: 1
