@@ -373,6 +373,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fcm_tokens_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_mentor_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       gdpr_consents: {
@@ -854,6 +861,13 @@ export type Database = {
             columns: ["reported_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parking_spots_reported_by_fkey"
+            columns: ["reported_by"]
+            isOneToOne: false
+            referencedRelation: "public_mentor_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1450,6 +1464,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "spot_reports_reporter_id_fkey"
+            columns: ["reporter_id"]
+            isOneToOne: false
+            referencedRelation: "public_mentor_profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "spot_reports_spot_id_fkey"
             columns: ["spot_id"]
             isOneToOne: false
@@ -1492,6 +1513,13 @@ export type Database = {
             columns: ["reviewer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "spot_reviews_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "public_mentor_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -2196,6 +2224,42 @@ export type Database = {
           f_table_schema?: unknown | null
           srid?: number | null
           type?: string | null
+        }
+        Relationships: []
+      }
+      public_mentor_profiles: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          certification_level: string | null
+          hourly_rate: number | null
+          id: string | null
+          reputation_score: number | null
+          user_type: string | null
+          username: string | null
+          years_experience: number | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          certification_level?: string | null
+          hourly_rate?: number | null
+          id?: string | null
+          reputation_score?: number | null
+          user_type?: string | null
+          username?: string | null
+          years_experience?: number | null
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          certification_level?: string | null
+          hourly_rate?: number | null
+          id?: string | null
+          reputation_score?: number | null
+          user_type?: string | null
+          username?: string | null
+          years_experience?: number | null
         }
         Relationships: []
       }

@@ -265,25 +265,10 @@ class AdminSecurityService {
     return 'unknown';
   }
 
-  // Emergency break-glass procedure
-  async emergencyAccess(emergencyCode: string): Promise<boolean> {
-    // This should be a secure emergency code known only to system administrators
-    const validEmergencyCode = 'EMERGENCY_2024';
-    
-    if (emergencyCode === validEmergencyCode) {
-      await this.logSecurityEvent({
-        userId: 'system',
-        action: 'emergency_access_used',
-        resource: 'system',
-        severity: 'critical',
-        details: { timestamp: Date.now() },
-        timestamp: Date.now()
-      });
-      return true;
-    }
-    
-    return false;
-  }
+  // REMOVED: Emergency access function removed for security.
+  // If emergency access is needed, implement server-side verification
+  // with proper authentication, audit logging, and notification systems.
+  // Never use hardcoded credentials in client-side code.
 
   // Clean up expired sessions
   cleanupExpiredSessions(): void {

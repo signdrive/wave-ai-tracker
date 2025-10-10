@@ -68,23 +68,8 @@ const SecureAdminLogin: React.FC<SecureAdminLoginProps> = ({ onSuccess }) => {
 
   const handleEmergencyAccess = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      const granted = await adminSecurityService.emergencyAccess(emergencyCode);
-      
-      if (granted) {
-        toast.success('Emergency access granted');
-        onSuccess('admin');
-      } else {
-        setError('Invalid emergency code');
-      }
-    } catch (error) {
-      setError('Emergency access error');
-    } finally {
-      setLoading(false);
-    }
+    setError('Emergency access has been removed for security. Please use the standard password reset flow or contact system administrator.');
+    toast.error('Emergency access disabled');
   };
 
   return (
