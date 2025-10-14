@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Helmet } from 'react-helmet';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,6 +8,7 @@ import Hero from '@/components/Hero';
 import EnhancedSurfInterface from '@/components/EnhancedSurfInterface';
 import SearchableWeatherForecast from '@/components/SearchableWeatherForecast';
 import MonetizationShowcase from '@/components/MonetizationShowcase';
+import StructuredData from '@/components/StructuredData';
 import { Link } from 'react-router-dom';
 import { 
   Waves, 
@@ -26,6 +28,28 @@ import {
 const Index = () => {
   return (
     <div className="min-h-screen">
+      <Helmet>
+        <title>WaveMentor - AI-Powered Surf Forecasting & Live Surf Cams | Expert Surf Coaching</title>
+        <meta name="description" content="WaveMentor is the ultimate surf intelligence platform with AI-powered wave predictions, live surf cams, expert coaching, and global surf spot database. Join thousands of surfers worldwide for accurate forecasts and personalized surf experiences." />
+        <meta name="keywords" content="surf forecast, surf report, surf cams, live surf, wave predictions, surf coaching, surf spots, surf travel, surf analytics, AI surf forecasting" />
+        <link rel="canonical" href="https://www.wavementor.com/" />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="WaveMentor - Ultimate Surf Intelligence Platform" />
+        <meta property="og:description" content="AI-powered surf forecasting with 95% accuracy. Live cams, expert coaching, and global surf spot database." />
+        <meta property="og:url" content="https://www.wavementor.com/" />
+        <meta property="og:site_name" content="WaveMentor" />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="WaveMentor - AI-Powered Surf Forecasting" />
+        <meta name="twitter:description" content="Get accurate surf forecasts, live cams, and expert coaching. Join thousands of surfers worldwide." />
+      </Helmet>
+      
+      <StructuredData type="Organization" />
+      <StructuredData type="WebSite" />
+      
       <Hero />
       
       {/* Main Content Section with SEO-friendly text */}
