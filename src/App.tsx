@@ -36,6 +36,7 @@ import SurfBlogPage from '@/pages/SurfBlogPage';
 import ExpandedSurfBlogPage from '@/pages/ExpandedSurfBlogPage';
 import SurfSpotDetailPage from '@/pages/SurfSpotDetailPage';
 import SearchPage from '@/pages/SearchPage';
+import { Dashboard } from '@/pages/Dashboard';
 import { PWAInstallPrompt } from '@/components/PWAInstallPrompt';
 
 const queryClient = new QueryClient();
@@ -51,6 +52,7 @@ function App() {
             <main className="pt-16 flex-grow">
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/live-spots" element={<LiveSpotsPage />} />
                 <Route path="/book-sessions" element={<BookSessionsPage />} />
                 <Route path="/surf-log" element={<SurfLogPage />} />

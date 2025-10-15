@@ -7,7 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, MapPin, Star, Users, Waves, Calendar, Compass, AlertTriangle, Camera, Wind, Thermometer } from 'lucide-react';
 import surfSpotsData from '@/data/surfSpotsBlog.json';
 import expandedSurfSpotsData from '@/data/expandedSurfSpotsBlog.json';
-import CanonicalUrl from '@/components/CanonicalUrl';
+import { Helmet } from 'react-helmet';
 import NotFound from './NotFound';
 
 const SurfSpotDetailPage = () => {
@@ -98,9 +98,52 @@ const SurfSpotDetailPage = () => {
 
   const content = generateDetailedContent(spot);
 
+  const canonicalUrl = `https://www.wavementor.com/surf-spots/${spotId}`;
+  const pageTitle = `${spot.name}, ${spot.country} - Surf Guide, Forecast & Conditions | WaveMentor`;
+  const pageDescription = `${spot.excerpt} Explore comprehensive surf guide for ${spot.name} including wave characteristics, best conditions, local insights, and ${spot.difficulty.toLowerCase()} difficulty rating.`;
+
   return (
     <>
-      <CanonicalUrl />
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <meta name="keywords" content={`${spot.name}, surf ${spot.location}, ${spot.country} surf spots, ${spot.wave_type}, ${spot.difficulty} surfing, surf forecast ${spot.location}`} />
+        <link rel="canonical" href={canonicalUrl} />
+        
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:site_name" content="WaveMentor" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Place",
+            "name": `${spot.name} Surf Spot`,
+            "description": pageDescription,
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": spot.coordinates[0],
+              "longitude": spot.coordinates[1]
+            },
+            "address": {
+              "@type": "PostalAddress",
+              "addressCountry": spot.country,
+              "addressRegion": spot.location
+            },
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": spot.rating,
+              "bestRating": 5
+            }
+          })}
+        </script>
+      </Helmet>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-cyan-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900">
         {/* Hero Section */}
         <section className="relative h-96 bg-gradient-to-r from-blue-600 to-cyan-600 overflow-hidden">
