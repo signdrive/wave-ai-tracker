@@ -3,14 +3,18 @@
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <sitemap>
     <loc>https://www.wavementor.com/main-sitemap.xml</loc>
-    <lastmod>2025-10-14</lastmod>
+    <lastmod>2025-11-05</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://www.wavementor.com/surf-spots-sitemap.xml</loc>
-    <lastmod>2025-10-14</lastmod>
+    <lastmod>2025-11-05</lastmod>
   </sitemap>
   <sitemap>
     <loc>https://www.wavementor.com/blog-sitemap.xml</loc>
-    <lastmod>2025-10-14</lastmod>
+    <lastmod>2025-11-05</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>https://www.wavementor.com/search-sitemap.xml</loc>
+    <lastmod>2025-11-05</lastmod>
   </sitemap>
 </sitemapindex>
