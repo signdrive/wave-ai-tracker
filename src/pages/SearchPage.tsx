@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,6 +11,14 @@ const SearchPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const query = searchParams.get('q') || '';
+
+  const canonicalUrl = 'https://www.wavementor.com/search';
+  const pageTitle = query 
+    ? `Surf Spots: ${query} - Search Results | WaveMentor`
+    : 'Search Surf Spots - Find Your Perfect Wave | WaveMentor';
+  const pageDescription = query
+    ? `Search results for "${query}". Find surf spots by location, wave type, and difficulty level. Real-time conditions and forecasts for surfers worldwide.`
+    : 'Search thousands of surf spots worldwide by location, wave type, and difficulty. Discover your perfect surf destination with live conditions and forecasts.';
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,8 +40,43 @@ const SearchPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ocean/5 to-sand/20">
-      <div className="container mx-auto px-4 py-8">
+    <>
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <meta name="keywords" content="surf spot search, find surf spots, surf location search, wave conditions, surf forecast, beach finder, surf destinations" />
+        <link rel="canonical" href={canonicalUrl} />
+        
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:site_name" content="WaveMentor" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": pageTitle,
+            "description": pageDescription,
+            "url": canonicalUrl,
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://www.wavementor.com/search?q={search_term}"
+              },
+              "query-input": "required name=search_term"
+            }
+          })}
+        </script>
+      </Helmet>
+      <div className="min-h-screen bg-gradient-to-br from-ocean/5 to-sand/20">
+        <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto space-y-8">
           {/* SEO-optimized Header */}
           <header className="text-center space-y-4">
@@ -182,8 +226,9 @@ const SearchPage = () => {
             </div>
           )}
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

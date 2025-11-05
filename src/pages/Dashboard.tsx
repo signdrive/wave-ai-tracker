@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -13,6 +14,10 @@ import CrowdReportForm from '@/components/crowd-feature/CrowdReportForm';
 
 export const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState('overview');
+
+  const canonicalUrl = 'https://www.wavementor.com/dashboard';
+  const pageTitle = 'Surf Dashboard - AI Predictions & Real-Time Conditions | WaveMentor';
+  const pageDescription = 'Your complete surf intelligence dashboard with AI-powered wave predictions, real-time surf conditions, crowd reports, and advanced analytics for surfers worldwide.';
 
   const surfConditions = [
     {
@@ -54,11 +59,43 @@ export const Dashboard: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-ocean-dark mb-2">WaveMentor Dashboard</h1>
-        <p className="text-gray-600">Your complete surf intelligence platform with AI predictions and real-time data</p>
-      </div>
+    <>
+      <Helmet>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <meta name="keywords" content="surf dashboard, AI surf forecast, real-time surf conditions, wave predictions, surf analytics, crowd intelligence, surf spots" />
+        <link rel="canonical" href={canonicalUrl} />
+        
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        <meta property="og:url" content={canonicalUrl} />
+        <meta property="og:site_name" content="WaveMentor" />
+        
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        
+        <script type="application/ld+json">
+          {JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "WaveMentor Dashboard",
+            "description": pageDescription,
+            "url": canonicalUrl,
+            "applicationCategory": "SportsApplication",
+            "offers": {
+              "@type": "Offer",
+              "category": "Surfing Analytics"
+            }
+          })}
+        </script>
+      </Helmet>
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-ocean-dark mb-2">WaveMentor Dashboard</h1>
+          <p className="text-gray-600">Your complete surf intelligence platform with AI predictions and real-time data</p>
+        </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
@@ -242,6 +279,7 @@ export const Dashboard: React.FC = () => {
           <AdvancedAnalyticsDashboard />
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+    </>
   );
 };
